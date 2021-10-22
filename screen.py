@@ -17,7 +17,7 @@ import shutil
 from multiprocessing import Pool
 # from multiprocessing import Value
 
-run_days = 20
+run_days = 30
 backward = 200
 
 EMA_Indicator = True
@@ -153,23 +153,29 @@ def run(file):                   #把要执行的代码写到run函数里面 线
 def run_all_by_date(date):
     # i = (end - date).days
     processed_data_files = os.listdir(processed_data_path)
+    isPathExists = os.path.exists(screened_data_path + str(date))
+    screened_data_files = []
+    if isPathExists:
+        screened_data_files = os.listdir(screened_data_path + str(date))
+
     for file in processed_data_files:
-        if (str(date) == '2021-10-12') & (file == 'HX.csv'):
-            print('HX.csv')
-        df = pd.read_csv(processed_data_path + f'/{file}')
-        if str(date) not in df.date.values:
-            continue
-        df_slice = df[0:df[df.date == str(date)].index[0]+1].reset_index(drop=True)
-        if (len(df_slice)) <= backward+2:
-            continue
-        # df_slice = df[0:len(df)-i].reset_index(drop=True)
-        history_day = df_slice.date[df_slice.index[-1]]
-        history_screened_data_path = screened_data_path + f'{history_day}'
-        isPathExists = os.path.exists(history_screened_data_path)
-        if not isPathExists:
-            os.makedirs(history_screened_data_path,exist_ok=True)
-        isTickerExists = os.path.exists(history_screened_data_path + f'/{file}')
-        if not isTickerExists:
+        # isTickerExists = os.path.exists(screened_data_path + str(date) + f'/{file}')
+        # if not isTickerExists:
+        if file not in screened_data_files:
+            df = pd.read_csv(processed_data_path + f'/{file}')
+            if str(date) not in df.date.values:
+                continue
+            df_slice = df[0:df[df.date == str(date)].index[0]+1].reset_index(drop=True)
+            if (len(df_slice)) <= backward+2:
+                continue
+            # df_slice = df[0:len(df)-i].reset_index(drop=True)
+            history_day = df_slice.date[df_slice.index[-1]]
+            history_screened_data_path = screened_data_path + f'{history_day}'
+            isPathExists = os.path.exists(history_screened_data_path)
+            if not isPathExists:
+                os.makedirs(history_screened_data_path,exist_ok=True)
+            # isTickerExists = os.path.exists(history_screened_data_path + f'/{file}')
+            # if not isTickerExists:
             save = screen(df_slice)
             if not save.empty:
                 # history_screened_data_path = screened_data_path+f'{date}'
@@ -199,7 +205,6 @@ if __name__ == '__main__':
         #         shutil.rmtree(screened_data_path+file)
 
     date_list = [end - datetime.timedelta(days=x) for x in range(1,run_days)]
-
     cores = multiprocessing.cpu_count()
     with Pool(cores) as p:
         # p.map(run_all_by_ticker, raw_data_files)
