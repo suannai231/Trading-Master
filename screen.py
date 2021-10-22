@@ -25,7 +25,7 @@ MACD_Indicator = True
 OBV_Indicator = True
 Cum_Turnover_Indicator = True
 Cum_Chip_Indicator = True
-Chip_Concentration_Indicator = True
+Chip_Concentration_Indicator = False
 WR_Indicator = True
 
 obv_convergence = 1
@@ -151,17 +151,18 @@ def run(file):                   #把要执行的代码写到run函数里面 线
     return file
 
 def run_all_by_date(date):
-    if str(date) == '2021-10-12':
-        print('2021-10-12')
-    i = (end - date).days
+    # i = (end - date).days
     processed_data_files = os.listdir(processed_data_path)
     for file in processed_data_files:
-        if file == 'HX.csv':
+        if (str(date) == '2021-10-12') & (file == 'HX.csv'):
             print('HX.csv')
         df = pd.read_csv(processed_data_path + f'/{file}')
-        if (len(df)-i) <= backward+2:
+        if str(date) not in df.date.values:
             continue
-        df_slice = df[0:len(df)-i].reset_index(drop=True)
+        df_slice = df[0:df[df.date == str(date)].index[0]+1].reset_index(drop=True)
+        if (len(df_slice)) <= backward+2:
+            continue
+        # df_slice = df[0:len(df)-i].reset_index(drop=True)
         history_day = df_slice.date[df_slice.index[-1]]
         history_screened_data_path = screened_data_path + f'{history_day}'
         isPathExists = os.path.exists(history_screened_data_path)
@@ -197,7 +198,7 @@ if __name__ == '__main__':
         #     if os.path.isdir(screened_data_path+file):
         #         shutil.rmtree(screened_data_path+file)
 
-    date_list = [end - datetime.timedelta(days=x) for x in range(run_days)]
+    date_list = [end - datetime.timedelta(days=x) for x in range(1,run_days)]
 
     cores = multiprocessing.cpu_count()
     with Pool(cores) as p:
