@@ -17,7 +17,7 @@ import shutil
 from multiprocessing import Pool
 # from multiprocessing import Value
 
-run_days = 20
+run_days = 200
 backward = 200
 
 EMA_Indicator = True
@@ -37,15 +37,15 @@ wr_bar = 40
 wr120_greater_than_50_days_bar = 0.7
 # wr120_greater_than_80_days_bar = 0.6
 
-def screen(origin_df):
-    if len(origin_df) <= backward+2:
-        #print(f'Ticker: {ticker} length is less than {backward}\n')
-        return pd.DataFrame()
+def screen(df):
+    # if len(origin_df) <= backward+2:
+    #     #print(f'Ticker: {ticker} length is less than {backward}\n')
+    #     return pd.DataFrame()
 
-    backward_startindex = len(origin_df)-backward
-    origin_endindex = len(origin_df)
+    # backward_startindex = len(origin_df)-backward
+    # origin_endindex = len(origin_df)
     
-    df = origin_df[backward_startindex:origin_endindex].reset_index(drop=True)
+    # df = origin_df[backward_startindex:origin_endindex].reset_index(drop=True)
 
     startindex = df.index[0]
     endindex = len(df)
@@ -155,15 +155,17 @@ def run_all_by_date(date):
     i = (end - date).days
     processed_data_files = os.listdir(processed_data_path + f'{date}')
     for file in processed_data_files:
-        df = pd.read_csv(processed_data_path + f'{date}' + f'/{file}')
-        if (len(df)-i) <= backward+2:
-            continue
-        df_slice = df[0:len(df)-i].reset_index(drop=True)
-        save = screen(df_slice)
-        if not save.empty:
-            history_day = save.date[save.index[-1]]
-            history_screened_data_path = screened_data_path + f'{history_day}'
-            save.to_csv(history_screened_data_path + f'/{file}')
+        isTickerExists = os.path.exists(screened_data_path + f'{date}' + file)
+        if not isTickerExists:
+            df = pd.read_csv(processed_data_path + f'{date}' + f'/{file}')
+            # if (len(df)-i) <= backward+2:
+            #     continue
+            # df_slice = df[0:len(df)-i].reset_index(drop=True)
+            save = screen(df)
+            if not save.empty:
+                history_day = save.date[save.index[-1]]
+                history_screened_data_path = screened_data_path + f'{history_day}'
+                save.to_csv(history_screened_data_path + f'/{file}')
     return
 
 end = datetime.date.today()
@@ -176,28 +178,28 @@ if __name__ == '__main__':
     if not isPathExists:
         os.makedirs(screened_data_path)
         #print(data_path+"created successfully\n")
-    else:
+    # else:
         # files = os.listdir(screened_data_path)
         # for f in files:
         #     os.remove(os.path.join(screened_data_path,f))
 
-        files = os.listdir(screened_data_path)
-        for file in files:
-            if os.path.isdir(screened_data_path+'/'+file):
-                shutil.rmtree(screened_data_path+'/'+file)
+        # files = os.listdir(screened_data_path)
+        # for file in files:
+        #     if os.path.isdir(screened_data_path+'/'+file):
+        #         shutil.rmtree(screened_data_path+'/'+file)
 
-        date_list = [end - datetime.timedelta(days=x) for x in range(run_days)]
+    date_list = [end - datetime.timedelta(days=x) for x in range(run_days)]
 
-        for i in date_list:
-            history_screened_data_path = screened_data_path+f'/{i}'
-            os.makedirs(history_screened_data_path,exist_ok=True)
+    for i in date_list:
+        history_screened_data_path = screened_data_path+f'/{i}'
+        os.makedirs(history_screened_data_path,exist_ok=True)
 
-        cores = multiprocessing.cpu_count()
-        with Pool(cores) as p:
-            # p.map(run_all_by_ticker, raw_data_files)
-            p.map(run_all_by_date, date_list)
-            p.close()
-            p.join()
+    cores = multiprocessing.cpu_count()
+    with Pool(cores) as p:
+        # p.map(run_all_by_ticker, raw_data_files)
+        p.map(run_all_by_date, date_list)
+        p.close()
+        p.join()
 
 
         # files = os.listdir(screened_data_path)

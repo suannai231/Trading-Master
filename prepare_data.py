@@ -17,7 +17,7 @@ import multiprocessing
 from multiprocessing import Pool
 # from multiprocessing import Value
 
-run_days = 20
+run_days = 200
 backward = 200
 CAP_Limit = 2000000000
 Price_Limit = 30
@@ -141,15 +141,17 @@ def run_all_by_date(date):
     i = (end - date).days
     raw_data_files = os.listdir(raw_data_path)
     for file in raw_data_files:
-        df = pd.read_csv(raw_data_path+'/'+file)
-        if (len(df)-i) <= backward+2:
-            continue
-        df_slice = df[0:len(df)-i].reset_index(drop=True)
-        save = prepare_data(df_slice)
-        if not save.empty:
-            history_day = save.date[save.index[-1]]
-            history_processed_data_path = processed_data_path + f'{history_day}'
-            save.to_csv(history_processed_data_path + f'/{file}')
+        isTickerExists = os.path.exists(processed_data_path + f'{date}' + file)
+        if not isTickerExists:
+            df = pd.read_csv(raw_data_path+'/'+file)
+            if (len(df)-i) <= backward+2:
+                continue
+            df_slice = df[0:len(df)-i].reset_index(drop=True)
+            save = prepare_data(df_slice)
+            if not save.empty:
+                history_day = save.date[save.index[-1]]
+                history_processed_data_path = processed_data_path + f'{history_day}'
+                save.to_csv(history_processed_data_path + f'/{file}')
     return
 
 end = datetime.date.today()
@@ -160,15 +162,15 @@ if __name__ == '__main__':
     isPathExists = os.path.exists(processed_data_path)
     if not isPathExists:
         os.makedirs(processed_data_path)
-    else:
+    # else:
         # files = os.listdir(processed_data_path)
         # for f in files:
         #     os.remove(os.path.join(processed_data_path,f))
 
-        files = os.listdir(processed_data_path)
-        for file in files:
-            if os.path.isdir(processed_data_path+'/'+file):
-                shutil.rmtree(processed_data_path+'/'+file)
+        # files = os.listdir(processed_data_path)
+        # for file in files:
+        #     if os.path.isdir(processed_data_path+'/'+file):
+        #         shutil.rmtree(processed_data_path+'/'+file)
 
     date_list = [end - datetime.timedelta(days=x) for x in range(run_days)]
 
