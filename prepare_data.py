@@ -171,12 +171,11 @@ if __name__ == '__main__':
             if os.path.isdir(processed_data_path+'/'+file):
                 shutil.rmtree(processed_data_path+'/'+file)
 
-    for i in range(365):
-        history_day = str((datetime.datetime.now() - datetime.timedelta(days=i)).date())
-        history_processed_data_path = processed_data_path+f'/{history_day}'
-        os.makedirs(history_processed_data_path,exist_ok=True)
-
     date_list = [end - datetime.timedelta(days=x) for x in range(run_days)]
+
+    for i in date_list:
+        history_processed_data_path = processed_data_path+f'/{i}'
+        os.makedirs(history_processed_data_path,exist_ok=True)
 
     cores = multiprocessing.cpu_count()
     with Pool(cores) as p:

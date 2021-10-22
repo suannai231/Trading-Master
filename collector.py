@@ -91,3 +91,6 @@ while True:
                 success_num += job.result()
         print(str(success_num)+' tickers raw data have been saved.\n')
         os.popen(f'python C:/Users/jayin/OneDrive/Code/prepare_data.py')
+        break
+    else:
+        break
