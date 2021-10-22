@@ -142,7 +142,7 @@ def run_all_by_date(date):
     for file in raw_data_files:
         df = pd.read_csv(raw_data_path+'/'+file)
         if (len(df)-i) <= backward+2:
-            return
+            continue
         df_slice = df[0:len(df)-i].reset_index(drop=True)
         save = prepare_data(df_slice)
         if not save.empty:
