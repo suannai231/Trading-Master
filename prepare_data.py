@@ -17,6 +17,7 @@ import multiprocessing
 from multiprocessing import Pool
 # from multiprocessing import Value
 
+run_days = 20
 backward = 200
 CAP_Limit = 2000000000
 Price_Limit = 30
@@ -127,7 +128,7 @@ def run_all_by_ticker(file):
     # save = prepare_data(df)
     for i in range(len(df)):
         if (len(df)-i) <= backward+2:
-            break
+            return
         df_slice = df[0:len(df)-i].reset_index(drop=True)
         save = prepare_data(df_slice)
         if not save.empty:
@@ -137,18 +138,17 @@ def run_all_by_ticker(file):
     return
 
 def run_all_by_date(date):
-
-    i = end - date
-    df = pd.read_csv(raw_data_path+'/'+file)
-    
-    if (len(df)-i) <= backward+2:
-        break
-    df_slice = df[0:len(df)-i].reset_index(drop=True)
-    save = prepare_data(df_slice)
-    if not save.empty:
-        history_day = save.date[save.index[-1]]
-        history_processed_data_path = processed_data_path + f'{history_day}'
-        save.to_csv(history_processed_data_path + f'/{file}')
+    i = (end - date).days
+    for file in raw_data_files:
+        df = pd.read_csv(raw_data_path+'/'+file)
+        if (len(df)-i) <= backward+2:
+            return
+        df_slice = df[0:len(df)-i].reset_index(drop=True)
+        save = prepare_data(df_slice)
+        if not save.empty:
+            history_day = save.date[save.index[-1]]
+            history_processed_data_path = processed_data_path + f'{history_day}'
+            save.to_csv(history_processed_data_path + f'/{file}')
     return
 
 end = datetime.date.today()
@@ -171,16 +171,17 @@ if __name__ == '__main__':
             if os.path.isdir(processed_data_path+'/'+file):
                 shutil.rmtree(processed_data_path+'/'+file)
 
-    for i in range(365*2-200):
+    for i in range(365):
         history_day = str((datetime.datetime.now() - datetime.timedelta(days=i)).date())
         history_processed_data_path = processed_data_path+f'/{history_day}'
         os.makedirs(history_processed_data_path,exist_ok=True)
 
-
+    date_list = [end - datetime.timedelta(days=x) for x in range(run_days)]
 
     cores = multiprocessing.cpu_count()
     with Pool(cores) as p:
-        p.map(run_all_by_ticker, raw_data_files)
+        # p.map(run_all_by_ticker, raw_data_files)
+        p.map(run_all_by_date, date_list)
         p.close()
         p.join()
     
