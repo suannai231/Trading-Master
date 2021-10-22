@@ -17,7 +17,7 @@ import shutil
 from multiprocessing import Pool
 # from multiprocessing import Value
 
-run_days = 200
+run_days = 20
 backward = 200
 
 EMA_Indicator = True
@@ -38,14 +38,14 @@ wr120_greater_than_50_days_bar = 0.7
 # wr120_greater_than_80_days_bar = 0.6
 
 def screen(df):
-    # if len(origin_df) <= backward+2:
-    #     #print(f'Ticker: {ticker} length is less than {backward}\n')
-    #     return pd.DataFrame()
+    if len(df) <= backward+2:
+        #print(f'Ticker: {ticker} length is less than {backward}\n')
+        return pd.DataFrame()
 
-    # backward_startindex = len(origin_df)-backward
-    # origin_endindex = len(origin_df)
+    backward_startindex = len(df)-backward
+    origin_endindex = len(df)
     
-    # df = origin_df[backward_startindex:origin_endindex].reset_index(drop=True)
+    df = df[backward_startindex:origin_endindex].reset_index(drop=True)
 
     startindex = df.index[0]
     endindex = len(df)
@@ -151,25 +151,34 @@ def run(file):                   #把要执行的代码写到run函数里面 线
     return file
 
 def run_all_by_date(date):
-
+    if str(date) == '2021-10-12':
+        print('2021-10-12')
     i = (end - date).days
-    processed_data_files = os.listdir(processed_data_path + f'{date}')
+    processed_data_files = os.listdir(processed_data_path)
     for file in processed_data_files:
-        isTickerExists = os.path.exists(screened_data_path + f'{date}' + file)
+        if file == 'HX.csv':
+            print('HX.csv')
+        df = pd.read_csv(processed_data_path + f'/{file}')
+        if (len(df)-i) <= backward+2:
+            continue
+        df_slice = df[0:len(df)-i].reset_index(drop=True)
+        history_day = df_slice.date[df_slice.index[-1]]
+        history_screened_data_path = screened_data_path + f'{history_day}'
+        isPathExists = os.path.exists(history_screened_data_path)
+        if not isPathExists:
+            os.makedirs(history_screened_data_path,exist_ok=True)
+        isTickerExists = os.path.exists(history_screened_data_path + f'/{file}')
         if not isTickerExists:
-            df = pd.read_csv(processed_data_path + f'{date}' + f'/{file}')
-            # if (len(df)-i) <= backward+2:
-            #     continue
-            # df_slice = df[0:len(df)-i].reset_index(drop=True)
-            save = screen(df)
+            save = screen(df_slice)
             if not save.empty:
-                history_day = save.date[save.index[-1]]
-                history_screened_data_path = screened_data_path + f'{history_day}'
+                # history_screened_data_path = screened_data_path+f'{date}'
+                # history_day = save.date[save.index[-1]]
+                # history_screened_data_path = screened_data_path + f'{history_day}'
                 save.to_csv(history_screened_data_path + f'/{file}')
     return
 
 end = datetime.date.today()
-processed_data_path="//jack-nas/home/Drive/Python/ProcessedData/"
+processed_data_path=f"//jack-nas/home/Drive/Python/ProcessedData/{end}"
 screened_data_path=f"//jack-nas/home/Drive/Python/ScreenedData/"
 
 if __name__ == '__main__':
@@ -185,14 +194,10 @@ if __name__ == '__main__':
 
         # files = os.listdir(screened_data_path)
         # for file in files:
-        #     if os.path.isdir(screened_data_path+'/'+file):
-        #         shutil.rmtree(screened_data_path+'/'+file)
+        #     if os.path.isdir(screened_data_path+file):
+        #         shutil.rmtree(screened_data_path+file)
 
     date_list = [end - datetime.timedelta(days=x) for x in range(run_days)]
-
-    for i in date_list:
-        history_screened_data_path = screened_data_path+f'/{i}'
-        os.makedirs(history_screened_data_path,exist_ok=True)
 
     cores = multiprocessing.cpu_count()
     with Pool(cores) as p:

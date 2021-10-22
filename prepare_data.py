@@ -31,14 +31,13 @@ def prepare_data(df):
     elif df['close'][origin_lastindex] > Price_Limit:
         #print(f'Ticker: {ticker} close price is over 30\n')
         return pd.DataFrame()
+    elif len(df) <= backward+2:
+        return pd.DataFrame()
     else:
-        if len(df) <= backward+2:
-            return pd.DataFrame()
-
-        backward_startindex = len(df)-backward
-        origin_endindex = len(df)
+        # backward_startindex = len(df)-backward
+        # origin_endindex = len(df)
         
-        df = df[backward_startindex:origin_endindex].reset_index(drop=True)
+        # df = df[backward_startindex:origin_endindex].reset_index(drop=True)
         df.rename(columns={"Unnamed: 0":"date"}, inplace=True)
 
         startindex = df.index[0]
@@ -109,18 +108,20 @@ def prepare_data(df):
 
 def run_today_by_ticker(file):                   #把要执行的代码写到run函数里面 线程在创建后会直接运行run函数 
     # print(file)
-    df = pd.read_csv(raw_data_path + file)
-    save = prepare_data(df)
-    # df_length = len(df)
-    # for i in range(df_length):
-    #     if (len(df)-i) <= backward+2:
-    #         break
-    #     history_df = df[0:len(df)-i].reset_index(drop=True)
-    #     save = prepare_data(history_df)
-    #     history_day = history_df.date[history_df.index[-1]]
-    # history_processed_data_path = processed_data_path+f'/{history_day}'
-    if not save.empty:
-        save.to_csv(processed_data_path + f'{end}' + f'/{file}')
+    isTickerExists = os.path.exists(processed_data_path + file)
+    if not isTickerExists:
+        df = pd.read_csv(raw_data_path + file)
+        save = prepare_data(df)
+        # df_length = len(df)
+        # for i in range(df_length):
+        #     if (len(df)-i) <= backward+2:
+        #         break
+        #     history_df = df[0:len(df)-i].reset_index(drop=True)
+        #     save = prepare_data(history_df)
+        #     history_day = history_df.date[history_df.index[-1]]
+        # history_processed_data_path = processed_data_path+f'/{history_day}'
+        if not save.empty:
+            save.to_csv(processed_data_path + file)
     return
 
 def run_all_by_ticker(file):
@@ -139,7 +140,7 @@ def run_all_by_ticker(file):
 
 def run_all_by_date(date):
     i = (end - date).days
-    raw_data_files = os.listdir(raw_data_path)
+    
     for file in raw_data_files:
         isTickerExists = os.path.exists(processed_data_path + f'{date}' + file)
         if not isTickerExists:
@@ -156,7 +157,8 @@ def run_all_by_date(date):
 
 end = datetime.date.today()
 raw_data_path=f"//jack-nas/home/Drive/Python/RawData/{end}/"
-processed_data_path="//jack-nas/home/Drive/Python/ProcessedData/"
+processed_data_path=f"//jack-nas/home/Drive/Python/ProcessedData/{end}/"
+raw_data_files = os.listdir(raw_data_path)
 
 if __name__ == '__main__':
     isPathExists = os.path.exists(processed_data_path)
@@ -172,16 +174,16 @@ if __name__ == '__main__':
         #     if os.path.isdir(processed_data_path+'/'+file):
         #         shutil.rmtree(processed_data_path+'/'+file)
 
-    date_list = [end - datetime.timedelta(days=x) for x in range(run_days)]
+    # date_list = [end - datetime.timedelta(days=x) for x in range(run_days)]
 
-    for i in date_list:
-        history_processed_data_path = processed_data_path+f'/{i}'
-        os.makedirs(history_processed_data_path,exist_ok=True)
+    # for i in date_list:
+    #     history_processed_data_path = processed_data_path+f'/{i}'
+    #     os.makedirs(history_processed_data_path,exist_ok=True)
 
     cores = multiprocessing.cpu_count()
     with Pool(cores) as p:
         # p.map(run_all_by_ticker, raw_data_files)
-        p.map(run_all_by_date, date_list)
+        p.map(run_today_by_ticker, raw_data_files)
         p.close()
         p.join()
     
