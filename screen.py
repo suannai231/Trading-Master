@@ -17,6 +17,9 @@ import shutil
 from multiprocessing import Pool
 # from multiprocessing import Value
 
+run_days = 20
+backward = 200
+
 EMA_Indicator = True
 MACD_Indicator = True
 OBV_Indicator = True
@@ -24,8 +27,6 @@ Cum_Turnover_Indicator = True
 Cum_Chip_Indicator = True
 Chip_Concentration_Indicator = True
 WR_Indicator = True
-
-backward = 200
 
 obv_convergence = 1
 obv_above_zero_days_bar = 0.8
@@ -149,9 +150,25 @@ def run(file):                   #把要执行的代码写到run函数里面 线
     # processed_numbers +=1
     return file
 
+def run_all_by_date(date):
+
+    i = (end - date).days
+    processed_data_files = os.listdir(processed_data_path + f'{date}')
+    for file in processed_data_files:
+        df = pd.read_csv(processed_data_path + f'{date}' + f'/{file}')
+        if (len(df)-i) <= backward+2:
+            continue
+        df_slice = df[0:len(df)-i].reset_index(drop=True)
+        save = screen(df_slice)
+        if not save.empty:
+            history_day = save.date[save.index[-1]]
+            history_screened_data_path = screened_data_path + f'{history_day}'
+            save.to_csv(history_screened_data_path + f'/{file}')
+    return
+
 end = datetime.date.today()
-processed_data_path=f"//jack-nas/home/Drive/Python/ProcessedData/{end}"
-screened_data_path=f"//jack-nas/home/Drive/Python/ScreenedData/{end}"
+processed_data_path="//jack-nas/home/Drive/Python/ProcessedData/"
+screened_data_path=f"//jack-nas/home/Drive/Python/ScreenedData/"
 
 if __name__ == '__main__':
     # porcessed_numbers = Value('d', 0)
@@ -160,9 +177,28 @@ if __name__ == '__main__':
         os.makedirs(screened_data_path)
         #print(data_path+"created successfully\n")
     else:
+        # files = os.listdir(screened_data_path)
+        # for f in files:
+        #     os.remove(os.path.join(screened_data_path,f))
+
         files = os.listdir(screened_data_path)
-        for f in files:
-            os.remove(os.path.join(screened_data_path,f))
+        for file in files:
+            if os.path.isdir(screened_data_path+'/'+file):
+                shutil.rmtree(screened_data_path+'/'+file)
+
+        date_list = [end - datetime.timedelta(days=x) for x in range(run_days)]
+
+        for i in date_list:
+            history_screened_data_path = screened_data_path+f'/{i}'
+            os.makedirs(history_screened_data_path,exist_ok=True)
+
+        cores = multiprocessing.cpu_count()
+        with Pool(cores) as p:
+            # p.map(run_all_by_ticker, raw_data_files)
+            p.map(run_all_by_date, date_list)
+            p.close()
+            p.join()
+
 
         # files = os.listdir(screened_data_path)
         # for file in files:
@@ -179,17 +215,17 @@ if __name__ == '__main__':
     #     history_screened_data_path = screened_data_path+f'/{history_day}'
     #     os.makedirs(history_screened_data_path,exist_ok=True)
 
-    files = os.listdir(processed_data_path)
+    
     # print(len(files))
     # df = pd.read_csv(path+"/"+'HX.csv')
     # df = df[0:len(df)-18].reset_index(drop=True)
     # save = screen(df)
 
-    cores = multiprocessing.cpu_count()
-    with Pool(cores) as p:
-        p.map(run, files)
-        p.close()
-        p.join()
+    # cores = multiprocessing.cpu_count()
+    # with Pool(cores) as p:
+    #     p.map(run, files)
+    #     p.close()
+    #     p.join()
     
     # print('all tickers data have been screened.\n')
 

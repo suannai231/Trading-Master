@@ -139,6 +139,7 @@ def run_all_by_ticker(file):
 
 def run_all_by_date(date):
     i = (end - date).days
+    raw_data_files = os.listdir(raw_data_path)
     for file in raw_data_files:
         df = pd.read_csv(raw_data_path+'/'+file)
         if (len(df)-i) <= backward+2:
@@ -154,8 +155,6 @@ def run_all_by_date(date):
 end = datetime.date.today()
 raw_data_path=f"//jack-nas/home/Drive/Python/RawData/{end}/"
 processed_data_path="//jack-nas/home/Drive/Python/ProcessedData/"
-
-raw_data_files = os.listdir(raw_data_path)
 
 if __name__ == '__main__':
     isPathExists = os.path.exists(processed_data_path)

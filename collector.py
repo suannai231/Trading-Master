@@ -94,3 +94,4 @@ while True:
         break
     else:
         break
+os.popen(f'python C:/Users/jayin/OneDrive/Code/prepare_data.py')
