@@ -185,8 +185,8 @@ def run_all_by_date(date):
     return
 
 end = datetime.date.today()
-processed_data_path=f"//jack-nas/home/Drive/Python/ProcessedData/{end}"
-screened_data_path=f"//jack-nas/home/Drive/Python/ScreenedData/"
+processed_data_path=f"E:/Python/ProcessedData/{end}"
+screened_data_path=f"E:/Python/ScreenedData/"
 
 if __name__ == '__main__':
     # porcessed_numbers = Value('d', 0)
