@@ -17,10 +17,10 @@ import multiprocessing
 from multiprocessing import Pool
 # from multiprocessing import Value
 
-run_days = 200
+# run_days = 200
 backward = 200
 CAP_Limit = 2000000000
-Price_Limit = 30
+Price_Limit = 50
 
 def prepare_data(df):
     origin_lastindex = df.index[-1]

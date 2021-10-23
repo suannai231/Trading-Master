@@ -17,7 +17,7 @@ import shutil
 from multiprocessing import Pool
 # from multiprocessing import Value
 
-run_days = 30
+run_days = 200
 backward = 200
 
 EMA_Indicator = True
@@ -28,9 +28,9 @@ Cum_Chip_Indicator = True
 Chip_Concentration_Indicator = False
 WR_Indicator = True
 
-obv_convergence = 1
-obv_above_zero_days_bar = 0.8
-cum_turnover_rate = 1.8
+obv_convergence = 0.5
+obv_above_zero_days_bar = 0.9
+cum_turnover_rate = 5
 cum_chip_bar = 0.8
 chip_concentration_bar = 0.4
 wr_bar = 40
