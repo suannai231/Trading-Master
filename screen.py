@@ -35,7 +35,7 @@ cum_chip_bar = 0.8
 chip_concentration_bar = 0.4
 wr_bar = 40
 wr120_greater_than_50_days_bar = 0.7
-wr120_greater_than_80_days_bar = 0.3
+wr120_greater_than_80_days_bar = 0.4
 
 def screen(df):
     if len(df) <= backward+2:
