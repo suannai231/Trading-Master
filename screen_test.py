@@ -28,9 +28,9 @@ Cum_Chip_Indicator = True
 Chip_Concentration_Indicator = False
 WR_Indicator = True
 
-obv_convergence = 0.5
+obv_convergence = 1
 obv_above_zero_days_bar = 0.7
-cum_turnover_rate = 3.9
+cum_turnover_rate = 0.5
 cum_chip_bar = 0.8
 chip_concentration_bar = 0.4
 wr_bar = 40
@@ -106,4 +106,4 @@ def run_all_by_date(date,file):
 end = datetime.date.today()
 processed_data_path=f"E:/Python/ProcessedData/{end}"
 
-run_all_by_date('2021-03-11','TKAT.csv')
+run_all_by_date('2021-07-20','NURO.csv')
