@@ -106,4 +106,4 @@ def run_all_by_date(date,file):
 end = datetime.date.today()
 processed_data_path=f"E:/Python/ProcessedData/{end}"
 
-run_all_by_date('2021-07-20','NURO.csv')
+run_all_by_date('2021-10-19','LMFA.csv')
