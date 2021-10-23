@@ -17,7 +17,7 @@ import shutil
 from multiprocessing import Pool
 # from multiprocessing import Value
 
-run_days = 200
+run_days = 365
 backward = 200
 
 EMA_Indicator = True
@@ -35,7 +35,7 @@ cum_chip_bar = 0.8
 chip_concentration_bar = 0.4
 wr_bar = 40
 wr120_greater_than_50_days_bar = 0.7
-# wr120_greater_than_80_days_bar = 0.6
+wr120_greater_than_80_days_bar = 0.3
 
 def screen(df):
     if len(df) <= backward+2:
@@ -89,9 +89,13 @@ def screen(df):
     if WR_Indicator & (wr120_less_than_50_days/backward < wr120_greater_than_50_days_bar):
         return pd.DataFrame()
 
-    # wr120_less_than_80_days = wr.Cal_WR120_Greater_Than_X_Days(df,80)
-    # if WR_Indicator & (wr120_less_than_80_days/120 < wr120_greater_than_80_days_bar):
-    #     return pd.DataFrame()
+    wr120_less_than_80_days = 0
+    for i in range(startindex,endindex):
+        if df.WR120[i] > 80:
+            wr120_less_than_80_days += 1
+    if WR_Indicator & (wr120_less_than_80_days/120 < wr120_greater_than_80_days_bar):
+        return pd.DataFrame()
+
     #Create buy and sell columns
     #x = buy_sell(df)
     #df['Buy_Signal_Price'] = x[0]
@@ -169,15 +173,15 @@ def run_all_by_date(date):
             if (len(df_slice)) <= backward+2:
                 continue
             # df_slice = df[0:len(df)-i].reset_index(drop=True)
-            history_day = df_slice.date[df_slice.index[-1]]
-            history_screened_data_path = screened_data_path + f'{history_day}'
-            isPathExists = os.path.exists(history_screened_data_path)
-            if not isPathExists:
-                os.makedirs(history_screened_data_path,exist_ok=True)
             # isTickerExists = os.path.exists(history_screened_data_path + f'/{file}')
             # if not isTickerExists:
             save = screen(df_slice)
             if not save.empty:
+                history_day = df_slice.date[df_slice.index[-1]]
+                history_screened_data_path = screened_data_path + f'{history_day}'
+                isPathExists = os.path.exists(history_screened_data_path)
+                if not isPathExists:
+                    os.makedirs(history_screened_data_path,exist_ok=True)
                 # history_screened_data_path = screened_data_path+f'{date}'
                 # history_day = save.date[save.index[-1]]
                 # history_screened_data_path = screened_data_path + f'{history_day}'
