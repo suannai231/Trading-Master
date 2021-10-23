@@ -29,13 +29,13 @@ Chip_Concentration_Indicator = False
 WR_Indicator = True
 
 obv_convergence = 0.5
-obv_above_zero_days_bar = 0.9
-cum_turnover_rate = 5
+obv_above_zero_days_bar = 0.7
+cum_turnover_rate = 3.9
 cum_chip_bar = 0.8
 chip_concentration_bar = 0.4
 wr_bar = 40
-wr120_greater_than_50_days_bar = 0.7
-# wr120_greater_than_80_days_bar = 0.6
+wr120_greater_than_50_days_bar = 0.6
+wr120_greater_than_80_days_bar = 0.2
 
 def screen(df):
     if len(df) <= backward+2:
@@ -88,6 +88,13 @@ def screen(df):
     if WR_Indicator & (wr120_less_than_50_days/backward < wr120_greater_than_50_days_bar):
         return pd.DataFrame()
 
+    wr120_less_than_80_days = 0
+    for i in range(startindex,endindex):
+        if df.WR120[i] > 80:
+            wr120_less_than_80_days += 1
+    if WR_Indicator & (wr120_less_than_80_days/backward < wr120_greater_than_80_days_bar):
+        return pd.DataFrame()
+
     return df
 
 def run_all_by_date(date,file):
@@ -99,4 +106,4 @@ def run_all_by_date(date,file):
 end = datetime.date.today()
 processed_data_path=f"E:/Python/ProcessedData/{end}"
 
-run_all_by_date('2021-08-23','RCMT.csv')
+run_all_by_date('2021-03-11','TKAT.csv')
