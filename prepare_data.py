@@ -156,8 +156,8 @@ def run_all_by_date(date):
     return
 
 end = datetime.date.today()
-raw_data_path=f"E:/Python/RawData/{end}/"
-processed_data_path=f"E:/Python/ProcessedData/{end}/"
+raw_data_path=f"D:/Python/RawData/{end}/"
+processed_data_path=f"D:/Python/ProcessedData/{end}/"
 raw_data_files = os.listdir(raw_data_path)
 
 if __name__ == '__main__':
