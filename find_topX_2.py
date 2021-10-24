@@ -17,7 +17,7 @@ import shutil
 from multiprocessing import Pool
 # from multiprocessing import Value
 
-run_days = 365*10
+run_days = 365*5
 topX = 20
 backward = 200
 
@@ -183,8 +183,8 @@ def run_all_by_date(date):
     return
 
 end = datetime.date.today()
-processed_data_path=f"D:/Python/ProcessedData/{end}"
-topX_data_path=f"D:/Python/TopX/"
+processed_data_path=f"//jack-nas/Work/Python/ProcessedData/{end}"
+topX_data_path=f"//jack-nas/Work/Python/TopX/"
 
 if __name__ == '__main__':
     # porcessed_numbers = Value('d', 0)
@@ -202,7 +202,7 @@ if __name__ == '__main__':
         #     if os.path.isdir(topX_data_path+file):
         #         shutil.rmtree(topX_data_path+file)
 
-    date_list = [end - datetime.timedelta(days=x) for x in range(1,run_days)]
+    date_list = [end - datetime.timedelta(days=x) for x in range(run_days,run_days*2)]
     cores = multiprocessing.cpu_count()
     with Pool(cores) as p:
         # p.map(run_all_by_ticker, raw_data_files)

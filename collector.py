@@ -65,7 +65,7 @@ start = datetime.datetime.now() - datetime.timedelta(days)
 end = datetime.date.today()
 
 # path=f"C:/Python/{end}"
-path = f'D:/Python/RawData/{end}'
+path = f'//jack-nas/Work/Python/RawData/{end}'
 
 isPathExists = os.path.exists(path)
 if not isPathExists:

@@ -104,6 +104,6 @@ def run_all_by_date(date,file):
     return
 
 end = datetime.date.today()
-processed_data_path=f"D:/Python/ProcessedData/{end}"
+processed_data_path=f"//jack-nas/Work/Python/ProcessedData/{end}"
 
 run_all_by_date('2021-10-22','MARK.csv')
