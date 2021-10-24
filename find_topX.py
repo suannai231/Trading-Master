@@ -115,24 +115,25 @@ def run_all_by_date(date):
     isFileExists = os.path.exists(history_topX_data_path + '.csv')
     topX_tickers = []
     if isFileExists:
+        return
         # topX_data_files = os.listdir(topX_data_path + str(date))
-        df = pd.read_csv(history_topX_data_path + '.csv')
-        topX_tickers = pd.ticker
+        # df = pd.read_csv(history_topX_data_path + '.csv')
+        # topX_tickers = df.ticker.values
 
     tickers_change_list = []
     for file in processed_data_files:
         # isTickerExists = os.path.exists(topX_data_path + str(date) + f'/{file}')
         # if not isTickerExists:
         ticker = file[:len(file)-4]
-        if ticker not in topX_tickers:
-            df = pd.read_csv(processed_data_path + f'/{file}')
-            if str(date) not in df.date.values:
-                continue
-            if df.volume[df.date == str(date)].iloc[0]*df.close[df.date == str(date)].iloc[0] < 500000:
-                continue
-            change = df.change[df.date == str(date)].iloc[0]
-            ticker_change_list = [df.ticker[df.date == str(date)].iloc[0],change]
-            tickers_change_list.append(ticker_change_list)
+        # if ticker not in topX_tickers:
+        df = pd.read_csv(processed_data_path + f'/{file}')
+        if str(date) not in df.date.values:
+            continue
+        if df.volume[df.date == str(date)].iloc[0]*df.close[df.date == str(date)].iloc[0] < 500000:
+            continue
+        change = df.change[df.date == str(date)].iloc[0]
+        ticker_change_list = [df.ticker[df.date == str(date)].iloc[0],change]
+        tickers_change_list.append(ticker_change_list)
     if len(tickers_change_list) == 0:
         return
     tickers_change_list_df = pd.DataFrame(tickers_change_list, columns = ['ticker','change'])
@@ -147,19 +148,29 @@ def run_all_by_date(date):
         file = ticker + '.csv'
         # isTickerExists = os.path.exists(screened_data_path + str(date) + f'/{file}')
         # if not isTickerExists:
-        if ticker not in topX_tickers:
-            df = pd.read_csv(processed_data_path + f'/{file}')
-            if str(date) not in df.date.values:
-                continue
-            df_slice = df[0:df[df.date == str(date)].index[0]+1].reset_index(drop=True)
-            if (len(df_slice)) <= backward+2:
-                continue
-            # df_slice = df[0:len(df)-i].reset_index(drop=True)
-            # isTickerExists = os.path.exists(history_screened_data_path + f'/{file}')
-            # if not isTickerExists:
-            ticker_data = screen(df_slice)
-            if len(ticker_data) != 0:
-                ticker_data_list.append(ticker_data)
+        # if ticker not in topX_tickers:
+        df = pd.read_csv(processed_data_path + f'/{file}')
+        if str(date) not in df.date.values:
+            continue
+        df_slice = df[0:df[df.date == str(date)].index[0]+1].reset_index(drop=True)
+        if (len(df_slice)) <= backward+2:
+            continue
+        # df_slice = df[0:len(df)-i].reset_index(drop=True)
+        # isTickerExists = os.path.exists(history_screened_data_path + f'/{file}')
+        # if not isTickerExists:
+        ticker_data = screen(df_slice)
+
+        pre_df_slice = df[0:df[df.date == str(date)].index[0]].reset_index(drop=True)
+        if (len(pre_df_slice)) <= backward+2:
+            continue
+        # df_slice = df[0:len(df)-i].reset_index(drop=True)
+        # isTickerExists = os.path.exists(history_screened_data_path + f'/{file}')
+        # if not isTickerExists:
+        pre_ticker_data = screen(pre_df_slice)
+
+        if len(ticker_data) != 0:
+            ticker_data_list.append(ticker_data)
+            ticker_data_list.append(pre_ticker_data)
     ticker_data_list_df = pd.DataFrame(ticker_data_list, columns = ['date','ticker','change','turn','ema','macd','obv_above_zero_days','OBV_DIFF_RATE','cum_turnover','cum_chip','chip_con','wr34','wr120','wr120_larger_than_50_days','wr120_larger_than_80_days'])
     
     isPathExists = os.path.exists(topX_data_path)
