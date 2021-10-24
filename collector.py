@@ -15,6 +15,8 @@ import os
 import concurrent.futures as cf
 from concurrent.futures import ThreadPoolExecutor
 
+days=365*10
+
 def run_thread(ticker):                   #把要执行的代码写到run函数里面 线程在创建后会直接运行run函数 
     isTickerExists = os.path.exists(path+'/'+ticker+'.csv')
     if not isTickerExists:
@@ -59,7 +61,7 @@ def run_thread(ticker):                   #把要执行的代码写到run函数�
         df.to_csv(path+'/'+ticker+'.csv')
         return 1
 
-start = datetime.datetime.now() - datetime.timedelta(days=365*2)
+start = datetime.datetime.now() - datetime.timedelta(days)
 end = datetime.date.today()
 
 # path=f"C:/Python/{end}"
