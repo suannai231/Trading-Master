@@ -44,6 +44,8 @@ def prepare_data(df):
         endindex = len(df)
         lastindex = df.index[-1]
 
+        df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
+
         shares = df['shares'][lastindex]
         df['turn'] = df.volume/shares
         df['cum_turnover'] = df['turn'].cumsum()

@@ -17,7 +17,7 @@ import shutil
 from multiprocessing import Pool
 # from multiprocessing import Value
 
-run_days = 500
+run_days = 365*10
 backward = 200
 
 EMA_Indicator = True
