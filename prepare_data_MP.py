@@ -16,6 +16,7 @@ import shutil
 import multiprocessing
 from multiprocessing import Pool
 # from multiprocessing import Value
+from multiprocessing import Process, Manager
 
 # run_days = 200
 backward = 200
@@ -108,11 +109,12 @@ def prepare_data(df):
 
         return df
 
-def run_today_by_ticker(file):                   #把要执行的代码写到run函数里面 线程在创建后会直接运行run函数 
+def run_today_by_ticker(df_dict,file):                   #把要执行的代码写到run函数里面 线程在创建后会直接运行run函数 
     # print(file)
     # isTickerExists = os.path.exists(processed_data_path + file)
     # if not isTickerExists:
-    df = pd.read_csv(raw_data_path + file)
+    # df = pd.read_csv(raw_data_path + file)
+    df = df_dict[file]
     save = prepare_data(df)
     # df_length = len(df)
     # for i in range(df_length):
@@ -160,7 +162,6 @@ def run_today_by_ticker(file):                   #把要执行的代码写到run
 end = datetime.date.today()
 raw_data_path=f"//jack-nas/Work/Python/RawData/{end}/"
 processed_data_path=f"//jack-nas/Work/Python/ProcessedData/{end}/"
-raw_data_files = os.listdir(raw_data_path)
 
 if __name__ == '__main__':
     isPathExists = os.path.exists(processed_data_path)
@@ -181,19 +182,26 @@ if __name__ == '__main__':
     # for i in date_list:
     #     history_processed_data_path = processed_data_path+f'/{i}'
     #     os.makedirs(history_processed_data_path,exist_ok=True)
-    processed_data_files = os.listdir(processed_data_path)
+    with Manager() as manager:
+        df_dict = manager.dict()
+        raw_data_files = os.listdir(raw_data_path)
+        for file in raw_data_files:
+            df = pd.read_csv(raw_data_path + f'/{file}')
+            df_dict[f'{file}'] = df
 
-    cores = multiprocessing.cpu_count()
-    with Pool(cores) as p:
-        # p.map(run_all_by_ticker, raw_data_files)
-        for raw_data_file in raw_data_files:
-            # processed_data_file = processed_data_path + raw_data_file
-            if raw_data_file in processed_data_files:
-                continue
-            p.apply_async(run_today_by_ticker, args=(raw_data_file,))
-        # p.map(run_today_by_ticker, raw_data_files)
-        p.close()
-        p.join()
+        processed_data_files = os.listdir(processed_data_path)
+        
+        cores = multiprocessing.cpu_count()
+        with Pool(cores) as p:
+            # p.map(run_all_by_ticker, raw_data_files)
+            for raw_data_file in raw_data_files:
+                # processed_data_file = processed_data_path + raw_data_file
+                if raw_data_file in processed_data_files:
+                    continue
+                p.apply_async(run_today_by_ticker, args=(df_dict,raw_data_file))
+            # p.map(run_today_by_ticker, raw_data_files)
+            p.close()
+            p.join()
     
     # print('all tickers data have been prepared.\n')
     # os.popen(f'python C:/Users/jayin/OneDrive/Code/screen.py')

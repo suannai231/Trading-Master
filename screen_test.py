@@ -51,49 +51,50 @@ def screen(df):
     lastindex = df.index[-1]
 
     if EMA_Indicator & (df['close'][lastindex] < df['EMA34'][lastindex]):
-        return pd.DataFrame()
+        print(df['close'][lastindex] < df['EMA34'][lastindex])
 
     if MACD_Indicator & ((df['MACD_dif'][lastindex]-df['MACD_dea'][lastindex]) < 0):
-        return pd.DataFrame()
+        print((df['MACD_dif'][lastindex]-df['MACD_dea'][lastindex]) < 0)
     
     obv_above_zero_days = 0
     for i in range(startindex,endindex):
         if df['OBV_DIFF'][i] > 0:
             obv_above_zero_days += 1
     if OBV_Indicator & (obv_above_zero_days/backward < obv_above_zero_days_bar):
-        return pd.DataFrame()
+        print(obv_above_zero_days)
 
     if OBV_Indicator & (df['OBV_DIFF_RATE'][lastindex] > obv_convergence):
-        return pd.DataFrame()
+        print(df['OBV_DIFF_RATE'][lastindex])
 
     if Cum_Turnover_Indicator & (df['cum_turnover'][lastindex] < cum_turnover_rate):
-        return pd.DataFrame()
+        print(df['cum_turnover'][lastindex])
 
     ss = chip.Cal_Chip_Distribution(df)
     if not ss.empty:
         cum_chip = ss['Cum_Chip'][ss.index[-1]]
         if Cum_Chip_Indicator & (cum_chip < cum_chip_bar):
-            return pd.DataFrame()
+            print(cum_chip)
         chip_con = chip.Cal_Chip_Concentration(ss)
         if Chip_Concentration_Indicator & (chip_con > chip_concentration_bar):
-            return pd.DataFrame()
+            print(chip_con)
 
     if WR_Indicator & ((df.WR34[lastindex] > wr_bar) | (df.WR120[lastindex] > wr_bar)):
-        return pd.DataFrame()
+        print(df.WR34[lastindex])
+        print(df.WR120[lastindex])
 
     wr120_less_than_50_days = 0
     for i in range(startindex,endindex):
         if df.WR120[i] > 50:
             wr120_less_than_50_days += 1
     if WR_Indicator & (wr120_less_than_50_days/backward < wr120_greater_than_50_days_bar):
-        return pd.DataFrame()
+        print(wr120_less_than_50_days)
 
     wr120_less_than_80_days = 0
     for i in range(startindex,endindex):
         if df.WR120[i] > 80:
             wr120_less_than_80_days += 1
     if WR_Indicator & (wr120_less_than_80_days/backward < wr120_greater_than_80_days_bar):
-        return pd.DataFrame()
+        print(wr120_less_than_80_days)
 
     return df
 
@@ -106,4 +107,4 @@ def run_all_by_date(date,file):
 end = datetime.date.today()
 processed_data_path=f"//jack-nas/Work/Python/ProcessedData/{end}"
 
-run_all_by_date('2021-10-22','MARK.csv')
+run_all_by_date('2021-10-22','WEI.csv')
