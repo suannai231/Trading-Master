@@ -17,6 +17,7 @@ import multiprocessing
 from multiprocessing import Pool
 # from multiprocessing import Value
 from multiprocessing import Process, Manager
+import socket
 
 # run_days = 200
 backward = 200
@@ -46,6 +47,12 @@ def prepare_data(df):
         lastindex = df.index[-1]
 
         df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
+        df['change_5days'] = (df.close.shift(-5)- df.close)/df.close
+        df['change_10days'] = (df.close.shift(-10)- df.close)/df.close
+        df['change_15days'] = (df.close.shift(-15)- df.close)/df.close
+        df['change_20days'] = (df.close.shift(-20)- df.close)/df.close
+        df['change_25days'] = (df.close.shift(-25)- df.close)/df.close
+        df['change_30days'] = (df.close.shift(-30)- df.close)/df.close
 
         shares = df['shares'][lastindex]
         df['turn'] = df.volume/shares
@@ -204,5 +211,10 @@ if __name__ == '__main__':
             p.join()
     
     # print('all tickers data have been prepared.\n')
-    # os.popen(f'python C:/Users/jayin/OneDrive/Code/screen.py')
 
+    os.popen(f'python C:/Users/jayin/OneDrive/Code/find_topX_MP.py')
+
+    # if socket.gethostname() == 'Jack-LC':
+    #     os.popen(f'python C:/Users/jayin/OneDrive/Code/find_topX_MP_1.py')
+    # else:
+    #     os.popen(f'python C:/Users/jayin/OneDrive/Code/find_topX_MP_2.py')

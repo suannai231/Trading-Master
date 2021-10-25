@@ -135,4 +135,4 @@ if __name__ == '__main__':
                 print(str(success_num)+' tickers raw data have been saved.\n')
         else:
             Loop = False
-    # os.popen(f'python C:/Users/jayin/OneDrive/Code/prepare_data.py')
+    os.popen(f'python C:/Users/jayin/OneDrive/Code/prepare_data_MP.py')
