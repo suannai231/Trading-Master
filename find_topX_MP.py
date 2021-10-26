@@ -229,8 +229,8 @@ if __name__ == '__main__':
         with Pool(cores*2) as p:
             # p.map(run_all_by_ticker, raw_data_files)
             for date in date_list:
-                history_topX_data_path = topX_data_path + f'{date}'
-                if history_topX_data_path in topX_data_files:
+                topX_data_file = str(date) + '.csv'
+                if topX_data_file in topX_data_files:
                     continue
                 p.apply_async(run_all_by_date, args=(df_dict, date))
             p.close()
