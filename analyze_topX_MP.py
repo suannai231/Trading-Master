@@ -135,7 +135,9 @@ def run(df_list,day):
                 print(e)
                 break
             for date in qfq_df.index:
-                busdays = np.busday_count( ticker_date, date)
+                start = ticker_date.date()
+                end = date.date()
+                busdays = np.busday_count( start, end)
                 # delta = date - ticker_date
                 if (busdays > 0) & (busdays<=day):
                     if index != sorted_df.index[-1]:
