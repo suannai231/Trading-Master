@@ -139,7 +139,7 @@ def run(df_list,day):
                 end = date.date()
                 busdays = np.busday_count( start, end)
                 # delta = date - ticker_date
-                if (busdays > 0) & (busdays<=day):
+                if (busdays > 0) & (busdays<day):
                     if index != sorted_df.index[-1]:
                         loop = True
                     else:
