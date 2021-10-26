@@ -106,7 +106,7 @@ def screen(df):
     # if WR_Indicator & (wr120_less_than_80_days/backward < wr120_greater_than_80_days_bar):
     #     return pd.DataFrame()
 
-    ticker_data = [df.date[lastindex],df.ticker[lastindex],df.change[lastindex],df.change_5days[lastindex],df.change_10days[lastindex],df.change_15days[lastindex],df.change_20days[lastindex],df.change_25days[lastindex],df.change_30days[lastindex],df.turn[lastindex],ema,macd,obv_above_zero_days,OBV_DIFF_RATE,cum_turnover,cum_chip,chip_con,wr34,wr120,wr120_larger_than_50_days,wr120_larger_than_80_days]
+    ticker_data = [df.date[lastindex],df.ticker[lastindex],df.change[lastindex],df.change_5days[lastindex],df.change_10days[lastindex],df.change_15days[lastindex],df.change_20days[lastindex],df.change_25days[lastindex],df.change_30days[lastindex],df.change_35days[lastindex],df.change_40days[lastindex],df.change_45days[lastindex],df.change_50days[lastindex],df.change_55days[lastindex],df.change_60days[lastindex],df.turn[lastindex],ema,macd,obv_above_zero_days,OBV_DIFF_RATE,cum_turnover,cum_chip,chip_con,wr34,wr120,wr120_larger_than_50_days,wr120_larger_than_80_days]
 
     return ticker_data
 
@@ -175,7 +175,7 @@ def run_all_by_date(df_dict,date):
         if len(ticker_data) != 0:
             ticker_data_list.append(ticker_data)
             ticker_data_list.append(pre_ticker_data)
-    ticker_data_list_df = pd.DataFrame(ticker_data_list, columns = ['date','ticker','change','change_5days','change_10days','change_15days','change_20days','change_25days','change_30days','turn','ema','macd','obv_above_zero_days','OBV_DIFF_RATE','cum_turnover','cum_chip','chip_con','wr34','wr120','wr120_larger_than_50_days','wr120_larger_than_80_days'])
+    ticker_data_list_df = pd.DataFrame(ticker_data_list, columns = ['date','ticker','change','change_5days','change_10days','change_15days','change_20days','change_25days','change_30days','change_35days','change_40days','change_45days','change_50days','change_55days','change_60days','turn','ema','macd','obv_above_zero_days','OBV_DIFF_RATE','cum_turnover','cum_chip','chip_con','wr34','wr120','wr120_larger_than_50_days','wr120_larger_than_80_days'])
     
     isPathExists = os.path.exists(topX_data_path)
     if not isPathExists:
@@ -235,3 +235,4 @@ if __name__ == '__main__':
                 p.apply_async(run_all_by_date, args=(df_dict, date))
             p.close()
             p.join()
+    os.popen(f'python C:/Users/jayin/OneDrive/Code/analyze_topX_MP.py')

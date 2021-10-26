@@ -139,7 +139,7 @@ def run(df_list,day):
                 end = date.date()
                 busdays = np.busday_count( start, end)
                 # delta = date - ticker_date
-                if (busdays > 0) & (busdays<day):
+                if (busdays > 0) & (busdays<=day+1):
                     if index != sorted_df.index[-1]:
                         loop = True
                     else:
@@ -196,7 +196,7 @@ if __name__ == '__main__':
         #     p.join()
     
         # cores = multiprocessing.cpu_count()
-        days = {5,10,15,20,25,30}
+        days = range(5,61,5)
         with Pool(len(days)) as p:
             # p.map(run_all_by_ticker, raw_data_files)
             for day in days:

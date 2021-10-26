@@ -53,6 +53,12 @@ def prepare_data(df):
         df['change_20days'] = (df.close.shift(-20)- df.close)/df.close
         df['change_25days'] = (df.close.shift(-25)- df.close)/df.close
         df['change_30days'] = (df.close.shift(-30)- df.close)/df.close
+        df['change_35days'] = (df.close.shift(-35)- df.close)/df.close
+        df['change_40days'] = (df.close.shift(-40)- df.close)/df.close
+        df['change_45days'] = (df.close.shift(-45)- df.close)/df.close
+        df['change_50days'] = (df.close.shift(-50)- df.close)/df.close
+        df['change_55days'] = (df.close.shift(-55)- df.close)/df.close
+        df['change_60days'] = (df.close.shift(-60)- df.close)/df.close
 
         shares = df['shares'][lastindex]
         df['turn'] = df.volume/shares
@@ -116,12 +122,12 @@ def prepare_data(df):
 
         return df
 
-def run_today_by_ticker(df_dict,file):                   #把要执行的代码写到run函数里面 线程在创建后会直接运行run函数 
+def run(df):                   #把要执行的代码写到run函数里面 线程在创建后会直接运行run函数 
     # print(file)
     # isTickerExists = os.path.exists(processed_data_path + file)
     # if not isTickerExists:
     # df = pd.read_csv(raw_data_path + file)
-    df = df_dict[file]
+    # df = df_dict[file]
     save = prepare_data(df)
     # df_length = len(df)
     # for i in range(df_length):
@@ -132,7 +138,7 @@ def run_today_by_ticker(df_dict,file):                   #把要执行的代码�
     #     history_day = history_df.date[history_df.index[-1]]
     # history_processed_data_path = processed_data_path+f'/{history_day}'
     if not save.empty:
-        save.to_csv(processed_data_path + file)
+        save.to_csv(processed_data_path + save.ticker[save.index[-1]] + '.csv')
     return
 
 # def run_all_by_ticker(file):
@@ -189,26 +195,28 @@ if __name__ == '__main__':
     # for i in date_list:
     #     history_processed_data_path = processed_data_path+f'/{i}'
     #     os.makedirs(history_processed_data_path,exist_ok=True)
-    with Manager() as manager:
-        df_dict = manager.dict()
-        raw_data_files = os.listdir(raw_data_path)
-        for file in raw_data_files:
-            df = pd.read_csv(raw_data_path + f'/{file}')
-            df_dict[f'{file}'] = df
+    # with Manager() as manager:
+        # df_dict = manager.dict()
+    df_dict = {}
+    raw_data_files = os.listdir(raw_data_path)
+    for file in raw_data_files:
+        df = pd.read_csv(raw_data_path + f'/{file}')
+        df_dict[f'{file}'] = df
 
-        processed_data_files = os.listdir(processed_data_path)
-        
-        cores = multiprocessing.cpu_count()
-        with Pool(cores) as p:
-            # p.map(run_all_by_ticker, raw_data_files)
-            for raw_data_file in raw_data_files:
-                # processed_data_file = processed_data_path + raw_data_file
-                if raw_data_file in processed_data_files:
-                    continue
-                p.apply_async(run_today_by_ticker, args=(df_dict,raw_data_file))
-            # p.map(run_today_by_ticker, raw_data_files)
-            p.close()
-            p.join()
+    processed_data_files = os.listdir(processed_data_path)
+    
+    cores = multiprocessing.cpu_count()
+    with Pool(cores) as p:
+        # p.map(run_all_by_ticker, raw_data_files)
+        for raw_data_file in raw_data_files:
+            # processed_data_file = processed_data_path + raw_data_file
+            if raw_data_file in processed_data_files:
+                continue
+            df = df_dict[raw_data_file]
+            p.apply_async(run, args=(df,))
+        # p.map(run_today_by_ticker, raw_data_files)
+        p.close()
+        p.join()
     
     # print('all tickers data have been prepared.\n')
 
