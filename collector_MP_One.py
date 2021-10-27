@@ -5,11 +5,11 @@ import datetime
 import os
 import multiprocessing
 from multiprocessing import Pool
-from multiprocessing import Manager
+import akshare as ak
 
 days=365*10
 
-def run(ticker,df_list):
+def get_stock(ticker):
     shares = -1
     try:
         quote_data = si.get_quote_data(ticker)
@@ -21,35 +21,48 @@ def run(ticker,df_list):
                 shares = info['sharesOutstanding']
             except Exception as e:
                 if str(e) == "'sharesOutstanding'":
-                    return 0
+                    return pd.DataFrame()
                 elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-                    return -1
+                    print(e)
+                    exit()
                 else:
-                    return 0
+                    return pd.DataFrame()
         elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-            return -1
+            print(e)
+            exit()
         else:
-            return 0
+            return pd.DataFrame()
     if (shares is None):
-        return 0
+        return pd.DataFrame()
     else:
         if int(shares) < 1:
-            return 0
+            return pd.DataFrame()
     try:
         df = si.get_data(ticker,start, end)
     except Exception as e:
         if (str(e) == "'timestamp'") | (str(e) == "'NoneType' object is not subscriptable"):
-            return 0
+            return pd.DataFrame()
         elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-            return -1
+            print(e)
+            exit()
         else:
-            return 0
+            return pd.DataFrame()
     if df.empty:
-        return 0
+        return pd.DataFrame()
     df["shares"] = shares
     df["marketCap"] = df["close"]*shares
-    df_list.append(df)
-    return 1
+    df.index.name = 'date'
+    return df
+
+def get_qfq(ticker):
+    try:
+        qfq_df = ak.stock_us_daily(symbol=ticker, adjust="qfq-factor")
+    except Exception as e:
+        print(e)
+        return pd.DataFrame()
+    qfq_df['ticker'] = ticker
+    # qfq_df['date'] = qfq_df.index
+    return qfq_df
 
 start = datetime.datetime.now() - datetime.timedelta(days)
 end = datetime.date.today()
@@ -57,48 +70,42 @@ end = datetime.date.today()
 path = '//jack-nas/Work/Python/RawData/'
 
 if __name__ == '__main__':
+    
     isPathExists = os.path.exists(path)
     if not isPathExists:
         os.makedirs(path)
 
     nasdaq = si.tickers_nasdaq()
     other = si.tickers_other()
-    tickers = nasdaq + other #+ dow + sp500
+    tickers = nasdaq + other
     files = os.listdir(path)
-    file = str(end)+'.csv'
-    if file in files:
+    stock_file = str(end)+'_stock.csv'
+    qfq_file = str(end)+'_qfq.csv'
+    if (stock_file in files) & (qfq_file in files):
         exit()
 
-    with Manager() as manager:
-        df_list = manager.list()
-        cores = multiprocessing.cpu_count()
-        i = 0
-        Loop = True
-        while Loop:
-            Loop = False
-            if cores-i != 0:
-                with Pool(cores-i) as p:
-                    async_result_list = []
-                    for ticker in tickers:
-                        async_result = p.apply_async(run, args=(ticker,df_list))
-                        async_result_list.append(async_result)
-                    p.close()
-                    p.join()
-                    
-                    success_num = 0
-                    for async_result in async_result_list:
-                        result = async_result.get()
-                        if result == -1:
-                            i+=1
-                            Loop = True
-                            print(str(cores-i)+' processes didn\'t work, restarting...\n')
-                            break
-                        success_num += result
-                                       
-                    if Loop == False:
-                        save = pd.DataFrame()
-                        for df in df_list:
-                            save = save.append(df, ignore_index=True)
-                        df.to_csv(path + f'{end}' + '.csv')
-                        print(str(success_num)+' tickers raw data have been saved.\n')
+    cores = multiprocessing.cpu_count()
+    pool = Pool(cores*2)
+    if stock_file not in files:
+        stock_async_result = pool.map_async(get_stock,tickers)
+
+    if qfq_file not in files:
+        qfq_async_result = pool.map_async(get_qfq,tickers)
+
+    pool.close()
+    pool.join()
+
+    if stock_file not in files:
+        stock_df_list = stock_async_result.get()
+        stock_concat_df = pd.DataFrame()
+        stock_concat_df = pd.concat(stock_df_list)
+        stock_concat_df.to_csv(path+f'{end}'+'_stock.csv')
+    if qfq_file not in files:
+        qfq_df_list = qfq_async_result.get()
+        qfq_concat_df = pd.DataFrame()
+        qfq_concat_df = pd.concat(qfq_df_list)
+        qfq_concat_df.to_csv(path+f'{end}'+'_qfq.csv')
+    if (stock_file not in files) & (qfq_file not in files):
+        merged_df = pd.merge(stock_concat_df, qfq_concat_df, how='left', on=["ticker", "date"])
+        merged_df.to_csv(path+f'{end}'+'.csv')
     # os.popen(f'python C:/Users/jayin/OneDrive/Code/prepare_data_MP.py')
