@@ -52,6 +52,7 @@ def get_stock(ticker):
     df["shares"] = shares
     df["marketCap"] = df["close"]*shares
     df.index.name = 'date'
+    # df.reset_index(inplace=True)
     return df
 
 def get_qfq(ticker):
@@ -62,6 +63,7 @@ def get_qfq(ticker):
         return pd.DataFrame()
     qfq_df['ticker'] = ticker
     # qfq_df['date'] = qfq_df.index
+    # qfq_df.reset_index(inplace=True)
     return qfq_df
 
 start = datetime.datetime.now() - datetime.timedelta(days)
@@ -79,8 +81,8 @@ if __name__ == '__main__':
     other = si.tickers_other()
     tickers = nasdaq + other
     files = os.listdir(path)
-    stock_file = str(end)+'_stock.csv'
-    qfq_file = str(end)+'_qfq.csv'
+    stock_file = str(end)+'_stock.feather'
+    qfq_file = str(end)+'_qfq.feather'
     if (stock_file in files) & (qfq_file in files):
         exit()
 
@@ -99,13 +101,16 @@ if __name__ == '__main__':
         stock_df_list = stock_async_result.get()
         stock_concat_df = pd.DataFrame()
         stock_concat_df = pd.concat(stock_df_list)
-        stock_concat_df.to_csv(path+f'{end}'+'_stock.csv')
+        stock_concat_df.reset_index(inplace=True)
+        stock_concat_df.to_feather(path+f'{end}'+'_stock.feather')
     if qfq_file not in files:
         qfq_df_list = qfq_async_result.get()
         qfq_concat_df = pd.DataFrame()
         qfq_concat_df = pd.concat(qfq_df_list)
-        qfq_concat_df.to_csv(path+f'{end}'+'_qfq.csv')
+        qfq_concat_df.reset_index(inplace=True)
+        qfq_concat_df.to_feather(path+f'{end}'+'_qfq.feather')
     if (stock_file not in files) & (qfq_file not in files):
         merged_df = pd.merge(stock_concat_df, qfq_concat_df, how='left', on=["ticker", "date"])
-        merged_df.to_csv(path+f'{end}'+'.csv')
+        # merged_df.reset_index(inplace=True)
+        merged_df.to_feather(path+f'{end}'+'.feather')
     # os.popen(f'python C:/Users/jayin/OneDrive/Code/prepare_data_MP.py')
