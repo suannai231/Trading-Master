@@ -52,7 +52,6 @@ def get_stock(ticker):
     df["shares"] = shares
     df["marketCap"] = df["close"]*shares
     df.index.name = 'date'
-    # df.reset_index(inplace=True)
     return df
 
 def get_qfq(ticker):
@@ -62,8 +61,6 @@ def get_qfq(ticker):
         print(e)
         return pd.DataFrame()
     qfq_df['ticker'] = ticker
-    # qfq_df['date'] = qfq_df.index
-    # qfq_df.reset_index(inplace=True)
     return qfq_df
 
 start = datetime.datetime.now() - datetime.timedelta(days)
@@ -111,6 +108,5 @@ if __name__ == '__main__':
         qfq_concat_df.to_feather(path+f'{end}'+'_qfq.feather')
     if (stock_file not in files) & (qfq_file not in files):
         merged_df = pd.merge(stock_concat_df, qfq_concat_df, how='left', on=["ticker", "date"])
-        # merged_df.reset_index(inplace=True)
         merged_df.to_feather(path+f'{end}'+'.feather')
     # os.popen(f'python C:/Users/jayin/OneDrive/Code/prepare_data_MP.py')

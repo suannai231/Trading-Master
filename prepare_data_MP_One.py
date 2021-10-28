@@ -1,25 +1,10 @@
-#from pandas_datareader import data
-# from yahoo_fin import stock_info as si
-#import yfinance as yf
-#import matplotlib.pyplot as plt
 import pandas as pd
-#import seaborn as sns
-# import numpy as np
 import datetime
-#import time
 import os
-# import threading
-# import chip
 import wr
-import shutil
-# from multiprocessing import Process
 import multiprocessing
 from multiprocessing import Pool
-# from multiprocessing import Value
-from multiprocessing import Process, Manager
-import socket
 
-# run_days = 200
 backward = 200
 CAP_Limit = 2000000000
 Price_Limit = 50
@@ -34,8 +19,6 @@ def prepare_data(df):
     elif len(df) <= backward+2:
         return pd.DataFrame()
     else:
-        # df.rename(columns={"Unnamed: 0":"date"}, inplace=True)
-
         startindex = df.index[0]
         endindex = len(df)
         lastindex = df.index[-1]
@@ -102,37 +85,18 @@ raw_data_path=f"//jack-nas/Work/Python/RawData/"
 processed_data_path=f"//jack-nas/Work/Python/ProcessedData/"
 
 if __name__ == '__main__':
-    isPathExists = os.path.exists(processed_data_path)
-    if not isPathExists:
-        os.makedirs(processed_data_path)
-    # else:
-        # files = os.listdir(processed_data_path)
-        # for f in files:
-        #     os.remove(os.path.join(processed_data_path,f))
-
-        # files = os.listdir(processed_data_path)
-        # for file in files:
-        #     if os.path.isdir(processed_data_path+'/'+file):
-        #         shutil.rmtree(processed_data_path+'/'+file)
-
-    # date_list = [end - datetime.timedelta(days=x) for x in range(run_days)]
-
-    # for i in date_list:
-    #     history_processed_data_path = processed_data_path+f'/{i}'
-    #     os.makedirs(history_processed_data_path,exist_ok=True)
-    # with Manager() as manager:
-        # df_dict = manager.dict()
-    
-    # raw_data_files = os.listdir(raw_data_path)
-    
-    df = pd.read_feather(raw_data_path + f'/{end}' + '.feather')
-    tickers = df.ticker.unique()
-
     processed_files = os.listdir(processed_data_path)
     processed_file = str(end)+'.feather'
     if processed_file in processed_files:
         exit()
+
+    isPathExists = os.path.exists(processed_data_path)
+    if not isPathExists:
+        os.makedirs(processed_data_path)
     
+    df = pd.read_feather(raw_data_path + f'{end}' + '.feather')
+    tickers = df.ticker.unique()
+
     cores = multiprocessing.cpu_count()
     pool = Pool(cores*3)
     async_results = []
@@ -142,6 +106,7 @@ if __name__ == '__main__':
         async_results.append(async_result)
     pool.close()
     pool.join()
+
     del(df)
     df = pd.DataFrame()
     for async_result in async_results:
@@ -150,11 +115,3 @@ if __name__ == '__main__':
             df = df.append(async_result.get())
     df.reset_index(drop=True,inplace=True)
     df.to_feather(processed_data_path + f'{end}' + '.feather')
-    # print('all tickers data have been prepared.\n')
-
-    # os.popen(f'python C:/Users/jayin/OneDrive/Code/find_topX_MP.py')
-
-    # if socket.gethostname() == 'Jack-LC':
-    #     os.popen(f'python C:/Users/jayin/OneDrive/Code/find_topX_MP_1.py')
-    # else:
-    #     os.popen(f'python C:/Users/jayin/OneDrive/Code/find_topX_MP_2.py')
