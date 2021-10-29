@@ -8,16 +8,21 @@ import math
 
 def drop_qfq(df,qfq,period):
     if df.empty:
-        return
+        return pd.DataFrame()
     column = 'change_' + str(period) +'days'
     df.dropna(subset=[column],inplace=True)
+    if df.empty:
+        return pd.DataFrame()
+    df.reset_index(drop=True,inplace=True)
     sorted_df = df.sort_values(by=[column],ascending=False,ignore_index=True)
-    i = sorted_df.index[0]
-    if math.isnan(sorted_df[column][i]):
-        return
-    while (i <= sorted_df.index[-1]) & (not math.isnan(sorted_df[column][i])):
+
+    for i in sorted_df.index:
         ticker = sorted_df['ticker'][i]
         ticker_date = sorted_df['date'][i]
+
+        if (sorted_df['cum_turnover'][i] < 1) | (sorted_df[column][i] < 1): #cum_turnover < 1 drop
+            sorted_df.drop(index=i,inplace=True)
+            continue
 
         for date in qfq[qfq.ticker==ticker].date:
             start = ticker_date.date()
@@ -26,21 +31,26 @@ def drop_qfq(df,qfq,period):
             if (busdays > 0) & (busdays<=period+1):
                 sorted_df.drop(index=i,inplace=True)
                 break
-        
-        if i in sorted_df.index:
-            if sorted_df['cum_turnover'][i] < 1: #cum_turnover < 1 drop
-                sorted_df.drop(index=i,inplace=True)
-
-        if i in sorted_df.index:
-            if sorted_df[column][i] < 1: #change X days period < 1 drop
-                sorted_df.drop(index=i,inplace=True)
-        
-        i+=1
-    if i == sorted_df.index[-1]+1:
-        return
-    sorted_df.reset_index(drop=True,inplace=True)
-    sorted_df.to_csv(analyzed_topX_data_path + f'{period}' + 'days.csv')
-    return 
+    
+    if not sorted_df.empty:
+        sorted_df = sorted_df.reset_index(drop=True)[0:50]
+        obv_above_zero_days_avg = sorted_df['obv_above_zero_days'].mean()
+        cum_turnover_avg = sorted_df['cum_turnover'].mean()
+        wr34_avg = sorted_df['wr34'].mean()
+        wr120_avg = sorted_df['wr120'].mean()
+        wr120_larger_than_50_days_avg = sorted_df['wr120_larger_than_50_days'].mean()
+        wr120_larger_than_80_days_avg = sorted_df['wr120_larger_than_80_days'].mean()
+        obv_above_zero_days_std = sorted_df['obv_above_zero_days'].std()
+        cum_turnover_std = sorted_df['cum_turnover'].std()
+        wr34_std = sorted_df['wr34'].std()
+        wr120_std = sorted_df['wr120'].std()
+        wr120_larger_than_50_days_std = sorted_df['wr120_larger_than_50_days'].std()
+        wr120_larger_than_80_days_std = sorted_df['wr120_larger_than_80_days'].std()
+        lst = [[column,obv_above_zero_days_avg,cum_turnover_avg,wr34_avg,wr120_avg,wr120_larger_than_50_days_avg,wr120_larger_than_80_days_avg,obv_above_zero_days_std,cum_turnover_std,wr34_std,wr120_std,wr120_larger_than_50_days_std,wr120_larger_than_80_days_std]]
+        statistics_df = pd.DataFrame(lst,columns=['period','obv_above_zero_days','cum_turnover','wr34','wr120','wr120_larger_than_50_days','wr120_larger_than_80_days','obv_above_zero_days_std','cum_turnover_std','wr34_std','wr120_std','wr120_larger_than_50_days_std','wr120_larger_than_80_days_std'])
+        sorted_df.to_csv(analyzed_topX_data_path + f'{period}' + 'days.csv')
+        statistics_df.to_csv(analyzed_topX_data_path + f'{period}' + 'days_statistics.csv')
+    return statistics_df
 
 end = datetime.date.today()
 topX_data_path=f"//jack-nas/Work/Python/TopX/"
@@ -62,8 +72,16 @@ if __name__ == '__main__':
     df = pd.read_feather(topX_data_path + f'{end}' + '.feather')
     qfq = pd.read_feather(qfq_path+f'{end}'+'_qfq.feather')
     
+    async_results = []
     pool = Pool(len(periods))
     for period in periods:
-        pool.apply_async(drop_qfq,args=(df,qfq,period))
+        async_result = pool.apply_async(drop_qfq,args=(df,qfq,period))
+        async_results.append(async_result)
     pool.close()
     pool.join()
+
+    statistics_df = pd.DataFrame()
+    for async_result in async_results:
+        result = async_result.get()
+        statistics_df = statistics_df.append(result)
+    statistics_df.to_csv(analyzed_topX_data_path + 'statistics.csv')

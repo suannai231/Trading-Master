@@ -24,18 +24,19 @@ EMA_Indicator = True
 MACD_Indicator = True
 OBV_Indicator = True
 Cum_Turnover_Indicator = True
-Cum_Chip_Indicator = True
+Cum_Chip_Indicator = False
 Chip_Concentration_Indicator = False
 WR_Indicator = True
 
 obv_convergence = 1
-obv_above_zero_days_bar = 0.7
-cum_turnover_rate = 0.5
+obv_above_zero_days_bar = 0.565
+cum_turnover_rate = 6.768
 cum_chip_bar = 0.8
 chip_concentration_bar = 0.4
-wr_bar = 40
-wr120_greater_than_50_days_bar = 0.6
-wr120_greater_than_80_days_bar = 0.16
+wr34_bar = 35.673
+wr120_bar = 54.028
+wr120_greater_than_50_days_bar = 0.8452
+wr120_greater_than_80_days_bar = 0.5144
 
 def screen(df):
     if len(df) <= backward+2:
@@ -70,16 +71,16 @@ def screen(df):
     if Cum_Turnover_Indicator & (df['cum_turnover'][lastindex] < cum_turnover_rate):
         return pd.DataFrame()
 
-    ss = chip.Cal_Chip_Distribution(df)
-    if not ss.empty:
-        cum_chip = ss['Cum_Chip'][ss.index[-1]]
-        if Cum_Chip_Indicator & (cum_chip < cum_chip_bar):
-            return pd.DataFrame()
-        chip_con = chip.Cal_Chip_Concentration(ss)
-        if Chip_Concentration_Indicator & (chip_con > chip_concentration_bar):
-            return pd.DataFrame()
+    # ss = chip.Cal_Chip_Distribution(df)
+    # if not ss.empty:
+    #     cum_chip = ss['Cum_Chip'][ss.index[-1]]
+    #     if Cum_Chip_Indicator & (cum_chip < cum_chip_bar):
+    #         return pd.DataFrame()
+    #     chip_con = chip.Cal_Chip_Concentration(ss)
+    #     if Chip_Concentration_Indicator & (chip_con > chip_concentration_bar):
+    #         return pd.DataFrame()
 
-    if WR_Indicator & ((df.WR34[lastindex] > wr_bar) | (df.WR120[lastindex] > wr_bar)):
+    if WR_Indicator & ((df.WR34[lastindex] > wr34_bar) | (df.WR120[lastindex] > wr120_bar)):
         return pd.DataFrame()
 
     wr120_less_than_50_days = 0
