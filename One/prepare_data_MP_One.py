@@ -81,7 +81,9 @@ def prepare_data(ticker_chunk_df):
                 OBV_DIFF_RATE.append(abs(df['OBV_DIFF'][i])/max_obv_diff)
 
         df["OBV_DIFF_RATE"] = OBV_DIFF_RATE
+
         df = wr.Cal_Daily_WR(df)
+        
         if not df.empty:
             return_ticker_chunk_df = return_ticker_chunk_df.append(df,ignore_index=True)
     return return_ticker_chunk_df
