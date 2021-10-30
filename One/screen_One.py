@@ -7,7 +7,7 @@ import os
 # import chip
 from multiprocessing import Pool
 
-run_days = 300
+run_days = 365*5
 backward = 200
 
 EMA_Indicator = True
@@ -155,3 +155,4 @@ if __name__ == '__main__':
         if not result.empty:
             df = df.append(result,ignore_index=True)
     df.to_csv(screened_data_path + f'{end}' + '.csv')
+    os.popen(f'python C:/Code/One/find_topX_MP_One.py')

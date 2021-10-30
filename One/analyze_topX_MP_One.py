@@ -34,20 +34,22 @@ def clean(df,qfq,period):
     
     if not sorted_df.empty:
         sorted_df = sorted_df.reset_index(drop=True)[0:30]
+        turn_avg = sorted_df['turn'].mean()
         obv_above_zero_days_avg = sorted_df['obv_above_zero_days'].mean()
         cum_turnover_avg = sorted_df['cum_turnover'].mean()
         wr34_avg = sorted_df['wr34'].mean()
         wr120_avg = sorted_df['wr120'].mean()
         wr120_larger_than_50_days_avg = sorted_df['wr120_larger_than_50_days'].mean()
         wr120_larger_than_80_days_avg = sorted_df['wr120_larger_than_80_days'].mean()
+        turn_std = sorted_df['turn'].std()
         obv_above_zero_days_std = sorted_df['obv_above_zero_days'].std()
         cum_turnover_std = sorted_df['cum_turnover'].std()
         wr34_std = sorted_df['wr34'].std()
         wr120_std = sorted_df['wr120'].std()
         wr120_larger_than_50_days_std = sorted_df['wr120_larger_than_50_days'].std()
         wr120_larger_than_80_days_std = sorted_df['wr120_larger_than_80_days'].std()
-        lst = [[column,obv_above_zero_days_avg,cum_turnover_avg,wr34_avg,wr120_avg,wr120_larger_than_50_days_avg,wr120_larger_than_80_days_avg,obv_above_zero_days_std,cum_turnover_std,wr34_std,wr120_std,wr120_larger_than_50_days_std,wr120_larger_than_80_days_std]]
-        statistics_df = pd.DataFrame(lst,columns=['period','obv_above_zero_days','cum_turnover','wr34','wr120','wr120_larger_than_50_days','wr120_larger_than_80_days','obv_above_zero_days_std','cum_turnover_std','wr34_std','wr120_std','wr120_larger_than_50_days_std','wr120_larger_than_80_days_std'])
+        lst = [[column,turn_avg,obv_above_zero_days_avg,cum_turnover_avg,wr34_avg,wr120_avg,wr120_larger_than_50_days_avg,wr120_larger_than_80_days_avg,turn_std,obv_above_zero_days_std,cum_turnover_std,wr34_std,wr120_std,wr120_larger_than_50_days_std,wr120_larger_than_80_days_std]]
+        statistics_df = pd.DataFrame(lst,columns=['period','turn_avg','obv_above_zero_days','cum_turnover','wr34','wr120','wr120_larger_than_50_days','wr120_larger_than_80_days','turn_std','obv_above_zero_days_std','cum_turnover_std','wr34_std','wr120_std','wr120_larger_than_50_days_std','wr120_larger_than_80_days_std'])
         sorted_df.to_csv(analyzed_topX_data_path + f'{period}' + 'days.csv')
         statistics_df.to_csv(analyzed_topX_data_path + f'{period}' + 'days_statistics.csv')
     return statistics_df
