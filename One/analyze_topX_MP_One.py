@@ -4,9 +4,9 @@ import numpy as np
 import datetime
 import os
 from multiprocessing import Pool
-import math
+# import math
 
-def drop_qfq(df,qfq,period):
+def clean(df,qfq,period):
     if df.empty:
         return pd.DataFrame()
     column = 'change_' + str(period) +'days'
@@ -33,7 +33,7 @@ def drop_qfq(df,qfq,period):
                 break
     
     if not sorted_df.empty:
-        sorted_df = sorted_df.reset_index(drop=True)[0:50]
+        sorted_df = sorted_df.reset_index(drop=True)[0:30]
         obv_above_zero_days_avg = sorted_df['obv_above_zero_days'].mean()
         cum_turnover_avg = sorted_df['cum_turnover'].mean()
         wr34_avg = sorted_df['wr34'].mean()
@@ -58,24 +58,24 @@ analyzed_topX_data_path=f"//jack-nas/Work/Python/AnalyzedTopX/"
 qfq_path = '//jack-nas/Work/Python/RawData/'
 
 if __name__ == '__main__':
+    isPathExists = os.path.exists(analyzed_topX_data_path)
+    if not isPathExists:
+        os.makedirs(analyzed_topX_data_path)
+
     analyzed_topX_data_files = os.listdir(analyzed_topX_data_path)
     periods = range(5,61,5)
     for period in periods:
         analyzed_topX_data_file = f'{period}'+'days.csv'
         if analyzed_topX_data_file in analyzed_topX_data_files:
             exit()
-    
-    isPathExists = os.path.exists(analyzed_topX_data_path)
-    if not isPathExists:
-        os.makedirs(analyzed_topX_data_path)
-    
+
     df = pd.read_feather(topX_data_path + f'{end}' + '.feather')
     qfq = pd.read_feather(qfq_path+f'{end}'+'_qfq.feather')
     
     async_results = []
     pool = Pool(len(periods))
     for period in periods:
-        async_result = pool.apply_async(drop_qfq,args=(df,qfq,period))
+        async_result = pool.apply_async(clean,args=(df,qfq,period))
         async_results.append(async_result)
     pool.close()
     pool.join()

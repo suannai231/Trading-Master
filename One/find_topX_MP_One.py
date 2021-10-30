@@ -62,30 +62,44 @@ def cal_secret_num(df):
 
     return ticker_data
 
-def run(df):
-    ticker_data_list = []
-    tickers = df.ticker.unique()
-    for ticker in tickers:
-        ticker_df = df[df.ticker==ticker].reset_index(drop=True)
-        ticker_data = cal_secret_num(ticker_df)
-        if len(ticker_data) !=0:
-            ticker_data_list.append(ticker_data)
-    ticker_data_list_df = pd.DataFrame(ticker_data_list, columns = ['date','ticker','change','change_5days','change_10days','change_15days','change_20days','change_25days','change_30days','change_35days','change_40days','change_45days','change_50days','change_55days','change_60days','turn','ema','macd','obv_above_zero_days','OBV_DIFF_RATE','cum_turnover','cum_chip','chip_con','wr34','wr120','wr120_larger_than_50_days','wr120_larger_than_80_days'])
-    return ticker_data_list_df
+def run(df,date_chunk):
+    return_date_chunk_df = pd.DataFrame()
+    for date in date_chunk:
+        date_df = df[df.date==str(date)].reset_index(drop=True)
+        topX_tickers = date_df.nlargest(topX,'change').ticker
+        topX_tickers_df = df[(df['date'].isin(pd.date_range(end=str(date), periods=300))) & df['ticker'].isin(topX_tickers)].reset_index(drop=True)
+        if not topX_tickers_df.empty:
+            ticker_data_list = []
+            tickers = topX_tickers_df.ticker.unique()
+            for ticker in tickers:
+                ticker_df = topX_tickers_df[topX_tickers_df.ticker==ticker].reset_index(drop=True)
+                ticker_data = cal_secret_num(ticker_df)
+                if len(ticker_data) !=0:
+                    ticker_data_list.append(ticker_data)
+            if len(ticker_data_list) !=0:
+                ticker_data_list_df = pd.DataFrame(ticker_data_list, columns = ['date','ticker','change','change_5days','change_10days','change_15days','change_20days','change_25days','change_30days','change_35days','change_40days','change_45days','change_50days','change_55days','change_60days','turn','ema','macd','obv_above_zero_days','OBV_DIFF_RATE','cum_turnover','cum_chip','chip_con','wr34','wr120','wr120_larger_than_50_days','wr120_larger_than_80_days'])
+                if not ticker_data_list_df.empty:
+                    return_date_chunk_df = return_date_chunk_df.append(ticker_data_list_df,ignore_index=True)
+    return return_date_chunk_df
+
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
 end = datetime.date.today()
 processed_data_path=f"//jack-nas/Work/Python/ProcessedData/"
 topX_data_path=f"//jack-nas/Work/Python/TopX/"
 
 if __name__ == '__main__':
+    isPathExists = os.path.exists(topX_data_path)
+    if not isPathExists:
+        os.makedirs(topX_data_path)
+
     topX_data_files = os.listdir(topX_data_path)
     topX_data_file = str(end) + '.feather'
     if topX_data_file in topX_data_files:
         exit()
-
-    isPathExists = os.path.exists(topX_data_path)
-    if not isPathExists:
-        os.makedirs(topX_data_path)
 
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
 
@@ -96,18 +110,16 @@ if __name__ == '__main__':
         date_list = [end - datetime.timedelta(days=x) for x in range(run_days,run_days*2)]
 
     cores = multiprocessing.cpu_count()
-    pool = Pool(cores*3)
+    date_chunk_list = list(chunks(date_list,cores))
+    pool = Pool(cores)
     async_results = []
-    for date in date_list:
-        date_df = df[df.date==str(date)].reset_index(drop=True)
-        topX_tickers = date_df.nlargest(topX,'change').ticker
-        selected_df = df[(df['date'].isin(pd.date_range(end=str(date), periods=300))) & df['ticker'].isin(topX_tickers)].reset_index(drop=True)
-        if not selected_df.empty:
-            async_result = pool.apply_async(run, args=(selected_df,))
-            async_results.append(async_result)
+    for date_chunk in date_chunk_list:
+        last_date_in_date_chunk = date_chunk[-1]
+        extend_date_list = pd.date_range(end=str(last_date_in_date_chunk), periods=300)
+        date_chunk_df = df[df['date'].isin(date_chunk) | df['date'].isin(extend_date_list)]
+        async_result = pool.apply_async(run, args=(date_chunk_df,date_chunk))
+        async_results.append(async_result)
     pool.close()
-    pool.join()
-
     del(df)
     df = pd.DataFrame()
     for async_result in async_results:

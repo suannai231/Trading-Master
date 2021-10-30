@@ -9,16 +9,20 @@ backward = 200
 CAP_Limit = 2000000000
 Price_Limit = 50
 
-def prepare_data(df):
-    origin_lastindex = df.index[-1]
-    cap = df["marketCap"][origin_lastindex]
-    if cap > CAP_Limit:
-        return pd.DataFrame()
-    elif df['close'][origin_lastindex] > Price_Limit:
-        return pd.DataFrame()
-    elif len(df) <= backward+2:
-        return pd.DataFrame()
-    else:
+def prepare_data(ticker_chunk_df):
+    return_ticker_chunk_df = pd.DataFrame()
+    tickers= ticker_chunk_df.ticker.unique()
+    for ticker in tickers:
+        df = ticker_chunk_df[ticker_chunk_df.ticker==ticker].reset_index(drop=True)
+        lastindex = df.index[-1]
+        cap = df["marketCap"][lastindex]
+        if cap > CAP_Limit:
+            continue
+        elif df['close'][lastindex] > Price_Limit:
+            continue
+        elif len(df) <= backward+2:
+            continue
+
         startindex = df.index[0]
         endindex = len(df)
         lastindex = df.index[-1]
@@ -78,35 +82,41 @@ def prepare_data(df):
 
         df["OBV_DIFF_RATE"] = OBV_DIFF_RATE
         df = wr.Cal_Daily_WR(df)
-        return df
+        if not df.empty:
+            return_ticker_chunk_df = return_ticker_chunk_df.append(df,ignore_index=True)
+    return return_ticker_chunk_df
+
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
 end = datetime.date.today()
 raw_data_path=f"//jack-nas/Work/Python/RawData/"
 processed_data_path=f"//jack-nas/Work/Python/ProcessedData/"
 
 if __name__ == '__main__':
+    isPathExists = os.path.exists(processed_data_path)
+    if not isPathExists:
+        os.makedirs(processed_data_path)
+
     processed_files = os.listdir(processed_data_path)
     processed_file = str(end)+'.feather'
     if processed_file in processed_files:
         exit()
-
-    isPathExists = os.path.exists(processed_data_path)
-    if not isPathExists:
-        os.makedirs(processed_data_path)
     
     df = pd.read_feather(raw_data_path + f'{end}' + '.feather')
     tickers = df.ticker.unique()
 
     cores = multiprocessing.cpu_count()
-    pool = Pool(cores*3)
+    ticker_chunk_list = list(chunks(tickers,cores))
+    pool = Pool(cores)
     async_results = []
-    for ticker in tickers:
-        ticker_df = df[df.ticker==ticker].reset_index(drop=True)
-        async_result = pool.apply_async(prepare_data, args=(ticker_df,))
+    for ticker_chunk in ticker_chunk_list:
+        ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
+        async_result = pool.apply_async(prepare_data, args=(ticker_chunk_df,))
         async_results.append(async_result)
     pool.close()
-    pool.join()
-
     del(df)
     df = pd.DataFrame()
     for async_result in async_results:
