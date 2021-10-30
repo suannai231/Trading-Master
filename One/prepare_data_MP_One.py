@@ -109,7 +109,7 @@ if __name__ == '__main__':
     tickers = df.ticker.unique()
 
     cores = multiprocessing.cpu_count()
-    ticker_chunk_list = list(chunks(tickers,cores))
+    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/cores)))
     pool = Pool(cores)
     async_results = []
     for ticker_chunk in ticker_chunk_list:
@@ -125,3 +125,5 @@ if __name__ == '__main__':
             df = df.append(async_result.get())
     df.reset_index(drop=True,inplace=True)
     df.to_feather(processed_data_path + f'{end}' + '.feather')
+
+    os.popen(f'python C:/Users/jayin/OneDrive/Code/screen_One.py')

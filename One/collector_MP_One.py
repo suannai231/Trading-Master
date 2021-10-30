@@ -95,7 +95,7 @@ if __name__ == '__main__':
     tickers = nasdaq + other
 
     cores = multiprocessing.cpu_count()
-    ticker_chunk_list = list(chunks(tickers,cores))
+    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/cores)))
 
     if qfq_file not in files:
         pool1 = Pool(cores)
@@ -136,4 +136,4 @@ if __name__ == '__main__':
     if (stock_file not in files) & (qfq_file not in files):
         merged_df = pd.merge(stock_concat_df, qfq_concat_df, how='left', on=["ticker", "date"])
         merged_df.to_feather(path+f'{end}'+'.feather')
-    # os.popen(f'python C:/Users/jayin/OneDrive/Code/prepare_data_MP.py')
+    os.popen(f'python C:/Users/jayin/OneDrive/Code/prepare_data_MP_One.py')

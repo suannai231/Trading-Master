@@ -110,7 +110,7 @@ if __name__ == '__main__':
         date_list = [end - datetime.timedelta(days=x) for x in range(run_days,run_days*2)]
 
     cores = multiprocessing.cpu_count()
-    date_chunk_list = list(chunks(date_list,cores))
+    date_chunk_list = list(chunks(date_list,int(len(date_list)/cores)))
     pool = Pool(cores)
     async_results = []
     for date_chunk in date_chunk_list:

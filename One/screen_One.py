@@ -7,7 +7,7 @@ import os
 # import chip
 from multiprocessing import Pool
 
-run_days = 365
+run_days = 300
 backward = 200
 
 EMA_Indicator = True
@@ -99,9 +99,12 @@ def run(df,date_chunk):
     tickers_dates_df = pd.DataFrame()
     for date in date_chunk:
         tickers = df[df['date']==str(date)].ticker.unique()
+        if len(tickers) == 0:
+            continue
+        date_df = df[df['date'].isin(pd.date_range(end=str(date), periods=300))]
         tickers_date_df = pd.DataFrame()
         for ticker in tickers:
-            ticker_date_df = df[(df['date'].isin(pd.date_range(end=str(date), periods=300))) & (df.ticker == ticker)].reset_index(drop=True)
+            ticker_date_df = date_df[date_df.ticker == ticker].reset_index(drop=True)
             if (len(ticker_date_df)) <= backward+2:
                 continue
             result = screen(ticker_date_df)
@@ -109,8 +112,6 @@ def run(df,date_chunk):
                 tickers_date_df = tickers_date_df.append(result,ignore_index=True)
         if not tickers_date_df.empty:
             tickers_dates_df = tickers_dates_df.append(tickers_date_df,ignore_index=True)
-        # history_screened_data_path = screened_data_path + f'{date}'
-        # results.to_csv(history_screened_data_path + '.csv')
     return tickers_dates_df
 
 def chunks(lst, n):
@@ -137,7 +138,7 @@ if __name__ == '__main__':
     date_list = [end - datetime.timedelta(days=x) for x in range(1,run_days)]
 
     cores = multiprocessing.cpu_count()
-    date_chunk_list = list(chunks(date_list,cores))
+    date_chunk_list = list(chunks(date_list,int(len(date_list)/cores)))
     pool=Pool(cores)
     async_results = []
     for date_chunk in date_chunk_list:
