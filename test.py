@@ -1,8 +1,1 @@
-import pandas as pd
-
-# df1 = pd.read_csv('//Jack-NAS/Work/Python/RawData/2021-10-27_stock.csv')
-# df2 = pd.read_csv('//Jack-NAS/Work/Python/RawData/2021-10-27_qfq.csv')
-df = pd.read_feather('c:/outlook/2021-10-27.feather')
-# result = pd.merge(df1, df2, how='left', on=["ticker", "date"])
-df.reset_index(drop=True) 
-df.to_feather('c:/outlook/2021-10-27.feather')
+'change_std','change_5days_std','change_10days_std','change_15days_std','change_20days_std','change_25days_std','change_30days_std','change_35days_std','change_40days_std','change_45days_std','change_50days_std','change_55days_std','change_60days_std',

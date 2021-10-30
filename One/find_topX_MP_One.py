@@ -58,7 +58,7 @@ def cal_secret_num(df):
         if df.WR120[i] > 80:
             wr120_larger_than_80_days += 1
 
-    ticker_data = [df.date[lastindex],df.ticker[lastindex],df.turn[lastindex],df.change[lastindex],df.change_5days[lastindex],df.change_10days[lastindex],df.change_15days[lastindex],df.change_20days[lastindex],df.change_25days[lastindex],df.change_30days[lastindex],df.change_35days[lastindex],df.change_40days[lastindex],df.change_45days[lastindex],df.change_50days[lastindex],df.change_55days[lastindex],df.change_60days[lastindex],df.turn[lastindex],ema,macd,obv_above_zero_days,OBV_DIFF_RATE,cum_turnover,cum_chip,chip_con,wr34,wr120,wr120_larger_than_50_days,wr120_larger_than_80_days]
+    ticker_data = [df.date[lastindex],df.ticker[lastindex],df.change[lastindex],df.change_5days[lastindex],df.change_10days[lastindex],df.change_15days[lastindex],df.change_20days[lastindex],df.change_25days[lastindex],df.change_30days[lastindex],df.change_35days[lastindex],df.change_40days[lastindex],df.change_45days[lastindex],df.change_50days[lastindex],df.change_55days[lastindex],df.change_60days[lastindex],df.turn[lastindex],ema,macd,obv_above_zero_days,OBV_DIFF_RATE,cum_turnover,cum_chip,chip_con,wr34,wr120,wr120_larger_than_50_days,wr120_larger_than_80_days]
 
     return ticker_data
 
@@ -77,7 +77,7 @@ def run(df,date_chunk):
                 if len(ticker_data) !=0:
                     ticker_data_list.append(ticker_data)
             if len(ticker_data_list) !=0:
-                ticker_data_list_df = pd.DataFrame(ticker_data_list, columns = ['date','ticker','turn','change','change_5days','change_10days','change_15days','change_20days','change_25days','change_30days','change_35days','change_40days','change_45days','change_50days','change_55days','change_60days','turn','ema','macd','obv_above_zero_days','OBV_DIFF_RATE','cum_turnover','cum_chip','chip_con','wr34','wr120','wr120_larger_than_50_days','wr120_larger_than_80_days'])
+                ticker_data_list_df = pd.DataFrame(ticker_data_list, columns = ['date','ticker','change','change_5days','change_10days','change_15days','change_20days','change_25days','change_30days','change_35days','change_40days','change_45days','change_50days','change_55days','change_60days','turn','ema','macd','obv_above_zero_days','OBV_DIFF_RATE','cum_turnover','cum_chip','chip_con','wr34','wr120','wr120_larger_than_50_days','wr120_larger_than_80_days'])
                 if not ticker_data_list_df.empty:
                     return_date_chunk_df = return_date_chunk_df.append(ticker_data_list_df,ignore_index=True)
     return return_date_chunk_df
