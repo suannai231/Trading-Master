@@ -68,12 +68,13 @@ def clean(sorted_df,qfq,period):
         clean_df.to_csv(analyzed_secret_num_data_path + f'{period}' + 'days.csv')
         clean_df.describe().to_csv(analyzed_secret_num_data_path + f'{period}' + 'days_describe.csv')
         # statistics_df.to_csv(analyzed_secret_num_data_path + f'{period}' + 'days_statistics.csv')
-        clean_df['period'] = period
-    return clean_df
+        describe_df = clean_df.describe()
+        describe_df['period'] = period
+    return describe_df
 
 end = datetime.date.today()
 secret_num_data_path=f"//jack-nas/Work/Python/SecretNum/"
-analyzed_secret_num_data_path=f"//jack-nas/Work/Python/AnalyzedTopX/"
+analyzed_secret_num_data_path=f"//jack-nas/Work/Python/AnalyzedSecretNum/"
 qfq_path = '//jack-nas/Work/Python/RawData/'
 
 if __name__ == '__main__':
@@ -113,4 +114,4 @@ if __name__ == '__main__':
         result_df = async_result.get()
         results_df = results_df.append(result_df)
     results_df.to_csv(analyzed_secret_num_data_path + 'all periods.csv')
-    results_df.describe().to_csv(analyzed_secret_num_data_path + 'all periods_describe.csv')
+    # results_df.describe().to_csv(analyzed_secret_num_data_path + 'all periods_describe.csv')
