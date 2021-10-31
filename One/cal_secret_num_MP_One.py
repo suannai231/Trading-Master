@@ -35,6 +35,43 @@ def cal_secret_num(df):
 
     return backward_df.tail(1)
 
+def cal_secret_num_2(df):
+    if len(df) <= backward+2:
+        return pd.DataFrame()
+    obv_above_zero_days = 0
+    wr120_larger_than_50_days = 0
+    wr120_larger_than_80_days = 0
+    for i in range(backward):
+        if df['OBV_DIFF'][i] > 0:
+            obv_above_zero_days += 1
+        if df.WR120[i] > 50:
+            wr120_larger_than_50_days += 1
+        if df.WR120[i] > 80:
+            wr120_larger_than_80_days += 1
+    df.loc[df.index[backward-1],'obv_above_zero_days'] = obv_above_zero_days
+    df.loc[df.index[backward-1],'wr120_larger_than_50_days'] = wr120_larger_than_50_days
+    df.loc[df.index[backward-1],'wr120_larger_than_80_days'] = wr120_larger_than_80_days
+    i = backward
+    while i<len(df):
+        removed_index = i-backward
+        if df['OBV_DIFF'][removed_index] > 0:
+            obv_above_zero_days -= 1
+        if df.WR120[removed_index] > 50:
+            wr120_larger_than_50_days -= 1
+        if df.WR120[removed_index] > 80:
+            wr120_larger_than_80_days -= 1
+        if df['OBV_DIFF'][i] > 0:
+            obv_above_zero_days += 1
+        if df.WR120[i] > 50:
+            wr120_larger_than_50_days += 1
+        if df.WR120[i] > 80:
+            wr120_larger_than_80_days += 1
+        df.loc[df.index[i],'obv_above_zero_days'] = obv_above_zero_days
+        df.loc[df.index[i],'wr120_larger_than_50_days'] = wr120_larger_than_50_days
+        df.loc[df.index[i],'wr120_larger_than_80_days'] = wr120_larger_than_80_days
+        i+=1
+    return df
+
 def run(ticker_chunk_df):
     if ticker_chunk_df.empty:
         return pd.DataFrame()
@@ -48,19 +85,20 @@ def run(ticker_chunk_df):
             continue
         # if ticker_df.empty:
         #     continue
-        dates = ticker_df.index.unique()
-        if len(dates) == 0:
-            continue
-        results_df = pd.DataFrame()
+        # dates = ticker_df.index.unique()
+        # if len(dates) == 0:
+        #     continue
+        # results_df = pd.DataFrame()
         start_time = time.time()
-        for date in dates:
-            date_ticker_df = ticker_df.loc[ticker_df.index.isin(pd.date_range(end=str(date), periods=300))]
-            result_df = cal_secret_num(date_ticker_df)
-            if not result_df.empty:
-                results_df = results_df.append(result_df)
+        # for date in dates:
+        #     date_ticker_df = ticker_df.loc[ticker_df.index.isin(pd.date_range(end=str(date), periods=300))]
+        #     result_df = cal_secret_num(date_ticker_df)
+        #     if not result_df.empty:
+        #         results_df = results_df.append(result_df)
+        result_df = cal_secret_num_2(ticker_df)
         print("%s seconds\n" %(time.time()-start_time))
-        if not results_df.empty:
-            return_ticker_chunk_df = return_ticker_chunk_df.append(results_df)
+        if not result_df.empty:
+            return_ticker_chunk_df = return_ticker_chunk_df.append(result_df)
     return return_ticker_chunk_df
 
 def chunks(lst, n):
