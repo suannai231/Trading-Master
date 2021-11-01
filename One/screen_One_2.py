@@ -96,9 +96,9 @@ def screen(df):
     # for i in range(startindex,endindex):
     #     if df['OBV_DIFF'][i] > 0:
     #         obv_above_zero_days += 1
-    if OBV_ABOVE_ZERO_DAYS_MINMAX & (df['turn']['obv_above_zero_days'] > OBV_ABOVE_ZERO_DAYS_MAX) | (df['turn']['obv_above_zero_days'] < OBV_ABOVE_ZERO_DAYS_MIN):
+    if OBV_ABOVE_ZERO_DAYS_MINMAX & (df['obv_above_zero_days'] > OBV_ABOVE_ZERO_DAYS_MAX) | (df['obv_above_zero_days'] < OBV_ABOVE_ZERO_DAYS_MIN):
         return pd.DataFrame()
-    if OBV_ABOVE_ZERO_DAYS_2575 & (df['turn']['obv_above_zero_days'] > OBV_ABOVE_ZERO_DAYS_75) | (df['turn']['obv_above_zero_days'] < OBV_ABOVE_ZERO_DAYS_25):
+    if OBV_ABOVE_ZERO_DAYS_2575 & (df['obv_above_zero_days'] > OBV_ABOVE_ZERO_DAYS_75) | (df['obv_above_zero_days'] < OBV_ABOVE_ZERO_DAYS_25):
         return pd.DataFrame()
 
     if OBV_DIFF_RATE_MINMAX & ((df['OBV_DIFF_RATE'][lastindex] > OBV_DIFF_RATE_MAX) | (df['OBV_DIFF_RATE'][lastindex] < OBV_DIFF_RATE_MIN)):
@@ -162,18 +162,19 @@ def run(ticker_chunk_df):
     tickers = ticker_chunk_df.ticker.unique()
     if len(tickers) == 0:
         return pd.DataFrame()
+    ticker_chunk_df.set_index('date',inplace=True)
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
-        ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker].set_index('date')
+        ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
         if ticker_df.empty:
             continue
-        dates = ticker_df.date.unique()
-        if len(dates) == 0:
-            continue
+        # dates = ticker_df.date.unique()
+        # if len(dates) == 0:
+        #     continue
         return_ticker_df = pd.DataFrame()
         start_time = time.time()
-        for date in dates:
-            date_ticker_df = ticker_df[date]
+        for date in ticker_df.index:
+            date_ticker_df = ticker_df[ticker_df.index==date]
             result = screen(date_ticker_df)
             if not result.empty:
                 return_ticker_df = return_ticker_df.append(result,ignore_index=True)
