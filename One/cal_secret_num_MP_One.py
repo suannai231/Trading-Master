@@ -70,7 +70,7 @@ def cal_secret_num_2(df):
         df.loc[df.index[i],'wr120_larger_than_50_days'] = wr120_larger_than_50_days
         df.loc[df.index[i],'wr120_larger_than_80_days'] = wr120_larger_than_80_days
         i+=1
-    return df
+    return df[backward-1:len(df)]
 
 def run(ticker_chunk_df):
     if ticker_chunk_df.empty:

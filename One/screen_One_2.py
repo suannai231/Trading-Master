@@ -133,18 +133,18 @@ def screen(df):
     # for i in range(startindex,endindex):
     #     if df.WR120[i] > 50:
     #         wr120_less_than_50_days += 1
-    if WR120_50_MINMAX & ((df['wr120_less_than_50_days'][lastindex] < WR120_GREATER_THAN_50_DAYS_MIN) | (df['wr120_less_than_50_days'][lastindex] > WR120_GREATER_THAN_50_DAYS_MAX)):
+    if WR120_50_MINMAX & ((df['wr120_larger_than_50_days'][lastindex] < WR120_GREATER_THAN_50_DAYS_MIN) | (df['wr120_larger_than_50_days'][lastindex] > WR120_GREATER_THAN_50_DAYS_MAX)):
         return pd.DataFrame()
-    if WR120_50_2575 & ((df['wr120_less_than_50_days'][lastindex] < WR120_GREATER_THAN_50_DAYS_25) | (df['wr120_less_than_50_days'][lastindex] > WR120_GREATER_THAN_50_DAYS_75)):
+    if WR120_50_2575 & ((df['wr120_larger_than_50_days'][lastindex] < WR120_GREATER_THAN_50_DAYS_25) | (df['wr120_larger_than_50_days'][lastindex] > WR120_GREATER_THAN_50_DAYS_75)):
         return pd.DataFrame()
 
     # wr120_less_than_80_days = 0
     # for i in range(startindex,endindex):
     #     if df.WR120[i] > 80:
     #         wr120_less_than_80_days += 1
-    if WR120_80_MINMAX & ((df['wr120_less_than_80_days'][lastindex] < WR120_GREATER_THAN_80_DAYS_MIN) | (df['wr120_less_than_80_days'][lastindex] > WR120_GREATER_THAN_80_DAYS_MAX)):
+    if WR120_80_MINMAX & ((df['wr120_larger_than_80_days'][lastindex] < WR120_GREATER_THAN_80_DAYS_MIN) | (df['wr120_larger_than_80_days'][lastindex] > WR120_GREATER_THAN_80_DAYS_MAX)):
         return pd.DataFrame()
-    if WR120_80_2575 & ((df['wr120_less_than_80_days'][lastindex] < WR120_GREATER_THAN_50_DAYS_25) | (df['wr120_less_than_80_days'][lastindex] > WR120_GREATER_THAN_80_DAYS_75)):
+    if WR120_80_2575 & ((df['wr120_larger_than_80_days'][lastindex] < WR120_GREATER_THAN_50_DAYS_25) | (df['wr120_larger_than_80_days'][lastindex] > WR120_GREATER_THAN_80_DAYS_75)):
         return pd.DataFrame()
 
     return df
@@ -177,10 +177,10 @@ def run(ticker_chunk_df):
             date_ticker_df = ticker_df[ticker_df.index==date]
             result = screen(date_ticker_df)
             if not result.empty:
-                return_ticker_df = return_ticker_df.append(result,ignore_index=True)
+                return_ticker_df = return_ticker_df.append(result)
         print("%s seconds\n" %(time.time()-start_time))
         if not return_ticker_df.empty:
-            return_ticker_chunk_df = return_ticker_chunk_df.append(return_ticker_df,ignore_index=True)
+            return_ticker_chunk_df = return_ticker_chunk_df.append(return_ticker_df)
     return return_ticker_chunk_df
 
 def chunks(lst, n):
@@ -199,7 +199,7 @@ if __name__ == '__main__':
 
     screened_data_files = os.listdir(screened_data_path)
     screened_data_file = str(end) + '.csv'
-    if screened_data_files in screened_data_files:
+    if screened_data_file in screened_data_files:
         exit()
 
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
@@ -219,6 +219,7 @@ if __name__ == '__main__':
     for async_result in async_results:
         result = async_result.get()
         if not result.empty:
-            df = df.append(result,ignore_index=True)
+            df = df.append(result)
+    df.reset_index(drop=False,inplace=True)
     df.to_csv(screened_data_path + f'{end}' + '.csv')
     # os.popen(f'python C:/Code/One/find_topX_MP_One.py')
