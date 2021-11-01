@@ -96,9 +96,9 @@ def screen(df):
     # for i in range(startindex,endindex):
     #     if df['OBV_DIFF'][i] > 0:
     #         obv_above_zero_days += 1
-    if OBV_ABOVE_ZERO_DAYS_MINMAX & (df['obv_above_zero_days'] > OBV_ABOVE_ZERO_DAYS_MAX) | (df['obv_above_zero_days'] < OBV_ABOVE_ZERO_DAYS_MIN):
+    if OBV_ABOVE_ZERO_DAYS_MINMAX & ((df['obv_above_zero_days'][lastindex] > OBV_ABOVE_ZERO_DAYS_MAX) | (df['obv_above_zero_days'][lastindex] < OBV_ABOVE_ZERO_DAYS_MIN)):
         return pd.DataFrame()
-    if OBV_ABOVE_ZERO_DAYS_2575 & (df['obv_above_zero_days'] > OBV_ABOVE_ZERO_DAYS_75) | (df['obv_above_zero_days'] < OBV_ABOVE_ZERO_DAYS_25):
+    if OBV_ABOVE_ZERO_DAYS_2575 & ((df['obv_above_zero_days'][lastindex] > OBV_ABOVE_ZERO_DAYS_75) | (df['obv_above_zero_days'][lastindex] < OBV_ABOVE_ZERO_DAYS_25)):
         return pd.DataFrame()
 
     if OBV_DIFF_RATE_MINMAX & ((df['OBV_DIFF_RATE'][lastindex] > OBV_DIFF_RATE_MAX) | (df['OBV_DIFF_RATE'][lastindex] < OBV_DIFF_RATE_MIN)):
@@ -133,18 +133,18 @@ def screen(df):
     # for i in range(startindex,endindex):
     #     if df.WR120[i] > 50:
     #         wr120_less_than_50_days += 1
-    if WR120_50_MINMAX & (df['turn']['wr120_less_than_50_days'] < WR120_GREATER_THAN_50_DAYS_MIN) | (df['turn']['wr120_less_than_50_days'] > WR120_GREATER_THAN_50_DAYS_MAX):
+    if WR120_50_MINMAX & ((df['wr120_less_than_50_days'][lastindex] < WR120_GREATER_THAN_50_DAYS_MIN) | (df['wr120_less_than_50_days'][lastindex] > WR120_GREATER_THAN_50_DAYS_MAX)):
         return pd.DataFrame()
-    if WR120_50_2575 & (df['turn']['wr120_less_than_50_days'] < WR120_GREATER_THAN_50_DAYS_25) | (df['turn']['wr120_less_than_50_days'] > WR120_GREATER_THAN_50_DAYS_75):
+    if WR120_50_2575 & ((df['wr120_less_than_50_days'][lastindex] < WR120_GREATER_THAN_50_DAYS_25) | (df['wr120_less_than_50_days'][lastindex] > WR120_GREATER_THAN_50_DAYS_75)):
         return pd.DataFrame()
 
     # wr120_less_than_80_days = 0
     # for i in range(startindex,endindex):
     #     if df.WR120[i] > 80:
     #         wr120_less_than_80_days += 1
-    if WR120_80_MINMAX & (df['turn']['wr120_less_than_80_days'] < WR120_GREATER_THAN_80_DAYS_MIN) | (df['turn']['wr120_less_than_80_days'] > WR120_GREATER_THAN_80_DAYS_MAX):
+    if WR120_80_MINMAX & ((df['wr120_less_than_80_days'][lastindex] < WR120_GREATER_THAN_80_DAYS_MIN) | (df['wr120_less_than_80_days'][lastindex] > WR120_GREATER_THAN_80_DAYS_MAX)):
         return pd.DataFrame()
-    if WR120_80_2575 & (df['turn']['wr120_less_than_80_days'] < WR120_GREATER_THAN_50_DAYS_25) | (df['turn']['wr120_less_than_80_days'] > WR120_GREATER_THAN_80_DAYS_75):
+    if WR120_80_2575 & ((df['wr120_less_than_80_days'][lastindex] < WR120_GREATER_THAN_50_DAYS_25) | (df['wr120_less_than_80_days'][lastindex] > WR120_GREATER_THAN_80_DAYS_75)):
         return pd.DataFrame()
 
     return df
