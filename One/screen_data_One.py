@@ -30,24 +30,24 @@ WR120_50_2575 = True
 WR120_80_MINMAX = False
 WR120_80_2575 = True
 
-TURN_25 = 0.001843759
-TURN_75 = 0.016290666
-OBV_ABOVE_ZERO_DAYS_25 = 90
-OBV_ABOVE_ZERO_DAYS_75 = 174
-OBV_DIFF_RATE_25 = 0.031796562
-OBV_DIFF_RATE_75 = 0.34831409
-CUM_TURNOVER_RATE_25 = 2.671338854
-CUM_TURNOVER_RATE_75 = 7.78641416
+TURN_25 = 0.002996092
+TURN_75 = 0.048697346
+OBV_ABOVE_ZERO_DAYS_25 = 91
+OBV_ABOVE_ZERO_DAYS_75 = 188
+OBV_DIFF_RATE_25 = 0.058478571
+OBV_DIFF_RATE_75 = 0.539422208
+CUM_TURNOVER_RATE_25 = 2.639108116
+CUM_TURNOVER_RATE_75 = 11.35109893
 # cum_chip_bar = 0.8
 # chip_concentration_bar = 0.4
-WR34_25 = 40.75829257
-WR34_75 = 82.56881261
-WR120_25 = 69.51219738
-WR120_75 = 91.76470544
-WR120_GREATER_THAN_50_DAYS_25 = 166
-WR120_GREATER_THAN_50_DAYS_75 = 197
-WR120_GREATER_THAN_80_DAYS_25 = 64
-WR120_GREATER_THAN_80_DAYS_75 = 150
+WR34_25 = 39.36171292
+WR34_75 = 82.35293751
+WR120_25 = 50
+WR120_75 = 89.10355722
+WR120_GREATER_THAN_50_DAYS_25 = 153
+WR120_GREATER_THAN_50_DAYS_75 = 195
+WR120_GREATER_THAN_80_DAYS_25 = 58
+WR120_GREATER_THAN_80_DAYS_75 = 140
 
 TURN_MIN = 0.023769694
 TURN_MAX = 4.854261389
@@ -189,7 +189,7 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 end = datetime.date.today()
-processed_data_path=f"//jack-nas/Work/Python/SecretNum/"
+processed_data_path=f"//jack-nas/Work/Python/ProcessedData/"
 screened_data_path=f"//jack-nas/Work/Python/ScreenedData/"
 
 if __name__ == '__main__':
@@ -203,6 +203,7 @@ if __name__ == '__main__':
         exit()
 
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
+    df = df[df['date'] > '2017-01-01']
     tickers = df.ticker.unique()
 
     cores = multiprocessing.cpu_count()
