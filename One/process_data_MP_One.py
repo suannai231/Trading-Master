@@ -1,7 +1,7 @@
 import pandas as pd
 import datetime
 import os
-import wr_One
+import wr_helper
 import multiprocessing
 from multiprocessing import Pool
 import time
@@ -123,8 +123,8 @@ def run(ticker_chunk_df):
             continue
         start_time = time.time()
         df = cal_basics(df)
-        df = wr_One.Cal_Hist_WR(df,34)
-        df = wr_One.Cal_Hist_WR(df,120)
+        df = wr_helper.Cal_Hist_WR(df,34)
+        df = wr_helper.Cal_Hist_WR(df,120)
         df = cal_secret_num(df)
         print("%s seconds\n" %(time.time()-start_time))
         if not df.empty:
