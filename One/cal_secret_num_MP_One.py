@@ -141,4 +141,4 @@ if __name__ == '__main__':
     df.reset_index(drop=False,inplace=True)
     df.to_feather(topX_data_path + f'{end}' + '.feather')
 
-    os.popen(f'python C:/Code/One/analyze_topX_MP_One.py')
+    os.popen(f'python C:/Code/One/analyze_secret_num_MP_One.py')

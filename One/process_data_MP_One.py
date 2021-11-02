@@ -132,4 +132,4 @@ if __name__ == '__main__':
     df.reset_index(drop=True,inplace=True)
     df.to_feather(processed_data_path + f'{end}' + '.feather')
 
-    # os.popen(f'python C:/Code/One/screen_One.py')
+    os.popen(f'python C:/Code/One/cal_secret_num_MP_One.py')
