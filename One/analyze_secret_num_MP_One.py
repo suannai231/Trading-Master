@@ -69,7 +69,9 @@ def clean(sorted_df,qfq,period):
         clean_df.describe().to_csv(analyzed_secret_num_data_path + f'{period}' + 'days_describe.csv')
         # statistics_df.to_csv(analyzed_secret_num_data_path + f'{period}' + 'days_statistics.csv')
         describe_df = clean_df.describe()
+        column = 'change_'+str(period)+'days'
         describe_df['period'] = period
+        describe_df[column+'_per_day'] = describe_df[column]/period
     return describe_df
 
 end = datetime.date.today()

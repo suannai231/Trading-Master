@@ -1,15 +1,16 @@
 import pandas as pd
 import datetime
 import os
-import wr
+import wr_One
 import multiprocessing
 from multiprocessing import Pool
+import time
 
 backward = 200
 CAP_Limit = 2000000000
 Price_Limit = 50
 
-def prepare_data(ticker_chunk_df):
+def process_data(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     tickers= ticker_chunk_df.ticker.unique()
     for ticker in tickers:
@@ -82,10 +83,13 @@ def prepare_data(ticker_chunk_df):
 
         df["OBV_DIFF_RATE"] = OBV_DIFF_RATE
 
-        df = wr.Cal_Daily_WR(df)
+        start_time = time.time()
+        df = wr_One.Cal_Hist_WR(df,34)
+        df = wr_One.Cal_Hist_WR(df,120)
+        print("%s seconds\n" %(time.time()-start_time))
         
         if not df.empty:
-            return_ticker_chunk_df = return_ticker_chunk_df.append(df,ignore_index=True)
+            return_ticker_chunk_df = return_ticker_chunk_df.append(df[120:len(df)-1],ignore_index=True)
     return return_ticker_chunk_df
 
 def chunks(lst, n):
@@ -116,7 +120,7 @@ if __name__ == '__main__':
     async_results = []
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(prepare_data, args=(ticker_chunk_df,))
+        async_result = pool.apply_async(process_data, args=(ticker_chunk_df,))
         async_results.append(async_result)
     pool.close()
     del(df)
@@ -128,4 +132,4 @@ if __name__ == '__main__':
     df.reset_index(drop=True,inplace=True)
     df.to_feather(processed_data_path + f'{end}' + '.feather')
 
-    os.popen(f'python C:/Code/One/screen_One.py')
+    # os.popen(f'python C:/Code/One/screen_One.py')
