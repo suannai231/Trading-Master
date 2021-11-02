@@ -10,6 +10,23 @@ backward = 200
 CAP_Limit = 2000000000
 Price_Limit = 50
 
+def cal_cum_turnover(df):
+    if len(df) <= backward+2:
+        return pd.DataFrame()
+    upper_cum_turn = 0
+    lower_cum_turn = 0
+    current = len(df)
+    while current >= backward:
+        for i in range(current-backward,current):
+            if df.loc[i,'close'] <= df.loc[current-1,'close']:
+                lower_cum_turn += df.loc[i,'turn']
+            else:
+                upper_cum_turn += df.loc[i,'turn']
+        df.loc[current-1,'upper_cum_turn'] = upper_cum_turn
+        df.loc[current-1,'lower_cum_turn'] = lower_cum_turn
+        current-=1
+    return df
+
 def cal_secret_num(df):
     if len(df) <= backward+2:
         return pd.DataFrame()
@@ -45,7 +62,7 @@ def cal_secret_num(df):
         df.loc[i,'wr120_larger_than_50_days'] = wr120_larger_than_50_days
         df.loc[i,'wr120_larger_than_80_days'] = wr120_larger_than_80_days
         i+=1
-    return df.loc[backward-1:len(df)-1]
+    return df
 
 def cal_basics(df):
     startindex = 0
@@ -68,7 +85,7 @@ def cal_basics(df):
 
     shares = df.loc[lastindex,'shares']
     df['turn'] = df.volume/shares
-    df['cum_turnover'] = df['turn'].cumsum()
+    # df['cum_turnover'] = df['turn'].cumsum()
 
     ema34 = df['close'].ewm(span = 34, adjust = False).mean()
     ema120 = df['close'].ewm(span = 120, adjust = False).mean()
@@ -126,9 +143,10 @@ def run(ticker_chunk_df):
         df = wr_helper.Cal_Hist_WR(df,34)
         df = wr_helper.Cal_Hist_WR(df,120)
         df = cal_secret_num(df)
+        df = cal_cum_turnover(df)
         print("%s seconds\n" %(time.time()-start_time))
         if not df.empty:
-            return_ticker_chunk_df = return_ticker_chunk_df.append(df,ignore_index=True)
+            return_ticker_chunk_df = return_ticker_chunk_df.append(df.loc[backward-1:len(df)-1],ignore_index=True)
     return return_ticker_chunk_df
 
 def chunks(lst, n):
@@ -171,4 +189,4 @@ if __name__ == '__main__':
     df.reset_index(drop=True,inplace=True)
     df.to_feather(processed_data_path + f'{end}' + '.feather')
 
-    os.popen(f'python C:/Code/One/analyze_data_MP_One.py')
+    # os.popen(f'python C:/Code/One/analyze_data_MP_One.py')

@@ -48,18 +48,20 @@ if __name__ == '__main__':
             exit()
 
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
+    df = df[df['date'] > '2017-01-01']
     qfq = pd.read_feather(qfq_path+f'{end}'+'_qfq.feather')
+    qfq = qfq[qfq['date'] > '2017-01-01']
     
     async_results = []
     pool = Pool(len(periods))
     for period in periods:
         column = 'change_' + str(period) +'days'
         selected_df = df.dropna(subset=[column],inplace=False)
-        selected_df = selected_df.loc[(df['cum_turnover'] > 1) & (df[column] > 1)]
+        selected_df = selected_df.loc[df[column] > period*0.2]
         if selected_df.empty:
             continue
         selected_df.reset_index(drop=True,inplace=True)
-        sorted_df = selected_df.sort_values(by=[column],ascending=False,ignore_index=True)[0:1000]
+        sorted_df = selected_df.sort_values(by=[column],ascending=False,ignore_index=True)
         if sorted_df.empty:
             continue
         async_result = pool.apply_async(analyze,args=(sorted_df,qfq,period))
