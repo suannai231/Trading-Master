@@ -136,4 +136,4 @@ if __name__ == '__main__':
     if (stock_file not in files) & (qfq_file not in files):
         merged_df = pd.merge(stock_concat_df, qfq_concat_df, how='left', on=["ticker", "date"])
         merged_df.to_feather(path+f'{end}'+'.feather')
-    os.popen(f'python C:/Code/One/prepare_data_MP_One.py')
+    os.popen(f'python C:/Code/One/process_data_MP_One.py')
