@@ -48,29 +48,29 @@ def cal_secret_num_2(df):
             wr120_larger_than_50_days += 1
         if df.WR120[i] > 80:
             wr120_larger_than_80_days += 1
-    df.loc[df.index[backward-1],'obv_above_zero_days'] = obv_above_zero_days
-    df.loc[df.index[backward-1],'wr120_larger_than_50_days'] = wr120_larger_than_50_days
-    df.loc[df.index[backward-1],'wr120_larger_than_80_days'] = wr120_larger_than_80_days
+    df.loc[backward-1,'obv_above_zero_days'] = obv_above_zero_days
+    df.loc[backward-1,'wr120_larger_than_50_days'] = wr120_larger_than_50_days
+    df.loc[backward-1,'wr120_larger_than_80_days'] = wr120_larger_than_80_days
     i = backward
     while i<len(df):
         removed_index = i-backward
-        if df['OBV_DIFF'][removed_index] > 0:
+        if df.loc[removed_index,'OBV_DIFF'] > 0:
             obv_above_zero_days -= 1
-        if df.WR120[removed_index] > 50:
+        if df.loc[removed_index,'WR120'] > 50:
             wr120_larger_than_50_days -= 1
-        if df.WR120[removed_index] > 80:
+        if df.loc[removed_index,'WR120'] > 80:
             wr120_larger_than_80_days -= 1
-        if df['OBV_DIFF'][i] > 0:
+        if df.loc[i,'OBV_DIFF'] > 0:
             obv_above_zero_days += 1
-        if df.WR120[i] > 50:
+        if df.loc[i,'WR120'] > 50:
             wr120_larger_than_50_days += 1
-        if df.WR120[i] > 80:
+        if df.loc[i,'WR120'] > 80:
             wr120_larger_than_80_days += 1
-        df.loc[df.index[i],'obv_above_zero_days'] = obv_above_zero_days
-        df.loc[df.index[i],'wr120_larger_than_50_days'] = wr120_larger_than_50_days
-        df.loc[df.index[i],'wr120_larger_than_80_days'] = wr120_larger_than_80_days
+        df.loc[i,'obv_above_zero_days'] = obv_above_zero_days
+        df.loc[i,'wr120_larger_than_50_days'] = wr120_larger_than_50_days
+        df.loc[i,'wr120_larger_than_80_days'] = wr120_larger_than_80_days
         i+=1
-    return df[backward-1:len(df)-1]
+    return df.loc[backward-1:len(df)-1]
 
 def run(ticker_chunk_df):
     if ticker_chunk_df.empty:
