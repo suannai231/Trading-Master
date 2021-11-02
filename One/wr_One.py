@@ -74,31 +74,31 @@ def Cal_Hist_WR(df,wr_days):
         current_index-=1
     return df
 
-def CalWR(df,wr_days):
-    if df.empty:
-        return 100
-    close = df.close[df.index[-1]]
-    high_value = HHV(df,wr_days)
-    low_value = LLV(df,wr_days)
-    if high_value == low_value:
-        return 100
-    wr_value = (high_value - close)/(high_value-low_value)*100
-    return wr_value
+# def CalWR(df,wr_days):
+#     if df.empty:
+#         return 100
+#     close = df.close[df.index[-1]]
+#     high_value = HHV(df,wr_days)
+#     low_value = LLV(df,wr_days)
+#     if high_value == low_value:
+#         return 100
+#     wr_value = (high_value - close)/(high_value-low_value)*100
+#     return wr_value
 
-def Cal_Daily_WR(df):
-    WR34_List = []
-    WR120_List = []
-    for i in range(0,len(df)):
-        df_slice = df[0:len(df)-i]
-        WR34 = CalWR(df_slice,34)
-        WR120 = CalWR(df_slice,120)
-        WR34_List.append(WR34)
-        WR120_List.append(WR120)
-    WR34_List.reverse()
-    WR120_List.reverse()
-    df['WR34'] = WR34_List
-    df['WR120'] = WR120_List
-    return df
+# def Cal_Daily_WR(df):
+#     WR34_List = []
+#     WR120_List = []
+#     for i in range(0,len(df)):
+#         df_slice = df[0:len(df)-i]
+#         WR34 = CalWR(df_slice,34)
+#         WR120 = CalWR(df_slice,120)
+#         WR34_List.append(WR34)
+#         WR120_List.append(WR120)
+#     WR34_List.reverse()
+#     WR120_List.reverse()
+#     df['WR34'] = WR34_List
+#     df['WR120'] = WR120_List
+#     return df
 
 # def Cal_WR120_Greater_Than_X_Days(df,x):
 #     WR120_Less_Than_X_Days = 0

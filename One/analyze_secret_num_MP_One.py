@@ -117,4 +117,4 @@ if __name__ == '__main__':
         results_df = results_df.append(result_df)
     results_df.to_csv(analyzed_secret_num_data_path + 'all periods.csv')
     # results_df.describe().to_csv(analyzed_secret_num_data_path + 'all periods_describe.csv')
-    os.popen(f'python C:/Code/One/screen_One_2.py')
+    os.popen(f'python C:/Code/One/screen_One.py')
