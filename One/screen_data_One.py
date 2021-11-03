@@ -125,7 +125,7 @@ def run(ticker_chunk_df):
         return_ticker_df = pd.DataFrame()
         start_time = time.time()
         for date in ticker_df.index:
-            date_ticker_df = ticker_df[date]
+            date_ticker_df = ticker_df.loc[date]
             result = screen(date_ticker_df)
             if not result.empty:
                 return_ticker_df = return_ticker_df.append(result)
