@@ -174,4 +174,3 @@ if __name__ == '__main__':
             df = df.append(result)
     df.reset_index(drop=False,inplace=True)
     df.to_csv(screened_data_path + f'{end}' + '.csv')
-    # os.popen(f'python C:/Code/One/find_topX_MP_One.py')

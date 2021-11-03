@@ -32,7 +32,7 @@ def analyze(sorted_df,qfq,period):
 
 end = datetime.date.today()
 processed_data_path=f"//jack-nas/Work/Python/ProcessedData/"
-analyzed_data_path=f"//jack-nas/Work/Python/AnalyzedData/"
+analyzed_data_path=f"//jack-nas/Work/Python/AnalyzedData/{end}/"
 qfq_path = '//jack-nas/Work/Python/RawData/'
 
 if __name__ == '__main__':
