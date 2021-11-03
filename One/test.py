@@ -1,8 +1,6 @@
-import multiprocessing
+
 import pandas as pd
 import datetime
-import os
-from multiprocessing import Pool
 import time
 
 CLOSE_ABOVE_EMA = True
@@ -110,68 +108,11 @@ def screen(df):
 
     return df
 
-def run(ticker_chunk_df):
-    if ticker_chunk_df.empty:
-        return pd.DataFrame()
-    tickers = ticker_chunk_df.ticker.unique()
-    if len(tickers) == 0:
-        return pd.DataFrame()
-    ticker_chunk_df.set_index('date',inplace=True)
-    return_ticker_chunk_df = pd.DataFrame()
-    for ticker in tickers:
-        ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-        if ticker_df.empty:
-            continue
-        return_ticker_df = pd.DataFrame()
-        start_time = time.time()
-        for date in ticker_df.index:
-            date_ticker_df = ticker_df[ticker_df.index==date]
-            result = screen(date_ticker_df)
-            if not result.empty:
-                return_ticker_df = return_ticker_df.append(result)
-        print("%s seconds\n" %(time.time()-start_time))
-        if not return_ticker_df.empty:
-            return_ticker_chunk_df = return_ticker_chunk_df.append(return_ticker_df)
-    return return_ticker_chunk_df
-
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
-
 end = datetime.date.today()
 processed_data_path=f"//jack-nas/Work/Python/ProcessedData/"
 screened_data_path=f"//jack-nas/Work/Python/ScreenedData/"
 
 if __name__ == '__main__':
-    isPathExists = os.path.exists(screened_data_path)
-    if not isPathExists:
-        os.makedirs(screened_data_path)
-
-    screened_data_files = os.listdir(screened_data_path)
-    screened_data_file = str(end) + '.csv'
-    if screened_data_file in screened_data_files:
-        exit()
-
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
-    df = df[df['date'] > '2017-01-01']
-    tickers = df.ticker.unique()
-
-    cores = multiprocessing.cpu_count()
-    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/cores)))
-    pool=Pool(cores)
-    async_results = []
-    for ticker_chunk in ticker_chunk_list:
-        ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
-        async_results.append(async_result)
-    pool.close()
-    del(df)
-    df = pd.DataFrame()
-    for async_result in async_results:
-        result = async_result.get()
-        if not result.empty:
-            df = df.append(result)
-    df.reset_index(drop=False,inplace=True)
-    df.to_csv(screened_data_path + f'{end}' + '.csv')
-    # os.popen(f'python C:/Code/One/find_topX_MP_One.py')
+    df = df[(df['date'] == '2021-11-01') & (df['ticker'] == 'LMFA')]
+    screen(df)
