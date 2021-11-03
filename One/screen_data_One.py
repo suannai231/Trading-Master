@@ -31,22 +31,22 @@ WR120_80_MINMAX = False
 WR120_80_2575 = True
 
 TURN_25 = 0
-TURN_75 = 0.30
-OBV_ABOVE_ZERO_DAYS_25 = 180
+TURN_75 = 0.322078938
+OBV_ABOVE_ZERO_DAYS_25 = 118
 OBV_ABOVE_ZERO_DAYS_75 = 200
 OBV_DIFF_RATE_25 = 0
-OBV_DIFF_RATE_75 = 0.6
-CUM_TURN_RATE_25 = 0.2
-CUM_TURN_RATE_75 = 0
+OBV_DIFF_RATE_75 = 1
+CUM_TURN_RATE_25 = 0
+CUM_TURN_RATE_75 = 2.150851559691136
 # cum_chip_bar = 0.8
 # chip_concentration_bar = 0.4
 WR34_25 = 0
-WR34_75 = 50
+WR34_75 = 45.37037146
 WR120_25 = 0
-WR120_75 = 55
-WR120_GREATER_THAN_50_DAYS_25 = 153
+WR120_75 = 76.88679184
+WR120_GREATER_THAN_50_DAYS_25 = 182
 WR120_GREATER_THAN_50_DAYS_75 = 200
-WR120_GREATER_THAN_80_DAYS_25 = 58
+WR120_GREATER_THAN_80_DAYS_25 = 93.75
 WR120_GREATER_THAN_80_DAYS_75 = 200
 
 TURN_MIN = 0.023769694
@@ -107,9 +107,9 @@ def screen(df):
         return pd.DataFrame()
 
     cum_turn_rate = df['upper_cum_turn'][lastindex]/df['lower_cum_turn'][lastindex]
-    if CUM_TURN_RATE_MINMAX & ((cum_turn_rate < CUM_TURN_RATE_MAX) | (cum_turn_rate > CUM_TURN_RATE_MIN)):
+    if CUM_TURN_RATE_MINMAX & ((cum_turn_rate > CUM_TURN_RATE_MAX) | (cum_turn_rate < CUM_TURN_RATE_MIN)):
         return pd.DataFrame()
-    if CUM_TURN_RATE_2575 & ((cum_turn_rate < CUM_TURN_RATE_75) | (cum_turn_rate > CUM_TURN_RATE_25)):
+    if CUM_TURN_RATE_2575 & ((cum_turn_rate > CUM_TURN_RATE_75) | (cum_turn_rate < CUM_TURN_RATE_25)):
         return pd.DataFrame()
     # ss = chip.Cal_Chip_Distribution(df)
     # if not ss.empty:

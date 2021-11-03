@@ -57,7 +57,7 @@ if __name__ == '__main__':
     for period in periods:
         column = 'change_' + str(period) +'days'
         selected_df = df.dropna(subset=[column],inplace=False)
-        selected_df = selected_df.loc[df[column] > period*0.2]
+        selected_df = selected_df.loc[(df['lower_cum_turn'] > 1) & (df[column] > period*0.2)]
         if selected_df.empty:
             continue
         selected_df.reset_index(drop=True,inplace=True)

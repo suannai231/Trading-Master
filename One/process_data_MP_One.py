@@ -13,10 +13,10 @@ Price_Limit = 50
 def cal_cum_turnover(df):
     if len(df) <= backward+2:
         return pd.DataFrame()
-    upper_cum_turn = 0
-    lower_cum_turn = 0
     current = len(df)
     while current >= backward:
+        upper_cum_turn = 0
+        lower_cum_turn = 0
         for i in range(current-backward,current):
             if df.loc[i,'close'] <= df.loc[current-1,'close']:
                 lower_cum_turn += df.loc[i,'turn']
