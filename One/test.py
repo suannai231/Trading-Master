@@ -10,7 +10,7 @@ TURN_2575 = True
 OBV_ABOVE_ZERO_DAYS_MINMAX = False
 OBV_ABOVE_ZERO_DAYS_2575 = True
 OBV_DIFF_RATE_MINMAX = False
-OBV_DIFF_RATE_2575 = True
+OBV_DIFF_RATE_2575 = False
 CUM_TURN_RATE_MINMAX = False
 CUM_TURN_RATE_2575 = True
 WR34_MINMAX = False
@@ -34,9 +34,9 @@ WR34_25 = 0
 WR34_75 = 50
 WR120_25 = 0
 WR120_75 = 50
-WR120_GREATER_THAN_50_DAYS_25 = 180
+WR120_GREATER_THAN_50_DAYS_25 = 110
 WR120_GREATER_THAN_50_DAYS_75 = 200
-WR120_GREATER_THAN_80_DAYS_25 = 70
+WR120_GREATER_THAN_80_DAYS_25 = 34
 WR120_GREATER_THAN_80_DAYS_75 = 200
 
 TURN_MIN = 0.023769694
@@ -114,5 +114,5 @@ screened_data_path=f"//jack-nas/Work/Python/ScreenedData/"
 
 if __name__ == '__main__':
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
-    df = df[(df['date'] == '2021-09-27') & (df['ticker'] == 'HX')]
+    df = df[(df['date'] == '2021-07-12') & (df['ticker'] == 'AEHR')]
     screen(df)
