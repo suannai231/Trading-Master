@@ -23,20 +23,20 @@ WR120_80_MINMAX = False
 WR120_80_2575 = True
 
 TURN_25 = 0
-TURN_75 = 0.06
-OBV_ABOVE_ZERO_DAYS_25 = 135.25
+TURN_75 = 0.30
+OBV_ABOVE_ZERO_DAYS_25 = 67
 OBV_ABOVE_ZERO_DAYS_75 = 200
-OBV_DIFF_RATE_25 = 0
-OBV_DIFF_RATE_75 = 0.77
+OBV_DIFF_RATE_25 = 0.20
+OBV_DIFF_RATE_75 = 1
 CUM_TURN_RATE_25 = 0
-CUM_TURN_RATE_75 = 2.15085156
+CUM_TURN_RATE_75 = 0.5
 WR34_25 = 0
-WR34_75 = 79.48277376
+WR34_75 = 50
 WR120_25 = 0
-WR120_75 = 88.29148528
-WR120_GREATER_THAN_50_DAYS_25 = 182
+WR120_75 = 50
+WR120_GREATER_THAN_50_DAYS_25 = 180
 WR120_GREATER_THAN_50_DAYS_75 = 200
-WR120_GREATER_THAN_80_DAYS_25 = 93.75
+WR120_GREATER_THAN_80_DAYS_25 = 70
 WR120_GREATER_THAN_80_DAYS_75 = 200
 
 TURN_MIN = 0.023769694
@@ -114,5 +114,5 @@ screened_data_path=f"//jack-nas/Work/Python/ScreenedData/"
 
 if __name__ == '__main__':
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
-    df = df[(df['date'] == '2021-11-01') & (df['ticker'] == 'LMFA')]
+    df = df[(df['date'] == '2021-09-27') & (df['ticker'] == 'HX')]
     screen(df)
