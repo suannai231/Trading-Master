@@ -3,12 +3,12 @@ import pandas as pd
 import datetime
 import os
 from multiprocessing import Pool
-import time
+import numpy as np
 
 CLOSE_ABOVE_EMA = True
 MACD_DIF_ABOVE_MACD_DEA = True
 TURN_MINMAX = False
-TURN_2575 = True
+TURN_2575 = False
 OBV_ABOVE_ZERO_DAYS_MINMAX = False
 OBV_ABOVE_ZERO_DAYS_2575 = True
 OBV_DIFF_RATE_MINMAX = False
@@ -24,21 +24,21 @@ WR120_50_2575 = True
 WR120_80_MINMAX = False
 WR120_80_2575 = True
 
-TURN_25 = 0
-TURN_75 = 0.35
-OBV_ABOVE_ZERO_DAYS_25 = 149
+TURN_25 = 0 # disabled
+TURN_75 = 0.35  # disabled
+OBV_ABOVE_ZERO_DAYS_25 = 122    # tested EH SNDL
 OBV_ABOVE_ZERO_DAYS_75 = 200
-OBV_DIFF_RATE_25 = 0
-OBV_DIFF_RATE_75 = 1
+OBV_DIFF_RATE_25 = 0    # disabled
+OBV_DIFF_RATE_75 = 1    # disabled
 CUM_TURN_RATE_25 = 0
-CUM_TURN_RATE_75 = 0.846
+CUM_TURN_RATE_75 = 0.31 # tested RCMT
 WR34_25 = 0
 WR34_75 = 48
 WR120_25 = 0
 WR120_75 = 53
-WR120_GREATER_THAN_50_DAYS_25 = 160
+WR120_GREATER_THAN_50_DAYS_25 = 107  # tested CEI RCMT AEHR EH
 WR120_GREATER_THAN_50_DAYS_75 = 200
-WR120_GREATER_THAN_80_DAYS_25 = 90
+WR120_GREATER_THAN_80_DAYS_25 = 34 # Tested ACY CPSH AEHR
 WR120_GREATER_THAN_80_DAYS_75 = 200
 
 TURN_MIN = 0.023769694
@@ -110,6 +110,17 @@ def screen(df):
 
     return df
 
+def is_qfq_in_period(df,qfq,period):
+    ticker = df.loc[df.index[-1],'ticker']
+    ticker_date = df.loc[df.index[-1],'date']
+    for date in qfq[qfq.ticker==ticker].date:   # remove qfq
+        start = ticker_date.date()
+        end = date.date()
+        busdays = np.busday_count( start, end)
+        if (busdays > 0) & (busdays<=period+1):
+            return True
+    return False
+
 def run(ticker_chunk_df):
     if ticker_chunk_df.empty:
         return pd.DataFrame()
@@ -126,7 +137,8 @@ def run(ticker_chunk_df):
         # start_time = time.time()
         for date in ticker_df.index:
             date_ticker_df = ticker_df[ticker_df.index==date]
-            result = screen(date_ticker_df)
+            if(not is_qfq_in_period(date_ticker_df,qfq,60)):
+                result = screen(date_ticker_df)
             if not result.empty:
                 return_ticker_df = return_ticker_df.append(result)
         # print("%s seconds\n" %(time.time()-start_time))
@@ -142,6 +154,7 @@ def chunks(lst, n):
 end = datetime.date.today()
 processed_data_path=f"//jack-nas/Work/Python/ProcessedData/"
 screened_data_path=f"//jack-nas/Work/Python/ScreenedData/"
+qfq_path = '//jack-nas/Work/Python/RawData/'
 
 if __name__ == '__main__':
     isPathExists = os.path.exists(screened_data_path)
@@ -155,8 +168,10 @@ if __name__ == '__main__':
 
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
     df = df[df['date'] > '2017-01-01']
-    tickers = df.ticker.unique()
+    qfq = pd.read_feather(qfq_path+f'{end}'+'_qfq.feather')
+    qfq = qfq[qfq['date'] > '2017-01-01']
 
+    tickers = df.ticker.unique()
     cores = multiprocessing.cpu_count()
     ticker_chunk_list = list(chunks(tickers,int(len(tickers)/cores)))
     pool=Pool(cores)
