@@ -4,7 +4,7 @@ import os
 import wr_helper
 import multiprocessing
 from multiprocessing import Pool
-import time
+# import time
 
 backward = 200
 CAP_Limit = 2000000000
@@ -138,13 +138,13 @@ def run(ticker_chunk_df):
             continue
         elif len(df) <= backward+2:
             continue
-        start_time = time.time()
+        # start_time = time.time()
         df = cal_basics(df)
         df = wr_helper.Cal_Hist_WR(df,34)
         df = wr_helper.Cal_Hist_WR(df,120)
         df = cal_secret_num(df)
         df = cal_cum_turnover(df)
-        print("%s seconds\n" %(time.time()-start_time))
+        # print("%s seconds\n" %(time.time()-start_time))
         if not df.empty:
             return_ticker_chunk_df = return_ticker_chunk_df.append(df.loc[backward-1:len(df)-1],ignore_index=True)
     return return_ticker_chunk_df
