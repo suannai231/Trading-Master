@@ -121,7 +121,7 @@ def is_qfq_in_period(df,qfq,period):
             return True
     return False
 
-def run(ticker_chunk_df):
+def run(ticker_chunk_df,qfq):
     if ticker_chunk_df.empty:
         return pd.DataFrame()
     tickers = ticker_chunk_df.ticker.unique()
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     async_results = []
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
+        async_result = pool.apply_async(run, args=(ticker_chunk_df,qfq))
         async_results.append(async_result)
     pool.close()
     del(df)
