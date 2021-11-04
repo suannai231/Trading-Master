@@ -137,8 +137,9 @@ def run(ticker_chunk_df):
         # start_time = time.time()
         for date in ticker_df.index:
             date_ticker_df = ticker_df[ticker_df.index==date]
-            if(not is_qfq_in_period(date_ticker_df,qfq,60)):
-                result = screen(date_ticker_df)
+            if(is_qfq_in_period(date_ticker_df,qfq,60)):
+                continue
+            result = screen(date_ticker_df)
             if not result.empty:
                 return_ticker_df = return_ticker_df.append(result)
         # print("%s seconds\n" %(time.time()-start_time))
