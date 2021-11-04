@@ -112,7 +112,7 @@ def screen(df):
 
 def is_qfq_in_period(df,qfq,period):
     ticker = df.loc[df.index[-1],'ticker']
-    ticker_date = df.loc[df.index[-1],'date']
+    ticker_date = df.index[-1]
     for date in qfq[qfq.ticker==ticker].date:   # remove qfq
         start = ticker_date.date()
         end = date.date()
