@@ -12,6 +12,7 @@ days=365*6
 def get_stock(ticker_chunk):
     ticker_chunk_df = pd.DataFrame()
     for ticker in ticker_chunk:
+        # print('stock '+ticker)
         shares = -1
         try:
             quote_data = si.get_quote_data(ticker)
@@ -59,11 +60,15 @@ def get_stock(ticker_chunk):
 def get_qfq(ticker_chunk):
     ticker_chunk_df = pd.DataFrame()
     for ticker in ticker_chunk:
+        # print('qfq '+ticker)
         try:
             qfq_df = ak.stock_us_daily(symbol=ticker, adjust="qfq-factor")
         except Exception as e:
-            print(e)
-            continue
+            if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+                print(e)
+                exit()
+            else:
+                continue
         if not qfq_df.empty:
             qfq_df['ticker'] = ticker
             ticker_chunk_df = ticker_chunk_df.append(qfq_df)
@@ -95,10 +100,10 @@ if __name__ == '__main__':
     tickers = nasdaq + other
 
     cores = multiprocessing.cpu_count()
-    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/cores)))
+    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/(cores*1.8))))
 
     if qfq_file not in files:
-        pool1 = Pool(cores)
+        pool1 = Pool(int(cores*1.8))
         qfq_async_results = []
         for ticker_chunk in ticker_chunk_list:
             qfq_async_result = pool1.apply_async(get_qfq,args=(ticker_chunk,))
@@ -106,7 +111,7 @@ if __name__ == '__main__':
         pool1.close()
 
     if stock_file not in files:
-        pool2 = Pool(cores)
+        pool2 = Pool(int(cores*1.8))
         stock_async_results = []
         for ticker_chunk in ticker_chunk_list:
             stock_async_result = pool2.apply_async(get_stock,args=(ticker_chunk,))
