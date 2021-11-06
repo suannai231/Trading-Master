@@ -100,10 +100,10 @@ if __name__ == '__main__':
     tickers = nasdaq + other
 
     cores = multiprocessing.cpu_count()
-    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/(cores*1.7))))
+    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/(cores*1.4))))
 
     if qfq_file not in files:
-        pool1 = Pool(int(cores*1.7))
+        pool1 = Pool(int(cores*1.4))
         qfq_async_results = []
         for ticker_chunk in ticker_chunk_list:
             qfq_async_result = pool1.apply_async(get_qfq,args=(ticker_chunk,))
@@ -111,7 +111,7 @@ if __name__ == '__main__':
         pool1.close()
 
     if stock_file not in files:
-        pool2 = Pool(int(cores*1.7))
+        pool2 = Pool(int(cores*1.4))
         stock_async_results = []
         for ticker_chunk in ticker_chunk_list:
             stock_async_result = pool2.apply_async(get_stock,args=(ticker_chunk,))
