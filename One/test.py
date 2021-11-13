@@ -97,7 +97,7 @@ if __name__ == '__main__':
     qfq = pd.read_feather(qfq_path+f'{end}'+'_qfq.feather')
     qfq = qfq[qfq['date'] > '2017-01-01']
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
-    df = df[(df['date'] == '2021-11-11') & (df['ticker'] == 'WNW')]
+    df = df[(df['date'] == '2021-10-05') & (df['ticker'] == 'HX')]
     df.set_index('date',inplace=True)
     if(is_qfq_in_period(df,qfq,60)):
         exit()
