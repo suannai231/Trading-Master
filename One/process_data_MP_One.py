@@ -4,7 +4,7 @@ import os
 import wr_helper
 import multiprocessing
 from multiprocessing import Pool
-# import time
+import time
 
 backward = 200
 CAP_Limit = 2000000000
@@ -13,18 +13,31 @@ Price_Limit = 50
 def cal_cum_turnover(df):
     if len(df) <= backward+2:
         return pd.DataFrame()
-    current = len(df)
-    while current >= backward:
-        upper_cum_turn = 0
-        lower_cum_turn = 0
-        for i in range(current-backward,current):
-            if df.loc[i,'close'] <= df.loc[current-1,'close']:
-                lower_cum_turn += df.loc[i,'turn']
-            else:
-                upper_cum_turn += df.loc[i,'turn']
-        df.loc[current-1,'upper_cum_turn'] = upper_cum_turn
-        df.loc[current-1,'lower_cum_turn'] = lower_cum_turn
+    current = len(df) - 1
+    # start_time = time.time()
+    while current >= 0:
+        
+        # upper_cum_turn = 0
+        # lower_cum_turn = 0
+
+        # for i in range(current-backward,current):
+        #     if df.loc[i,'close'] <= df.loc[current-1,'close']:
+        #         lower_cum_turn += df.loc[i,'turn']
+        #     else:
+        #         upper_cum_turn += df.loc[i,'turn']
+
+        if(current-backward>=0):
+            start = current-backward
+        else:
+            start = 0
+        
+        lower_cum_turn = df.loc[start:current].loc[df.close <= df.loc[current,'close'],'turn'].sum()
+        upper_cum_turn = df.loc[start:current].loc[df.close > df.loc[current,'close'],'turn'].sum()
+
+        df.loc[current,'upper_cum_turn'] = upper_cum_turn
+        df.loc[current,'lower_cum_turn'] = lower_cum_turn
         current-=1
+    # print("--- %s seconds ---" % (time.time() - start_time))
     return df
 
 def cal_secret_num(df):
@@ -40,9 +53,9 @@ def cal_secret_num(df):
             wr120_larger_than_50_days += 1
         if df.WR120[i] > 80:
             wr120_larger_than_80_days += 1
-    df.loc[backward-1,'obv_above_zero_days'] = obv_above_zero_days
-    df.loc[backward-1,'wr120_larger_than_50_days'] = wr120_larger_than_50_days
-    df.loc[backward-1,'wr120_larger_than_80_days'] = wr120_larger_than_80_days
+        df.loc[i,'obv_above_zero_days'] = obv_above_zero_days
+        df.loc[i,'wr120_larger_than_50_days'] = wr120_larger_than_50_days
+        df.loc[i,'wr120_larger_than_80_days'] = wr120_larger_than_80_days
     i = backward
     while i<len(df):
         removed_index = i-backward
@@ -146,7 +159,7 @@ def run(ticker_chunk_df):
         df = cal_cum_turnover(df)
         # print("%s seconds\n" %(time.time()-start_time))
         if not df.empty:
-            return_ticker_chunk_df = return_ticker_chunk_df.append(df.loc[backward-1:len(df)-1],ignore_index=True)
+            return_ticker_chunk_df = return_ticker_chunk_df.append(df,ignore_index=True)
     return return_ticker_chunk_df
 
 def chunks(lst, n):

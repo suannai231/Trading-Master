@@ -37,7 +37,7 @@ def Cal_Hist_WR(df,wr_days):
     last = len(df) - 1
     df = Cal_WR(df, last, wr_days)
     current_index = len(df)-2
-    while current_index>=wr_days:
+    while current_index>=0:
         remove_index = current_index+1
         add_index = current_index-wr_days
         if (df.loc[remove_index,'high'] == df.loc[remove_index,str(wr_days)+'days_high_value']) | (df.loc[remove_index,'low'] == df.loc[remove_index,str(wr_days)+'days_low_value']):
@@ -48,10 +48,11 @@ def Cal_Hist_WR(df,wr_days):
             high_value = df.loc[remove_index,str(wr_days)+'days_high_value']
             low_value = df.loc[remove_index,str(wr_days)+'days_low_value']
 
-        if df.loc[add_index,'high'] > high_value:
-            high_value = df.loc[add_index,'high']
-        if df.loc[add_index,'low'] < low_value:
-            low_value = df.loc[add_index,'low']
+        if(add_index>=0):
+            if df.loc[add_index,'high'] > high_value:
+                high_value = df.loc[add_index,'high']
+            if df.loc[add_index,'low'] < low_value:
+                low_value = df.loc[add_index,'low']
 
         df.loc[current_index,str(wr_days)+'days_high_value'] = high_value
         df.loc[current_index,str(wr_days)+'days_low_value'] = low_value
