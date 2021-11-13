@@ -28,15 +28,15 @@ OBV_ABOVE_ZERO_DAYS_25 = 180    # tested EH SNDL
 OBV_ABOVE_ZERO_DAYS_75 = 200
 OBV_DIFF_RATE_25 = 0    # disabled
 OBV_DIFF_RATE_75 = 1    # disabled
-CUM_TURN_RATE_25 = 0
-CUM_TURN_RATE_75 = 3.5 # tested RCMT HX
+CUM_TURN_RATE_25 = 0    # disabled
+CUM_TURN_RATE_75 = 3.5  # disabled
 WR34_25 = 0
-WR34_75 = 60
+WR34_75 = 53
 WR120_25 = 0
-WR120_75 = 80
-WR120_GREATER_THAN_50_DAYS_25 = 107  # tested CEI RCMT AEHR EH
+WR120_75 = 84
+WR120_GREATER_THAN_50_DAYS_25 = 150  # tested CEI RCMT AEHR EH
 WR120_GREATER_THAN_50_DAYS_75 = 200
-WR120_GREATER_THAN_80_DAYS_25 = 34 # Tested ACY CPSH AEHR
+WR120_GREATER_THAN_80_DAYS_25 = 100 # Tested ACY CPSH AEHR
 WR120_GREATER_THAN_80_DAYS_75 = 200
 
 def screen(df):
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     qfq = pd.read_feather(qfq_path+f'{end}'+'_qfq.feather')
     qfq = qfq[qfq['date'] > '2017-01-01']
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
-    df = df[(df['date'] == '2021-10-05') & (df['ticker'] == 'HX')]
+    df = df[(df['date'] == '2021-11-12') & (df['ticker'] == 'WNW')]
     df.set_index('date',inplace=True)
     if(is_qfq_in_period(df,qfq,60)):
         exit()
