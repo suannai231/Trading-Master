@@ -2,6 +2,7 @@ import pandas as pd
 import datetime
 from multiprocessing import Pool
 import numpy as np
+from pandas.core.frame import DataFrame
 
 CLOSE_ABOVE_EMA = True
 MACD_DIF_ABOVE_MACD_DEA = True
@@ -89,15 +90,17 @@ def is_qfq_in_period(df,qfq,period):
     return False
 
 end = datetime.date.today()
+data_date = '2021-12-10'
+stock_date = '2021-12-09'
 processed_data_path=f"//jack-nas/Work/Python/ProcessedData/"
 screened_data_path=f"//jack-nas/Work/Python/ScreenedData/"
 qfq_path = '//jack-nas/Work/Python/RawData/'
 
 if __name__ == '__main__':
-    qfq = pd.read_feather(qfq_path+f'{end}'+'_qfq.feather')
+    qfq = pd.read_feather(qfq_path + data_date + '_qfq.feather')
     qfq = qfq[qfq['date'] > '2017-01-01']
-    df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
-    df = df[(df['date'] == '2021-11-12') & (df['ticker'] == 'WNW')]
+    df = pd.read_feather(processed_data_path + data_date + '.feather')
+    df = df[(df['date'] == stock_date) & (df['ticker'] == 'ABUS')]
     df.set_index('date',inplace=True)
     if(is_qfq_in_period(df,qfq,60)):
         exit()
