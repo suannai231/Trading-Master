@@ -55,7 +55,7 @@ def screen(df):
     if TURN_RATE & (df['turn'][lastindex] < TURN_RATE_LOW):
         return pd.DataFrame()
 
-    if CLOSE_ABOVE_EMA & ((df['close'][lastindex] < df['EMA5'][lastindex]) | (df['EMA5'][lastindex] < df['EMA10'][lastindex]) | (df['EMA10'][lastindex] < df['EMA20'][lastindex]) | (df['EMA5'][lastindex] < df['EMA60'][lastindex]) | (df['EMA10'][lastindex] < df['EMA60'][lastindex])):
+    if CLOSE_ABOVE_EMA & ((df['EMA5'][lastindex] < df['EMA10'][lastindex]) | (df['EMA10'][lastindex] < df['EMA20'][lastindex]) | (df['EMA5'][lastindex] < df['EMA60'][lastindex]) | (df['EMA10'][lastindex] < df['EMA60'][lastindex])):
         return pd.DataFrame()
 
     if MACD_DIF_ABOVE_MACD_DEA & ((df['MACD_dif'][lastindex]-df['MACD_dea'][lastindex]) < 0):
