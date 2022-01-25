@@ -165,10 +165,10 @@ def run(ticker_chunk_df):
             continue
         # start_time = time.time()
         df = cal_basics(df)
-        df = wr_helper.Cal_Hist_WR(df,21)
-        df = wr_helper.Cal_Hist_WR(df,42)
+        # df = wr_helper.Cal_Hist_WR(df,21)
+        # df = wr_helper.Cal_Hist_WR(df,42)
         # df = cal_secret_num(df)
-        df = cal_cum_turnover(df)
+        # df = cal_cum_turnover(df)
         # print("%s seconds\n" %(time.time()-start_time))
         if not df.empty:
             return_ticker_chunk_df = return_ticker_chunk_df.append(df,ignore_index=True)

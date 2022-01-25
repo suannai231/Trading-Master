@@ -48,18 +48,28 @@ WR42_LOW = 0
 # WR120_GREATER_THAN_50_DAYS_75 = 200
 # WR120_GREATER_THAN_80_DAYS_25 = 34 # Tested ACY CPSH AEHR
 # WR120_GREATER_THAN_80_DAYS_75 = 200
+backward = 100
+CUM_TURN_LOW = 20
 
 def screen(df):
-    lastindex = df.index[-1]
-
-    if TURN_RATE & (df['turn'][lastindex] < TURN_RATE_LOW):
+    # lastindex = df.index[-1]
+    current = len(df) - 1
+    if(current-backward>=0):
+        start = current-backward
+    else:
+        start = 0
+    cum_turn = df.loc[start:current]['turn'].sum()
+    if cum_turn < CUM_TURN_LOW:
         return pd.DataFrame()
 
-    if CLOSE_ABOVE_EMA & ((df['close'][lastindex] < df['EMA5'][lastindex]) | (df['EMA5'][lastindex] < df['EMA10'][lastindex]) | (df['EMA10'][lastindex] < df['EMA20'][lastindex]) | (df['EMA5'][lastindex] < df['EMA60'][lastindex]) | (df['EMA10'][lastindex] < df['EMA60'][lastindex])):
-        return pd.DataFrame()
+    # if TURN_RATE & (df['turn'][lastindex] < TURN_RATE_LOW):
+    #     return pd.DataFrame()
 
-    if MACD_DIF_ABOVE_MACD_DEA & ((df['MACD_dif'][lastindex]-df['MACD_dea'][lastindex]) < 0):
-        return pd.DataFrame()
+    # if CLOSE_ABOVE_EMA & ((df['close'][lastindex] < df['EMA5'][lastindex]) | (df['EMA5'][lastindex] < df['EMA10'][lastindex]) | (df['EMA10'][lastindex] < df['EMA20'][lastindex]) | (df['EMA5'][lastindex] < df['EMA60'][lastindex]) | (df['EMA10'][lastindex] < df['EMA60'][lastindex])):
+    #     return pd.DataFrame()
+
+    # if MACD_DIF_ABOVE_MACD_DEA & ((df['MACD_dif'][lastindex]-df['MACD_dea'][lastindex]) < 0):
+    #     return pd.DataFrame()
 
     # if TURN_2575 & ((df['turn'][lastindex] > TURN_75) | (df['turn'][lastindex] < TURN_25)):
     #     return pd.DataFrame()
@@ -70,15 +80,15 @@ def screen(df):
     # if OBV_DIFF_RATE_2575 & ((df['OBV_DIFF_RATE'][lastindex] > OBV_DIFF_RATE_75) | (df['OBV_DIFF_RATE'][lastindex] < OBV_DIFF_RATE_25)):
     #     return pd.DataFrame()
 
-    cum_turn_rate = df['upper_cum_turn'][lastindex]/df['lower_cum_turn'][lastindex]
-    if CUM_TURN_RATE_2575 & ((cum_turn_rate > CUM_TURN_RATE_75) | (cum_turn_rate < CUM_TURN_RATE_25)):
-        return pd.DataFrame()
+    # cum_turn_rate = df['upper_cum_turn'][lastindex]/df['lower_cum_turn'][lastindex]
+    # if CUM_TURN_RATE_2575 & ((cum_turn_rate > CUM_TURN_RATE_75) | (cum_turn_rate < CUM_TURN_RATE_25)):
+    #     return pd.DataFrame()
 
-    if WR21 & ((df.WR21[lastindex] > WR21_HIGH) | (df.WR21[lastindex] < WR21_LOW)):
-        return pd.DataFrame()
+    # if WR21 & ((df.WR21[lastindex] > WR21_HIGH) | (df.WR21[lastindex] < WR21_LOW)):
+    #     return pd.DataFrame()
 
-    if WR42 & ((df.WR42[lastindex] > WR42_HIGH) | (df.WR42[lastindex] < WR42_LOW)):
-        return pd.DataFrame()
+    # if WR42 & ((df.WR42[lastindex] > WR42_HIGH) | (df.WR42[lastindex] < WR42_LOW)):
+    #     return pd.DataFrame()
 
     # if WR34_2575 & ((df.WR34[lastindex] > WR34_75) | (df.WR34[lastindex] < WR34_25)):
     #     return pd.DataFrame()
