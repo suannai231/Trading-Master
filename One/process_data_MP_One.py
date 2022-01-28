@@ -6,7 +6,7 @@ import multiprocessing
 from multiprocessing import Pool
 import time
 
-backward = 200
+backward = 50
 CAP_Limit = 2000000000
 Price_Limit = 50
 
@@ -100,41 +100,41 @@ def cal_basics(df):
     df['turn'] = df.volume/shares
     # df['cum_turnover'] = df['turn'].cumsum()
 
-    ema5 = df['close'].ewm(span = 5, adjust = False).mean()
-    ema10 = df['close'].ewm(span = 10, adjust = False).mean()
-    ema20 = df['close'].ewm(span = 20, adjust = False).mean()
-    ema60 = df['close'].ewm(span = 60, adjust = False).mean()
-    ema12 = df['close'].ewm(span = 12, adjust = False).mean()
-    ema26 = df['close'].ewm(span = 26, adjust = False).mean()
-    ema34 = df['close'].ewm(span = 34, adjust = False).mean()
-    ema120 = df['close'].ewm(span = 120, adjust = False).mean()
-    df['EMA5'] = ema5
-    df['EMA10'] = ema10
-    df['EMA20'] = ema20
-    df['EMA60'] = ema60
-    df['EMA12'] = ema12
-    df['EMA26'] = ema26
-    df['EMA34'] = ema34
-    df['EMA120'] = ema120
+    # ema5 = df['close'].ewm(span = 5, adjust = False).mean()
+    # ema10 = df['close'].ewm(span = 10, adjust = False).mean()
+    # ema20 = df['close'].ewm(span = 20, adjust = False).mean()
+    # ema60 = df['close'].ewm(span = 60, adjust = False).mean()
+    # ema12 = df['close'].ewm(span = 12, adjust = False).mean()
+    # ema26 = df['close'].ewm(span = 26, adjust = False).mean()
+    # ema34 = df['close'].ewm(span = 34, adjust = False).mean()
+    # ema120 = df['close'].ewm(span = 120, adjust = False).mean()
+    # df['EMA5'] = ema5
+    # df['EMA10'] = ema10
+    # df['EMA20'] = ema20
+    # df['EMA60'] = ema60
+    # df['EMA12'] = ema12
+    # df['EMA26'] = ema26
+    # df['EMA34'] = ema34
+    # df['EMA120'] = ema120
 
-    MACD_dif = ema12 - ema26
-    MACD_dea = MACD_dif.ewm(span = 9, adjust = False).mean()
-    df['MACD_dif'] = MACD_dif
-    df['MACD_dea'] = MACD_dea
+    # MACD_dif = ema12 - ema26
+    # MACD_dea = MACD_dif.ewm(span = 9, adjust = False).mean()
+    # df['MACD_dif'] = MACD_dif
+    # df['MACD_dea'] = MACD_dea
             
-    OBV = []
-    OBV.append(0)
-    for i in range(startindex+1, endindex):
-        if df.loc[i,'close'] > df.loc[i-1,'close']: #If the closing price is above the prior close price 
-            OBV.append(OBV[-1] + df.loc[i,'volume']) #then: Current OBV = Previous OBV + Current volume
-        elif df.close[i] < df.close[i-1]:
-            OBV.append(OBV[-1] - df.loc[i,'volume'])
-        else:
-            OBV.append(OBV[-1])
+    # OBV = []
+    # OBV.append(0)
+    # for i in range(startindex+1, endindex):
+    #     if df.loc[i,'close'] > df.loc[i-1,'close']: #If the closing price is above the prior close price 
+    #         OBV.append(OBV[-1] + df.loc[i,'volume']) #then: Current OBV = Previous OBV + Current volume
+    #     elif df.close[i] < df.close[i-1]:
+    #         OBV.append(OBV[-1] - df.loc[i,'volume'])
+    #     else:
+    #         OBV.append(OBV[-1])
 
-    df['OBV'] = OBV
-    df['OBV_EMA34'] = df['OBV'].ewm(com=34).mean()
-    df['OBV_DIFF'] = df['OBV'] - df['OBV_EMA34']
+    # df['OBV'] = OBV
+    # df['OBV_EMA34'] = df['OBV'].ewm(com=34).mean()
+    # df['OBV_DIFF'] = df['OBV'] - df['OBV_EMA34']
     # max_obv_diff = 0
 
     # OBV_DIFF_RATE = []
@@ -168,7 +168,7 @@ def run(ticker_chunk_df):
         # df = wr_helper.Cal_Hist_WR(df,21)
         # df = wr_helper.Cal_Hist_WR(df,42)
         # df = cal_secret_num(df)
-        # df = cal_cum_turnover(df)
+        df = cal_cum_turnover(df)
         # print("%s seconds\n" %(time.time()-start_time))
         if not df.empty:
             return_ticker_chunk_df = return_ticker_chunk_df.append(df,ignore_index=True)

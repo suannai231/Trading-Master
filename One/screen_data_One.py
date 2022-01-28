@@ -49,18 +49,17 @@ WR42_LOW = 0
 # WR120_GREATER_THAN_80_DAYS_25 = 34 # Tested ACY CPSH AEHR
 # WR120_GREATER_THAN_80_DAYS_75 = 200
 backward = 100
-CUM_TURN_LOW = 20
+CUM_TURN_LOW = 4
 
 def screen(df):
-    # lastindex = df.index[-1]
-    current = len(df) - 1
-    if(current-backward>=0):
-        start = current-backward
-    else:
-        start = 0
-    cum_turn = df.loc[start:current]['turn'].sum()
-    if cum_turn < CUM_TURN_LOW:
-        return pd.DataFrame()
+    lastindex = df.index[-1]
+    upper_cum_turn = df.loc[lastindex]['upper_cum_turn']
+    lower_cum_turn = df.loc[lastindex]['lower_cum_turn']
+    cum_turn = upper_cum_turn+lower_cum_turn
+    if cum_turn < 1:
+        return df
+    
+    return pd.DataFrame()
 
     # if TURN_RATE & (df['turn'][lastindex] < TURN_RATE_LOW):
     #     return pd.DataFrame()
@@ -101,8 +100,6 @@ def screen(df):
 
     # if WR120_80_2575 & ((df['wr120_larger_than_80_days'][lastindex] < WR120_GREATER_THAN_80_DAYS_25) | (df['wr120_larger_than_80_days'][lastindex] > WR120_GREATER_THAN_80_DAYS_75)):
     #     return pd.DataFrame()
-
-    return df
 
 def is_qfq_in_period(df,qfq,period):
     ticker = df.loc[df.index[-1],'ticker']
