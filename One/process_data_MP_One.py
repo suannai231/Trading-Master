@@ -6,7 +6,7 @@ import multiprocessing
 from multiprocessing import Pool
 import time
 
-backward = 150
+backward = 80
 CAP_Limit = 2000000000
 Price_Limit = 50
 
