@@ -10,6 +10,43 @@ backward = 80
 CAP_Limit = 2000000000
 Price_Limit = 50
 
+def HHV(df,wr_days):
+    high = 0
+    if len(df) < wr_days:
+        wr_days = df.index[-1]
+    for i in range(len(df)-wr_days,len(df)):
+        if df.loc[i,'MACD_dif'] > high:
+            high = df.loc[i,'MACD_dif'] 
+    return high
+
+def Cal_MACD_High(df,i,wr_days):
+    if df.empty:
+        return df
+    high_value = HHV(df.loc[0:i],wr_days)
+    df.loc[i,str(wr_days)+'days_high_value'] = high_value
+    return df
+
+def Cal_Hist_MACD_High(df,wr_days):
+    if df.empty:
+        return df
+    last = len(df) - 1
+    df = Cal_MACD_High(df, last, wr_days)
+    current_index = len(df)-2
+    while current_index>=0:
+        remove_index = current_index+1
+        add_index = current_index-wr_days
+        if (df.loc[remove_index,'MACD_dif'] == df.loc[remove_index,str(wr_days)+'days_high_value']):
+            df = Cal_MACD_High(df, current_index ,wr_days)
+            high_value = df.loc[current_index,str(wr_days)+'days_high_value']
+        else:
+            high_value = df.loc[remove_index,str(wr_days)+'days_high_value']
+        if(add_index>=0):
+            if df.loc[add_index,'MACD_dif'] > high_value:
+                high_value = df.loc[add_index,'MACD_dif']
+        df.loc[current_index,str(wr_days)+'days_high_value'] = high_value
+        current_index-=1
+    return df
+    
 def cal_cum_turnover(df):
     if len(df) <= backward+2:
         return pd.DataFrame()
@@ -102,25 +139,26 @@ def cal_basics(df):
 
     # ema5 = df['close'].ewm(span = 5, adjust = False).mean()
     # ema10 = df['close'].ewm(span = 10, adjust = False).mean()
-    # ema20 = df['close'].ewm(span = 20, adjust = False).mean()
-    # ema60 = df['close'].ewm(span = 60, adjust = False).mean()
+    ema20 = df['close'].ewm(span = 20, adjust = False).mean()
+    ema60 = df['close'].ewm(span = 60, adjust = False).mean()
     # ema12 = df['close'].ewm(span = 12, adjust = False).mean()
     # ema26 = df['close'].ewm(span = 26, adjust = False).mean()
     # ema34 = df['close'].ewm(span = 34, adjust = False).mean()
     # ema120 = df['close'].ewm(span = 120, adjust = False).mean()
     # df['EMA5'] = ema5
     # df['EMA10'] = ema10
-    # df['EMA20'] = ema20
-    # df['EMA60'] = ema60
+    df['EMA20'] = ema20
+    df['EMA60'] = ema60
     # df['EMA12'] = ema12
     # df['EMA26'] = ema26
     # df['EMA34'] = ema34
     # df['EMA120'] = ema120
 
+    MACD_dif = ema20 - ema60
     # MACD_dif = ema12 - ema26
-    # MACD_dea = MACD_dif.ewm(span = 9, adjust = False).mean()
-    # df['MACD_dif'] = MACD_dif
-    # df['MACD_dea'] = MACD_dea
+    MACD_dea = MACD_dif.ewm(span = 9, adjust = False).mean()
+    df['MACD_dif'] = MACD_dif
+    df['MACD_dea'] = MACD_dea
             
     # OBV = []
     # OBV.append(0)
@@ -165,11 +203,12 @@ def run(ticker_chunk_df):
             continue
         # start_time = time.time()
         df = cal_basics(df)
-        df = wr_helper.Cal_Hist_WR(df,backward)
+        df = Cal_Hist_MACD_High(df,backward)
+        # df = wr_helper.Cal_Hist_WR(df,backward)
         # df = wr_helper.Cal_Hist_WR(df,21)
         # df = wr_helper.Cal_Hist_WR(df,42)
         # df = cal_secret_num(df)
-        df = cal_cum_turnover(df)
+        # df = cal_cum_turnover(df)
         # print("%s seconds\n" %(time.time()-start_time))
         if not df.empty:
             return_ticker_chunk_df = return_ticker_chunk_df.append(df,ignore_index=True)
