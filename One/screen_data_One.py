@@ -48,8 +48,8 @@ WR42_LOW = 0
 # WR120_GREATER_THAN_50_DAYS_75 = 200
 # WR120_GREATER_THAN_80_DAYS_25 = 34 # Tested ACY CPSH AEHR
 # WR120_GREATER_THAN_80_DAYS_75 = 200
-backward = 150
-CUM_TURN_LOW = 1
+backward = 80
+CUM_TURN_LOW = 3
 INCREASE_LOW = 0.8
 
 def screen(df):
@@ -62,10 +62,9 @@ def screen(df):
     
     days_high_value_str = str(backward)+'days_high_value'
     days_high_values = df.loc[lastindex][days_high_value_str]
-    days_low_value_str = str(backward)+'days_low_value'
-    days_low_values = df.loc[lastindex][days_low_value_str]
-    increase = (days_high_values - days_low_values)/days_low_values
-    if (increase < INCREASE_LOW) and (cum_turn < CUM_TURN_LOW):
+
+    MACD_dif = df.loc[lastindex]['MACD_dif']
+    if MACD_dif >= days_high_values:
         return df
 
     return pd.DataFrame()
