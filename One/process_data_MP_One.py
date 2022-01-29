@@ -6,7 +6,7 @@ import multiprocessing
 from multiprocessing import Pool
 import time
 
-backward = 50
+backward = 150
 CAP_Limit = 2000000000
 Price_Limit = 50
 
@@ -165,6 +165,7 @@ def run(ticker_chunk_df):
             continue
         # start_time = time.time()
         df = cal_basics(df)
+        df = wr_helper.Cal_Hist_WR(df,backward)
         # df = wr_helper.Cal_Hist_WR(df,21)
         # df = wr_helper.Cal_Hist_WR(df,42)
         # df = cal_secret_num(df)
