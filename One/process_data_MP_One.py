@@ -154,11 +154,11 @@ def cal_basics(df):
     # df['EMA34'] = ema34
     # df['EMA120'] = ema120
 
-    MACD_dif = ema20 - ema60
+    # MACD_dif = ema20 - ema60
     # MACD_dif = ema12 - ema26
-    MACD_dea = MACD_dif.ewm(span = 9, adjust = False).mean()
-    df['MACD_dif'] = MACD_dif
-    df['MACD_dea'] = MACD_dea
+    # MACD_dea = MACD_dif.ewm(span = 9, adjust = False).mean()
+    # df['MACD_dif'] = MACD_dif
+    # df['MACD_dea'] = MACD_dea
             
     # OBV = []
     # OBV.append(0)
@@ -203,7 +203,7 @@ def run(ticker_chunk_df):
             continue
         # start_time = time.time()
         df = cal_basics(df)
-        df = Cal_Hist_MACD_High(df,backward)
+        # df = Cal_Hist_MACD_High(df,backward)
         # df = wr_helper.Cal_Hist_WR(df,backward)
         # df = wr_helper.Cal_Hist_WR(df,21)
         # df = wr_helper.Cal_Hist_WR(df,42)
@@ -254,4 +254,5 @@ if __name__ == '__main__':
     df.reset_index(drop=True,inplace=True)
     df.to_feather(processed_data_path + f'{end}' + '.feather')
 
-    os.popen(f'python C:/Code/One/analyze_data_MP_One.py')
+    # os.popen(f'python C:/Code/One/analyze_data_MP_One.py')
+    os.popen(f'python C:/Code/One/screen_data_One.py')

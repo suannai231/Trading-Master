@@ -4,6 +4,7 @@ import datetime
 import os
 from multiprocessing import Pool
 import numpy as np
+from datetime import timedelta
 
 CLOSE_ABOVE_EMA = True
 MACD_DIF_ABOVE_MACD_DEA = True
@@ -53,18 +54,28 @@ CUM_TURN_LOW = 3
 INCREASE_LOW = 0.8
 
 def screen(df):
-    lastindex = df.index[-1]
-    upper_cum_turn = df.loc[lastindex]['upper_cum_turn']
-    lower_cum_turn = df.loc[lastindex]['lower_cum_turn']
-    cum_turn = upper_cum_turn+lower_cum_turn
+    # lastindex = df.index[-1]
+    # lastindex2 = df.index[-2]
+    # upper_cum_turn = df.loc[lastindex]['upper_cum_turn']
+    # lower_cum_turn = df.loc[lastindex]['lower_cum_turn']
+    # cum_turn = upper_cum_turn+lower_cum_turn
     # if cum_turn < CUM_TURN_LOW:
     #     return df
     
-    days_high_value_str = str(backward)+'days_high_value'
-    days_high_values = df.loc[lastindex][days_high_value_str]
+    # days_high_value_str = str(backward)+'days_high_value'
+    # days_high_values = df.loc[lastindex][days_high_value_str]
 
-    MACD_dif = df.loc[lastindex]['MACD_dif']
-    if MACD_dif >= days_high_values:
+    # MACD_dif = df.loc[lastindex]['MACD_dif']
+    # if MACD_dif >= days_high_values:
+    #     return df
+
+    close = df.iloc[-1]['close']
+    last_ema20 = df.iloc[-1]['EMA20']
+
+    close2 = df.iloc[-2]['close']
+    last2_ema20 = df.iloc[-2]['EMA20']
+
+    if (close2<=last2_ema20) and (close>=last_ema20):
         return df
 
     return pd.DataFrame()
@@ -136,14 +147,24 @@ def run(ticker_chunk_df,qfq):
             continue
         return_ticker_df = pd.DataFrame()
         # start_time = time.time()
-        for date in ticker_df.index:
-            date_ticker_df = ticker_df[ticker_df.index==date]
-            # if(is_qfq_in_period(date_ticker_df,qfq,60)):
-            #     continue
-            result = screen(date_ticker_df)
-            if not result.empty:
-                return_ticker_df = return_ticker_df.append(result)
+        # for date in ticker_df.index:
+        #     date2 = date - timedelta(days=1)
+        #     dates = []
+        #     dates.append(date2)
+        #     while not np.is_busday(dates):
+        #         date2 = date2 - timedelta(days=1)
+        #     date_ticker_df = ticker_df[(ticker_df.index==date) and (ticker_df.index==date2)]
+        #     # if(is_qfq_in_period(date_ticker_df,qfq,60)):
+        #     #     continue
+        #     if date_ticker_df.empty:
+        #         continue
+        #     result = screen(date_ticker_df)
+        #     if not result.empty:
+        #         return_ticker_df = return_ticker_df.append(result)
         # print("%s seconds\n" %(time.time()-start_time))
+        result = screen(ticker_df)
+        if not result.empty:
+            return_ticker_df = return_ticker_df.append(result)
         if not return_ticker_df.empty:
             return_ticker_chunk_df = return_ticker_chunk_df.append(return_ticker_df)
     return return_ticker_chunk_df
