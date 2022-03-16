@@ -77,7 +77,7 @@ def screen(df):
     last2_ema20 = df.iloc[-2]['EMA20']
     volume2 = df.iloc[-2]['volume']
 
-    if (close2<=last2_ema20) and (close>=last_ema20) and (volume >= volume2*2):
+    if (close2<=last2_ema20) and (close>=last_ema20) and (volume >= volume2*3):
         return df.tail(1)
 
     return pd.DataFrame()
