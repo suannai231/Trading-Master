@@ -71,12 +71,14 @@ def screen(df):
 
     close = df.iloc[-1]['close']
     last_ema20 = df.iloc[-1]['EMA20']
+    volume = df.iloc[-1]['volume']
 
     close2 = df.iloc[-2]['close']
     last2_ema20 = df.iloc[-2]['EMA20']
+    volume2 = df.iloc[-2]['volume']
 
-    if (close2<=last2_ema20) and (close>=last_ema20):
-        return df
+    if (close2<=last2_ema20) and (close>=last_ema20) and (volume >= volume2*2):
+        return df.tail(1)
 
     return pd.DataFrame()
 
@@ -147,24 +149,26 @@ def run(ticker_chunk_df,qfq):
             continue
         return_ticker_df = pd.DataFrame()
         # start_time = time.time()
-        # for date in ticker_df.index:
-        #     date2 = date - timedelta(days=1)
-        #     dates = []
-        #     dates.append(date2)
-        #     while not np.is_busday(dates):
-        #         date2 = date2 - timedelta(days=1)
-        #     date_ticker_df = ticker_df[(ticker_df.index==date) and (ticker_df.index==date2)]
+        for date in ticker_df.index:
+            date2 = date - timedelta(days=1)
+            i = 0
+            while (date2 not in ticker_df.index) and (i<3):
+                date2 = date2 - timedelta(days=1)
+                i=i+1
+            if i == 3:
+                continue
+            date_ticker_df = ticker_df[(ticker_df.index==date) | (ticker_df.index==date2)]
         #     # if(is_qfq_in_period(date_ticker_df,qfq,60)):
         #     #     continue
-        #     if date_ticker_df.empty:
-        #         continue
-        #     result = screen(date_ticker_df)
-        #     if not result.empty:
-        #         return_ticker_df = return_ticker_df.append(result)
+            if date_ticker_df.empty:
+                continue
+            result = screen(date_ticker_df)
+            if not result.empty:
+                return_ticker_df = return_ticker_df.append(result)
         # print("%s seconds\n" %(time.time()-start_time))
-        result = screen(ticker_df)
-        if not result.empty:
-            return_ticker_df = return_ticker_df.append(result)
+        # result = screen(ticker_df)
+        # if not result.empty:
+        #     return_ticker_df = return_ticker_df.append(result)
         if not return_ticker_df.empty:
             return_ticker_chunk_df = return_ticker_chunk_df.append(return_ticker_df)
     return return_ticker_chunk_df
