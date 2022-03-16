@@ -136,7 +136,7 @@ def is_qfq_in_period(df,qfq,period):
             return True
     return False
 
-def run(ticker_chunk_df,qfq):
+def run(ticker_chunk_df):
     if ticker_chunk_df.empty:
         return pd.DataFrame()
     tickers = ticker_chunk_df.ticker.unique()
@@ -146,7 +146,7 @@ def run(ticker_chunk_df,qfq):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-        if ticker_df.empty:
+        if ticker_df.empty or (ticker_df.iloc[0]['close'] < ticker_df.iloc[0]['EMA20']):
             continue
         return_ticker_df = pd.DataFrame()
         # start_time = time.time()
@@ -170,6 +170,7 @@ def run(ticker_chunk_df,qfq):
         # result = screen(ticker_df)
         # if not result.empty:
         #     return_ticker_df = return_ticker_df.append(result)
+
         if not return_ticker_df.empty:
             return_ticker_chunk_df = return_ticker_chunk_df.append(return_ticker_df)
     return return_ticker_chunk_df
@@ -196,8 +197,8 @@ if __name__ == '__main__':
 
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
     df = df[df['date'] > '2017-01-01']
-    qfq = pd.read_feather(qfq_path+f'{end}'+'_qfq.feather')
-    qfq = qfq[qfq['date'] > '2017-01-01']
+    # qfq = pd.read_feather(qfq_path+f'{end}'+'_qfq.feather')
+    # qfq = qfq[qfq['date'] > '2017-01-01']
 
     tickers = df.ticker.unique()
     cores = multiprocessing.cpu_count()
@@ -206,14 +207,15 @@ if __name__ == '__main__':
     async_results = []
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run, args=(ticker_chunk_df,qfq))
+        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
         async_results.append(async_result)
     pool.close()
-    del(df)
-    df = pd.DataFrame()
+
+    return_df = pd.DataFrame()
     for async_result in async_results:
         result = async_result.get()
         if not result.empty:
-            df = df.append(result)
-    df.reset_index(drop=False,inplace=True)
-    df.to_csv(screened_data_path + f'{end}' + '.csv')
+            return_df = return_df.append(result)
+    
+    return_df.reset_index(drop=False,inplace=True)
+    return_df.to_csv(screened_data_path + f'{end}' + '.csv')
