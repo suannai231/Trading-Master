@@ -199,8 +199,8 @@ def run(ticker_chunk_df):
             continue
         elif df['close'][lastindex] > Price_Limit:
             continue
-        elif len(df) <= backward+2:
-            continue
+        # elif len(df) <= backward+2:
+        #     continue
         # start_time = time.time()
         df = cal_basics(df)
         # df = Cal_Hist_MACD_High(df,backward)
