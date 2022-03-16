@@ -146,7 +146,7 @@ def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-        if ticker_df.empty or (ticker_df.iloc[0]['close'] < ticker_df.iloc[0]['EMA20']):
+        if ticker_df.empty or (ticker_df.iloc[-1]['close'] < ticker_df.iloc[-1]['EMA20']):
             continue
         return_ticker_df = pd.DataFrame()
         # start_time = time.time()
