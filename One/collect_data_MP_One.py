@@ -82,7 +82,7 @@ def chunks(lst, n):
 start = datetime.datetime.now() - datetime.timedelta(days)
 end = datetime.date.today()
 
-path = '//jack-nas/Work/Python/RawData/'
+path = 'C:/Python/RawData/'
 
 if __name__ == '__main__':
     isPathExists = os.path.exists(path)
@@ -100,16 +100,16 @@ if __name__ == '__main__':
     tickers = nasdaq + other
 
     cores = multiprocessing.cpu_count()
-    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/(cores))))
+    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/(cores*4))))
     proc_num = len(ticker_chunk_list)
 
-    if qfq_file not in files:
-        pool1 = Pool(proc_num)
-        qfq_async_results = []
-        for ticker_chunk in ticker_chunk_list:
-            qfq_async_result = pool1.apply_async(get_qfq,args=(ticker_chunk,))
-            qfq_async_results.append(qfq_async_result)
-        pool1.close()
+    # if qfq_file not in files:
+    #     pool1 = Pool(proc_num)
+    #     qfq_async_results = []
+    #     for ticker_chunk in ticker_chunk_list:
+    #         qfq_async_result = pool1.apply_async(get_qfq,args=(ticker_chunk,))
+    #         qfq_async_results.append(qfq_async_result)
+    #     pool1.close()
 
     if stock_file not in files:
         pool2 = Pool(proc_num)
@@ -120,14 +120,14 @@ if __name__ == '__main__':
         pool2.close()
 
     # pool1.join()
-    if qfq_file not in files:
-        qfq_concat_df = pd.DataFrame()
-        for qfq_async_result in qfq_async_results:
-            qfq_chunk_df = qfq_async_result.get()
-            if not qfq_chunk_df.empty:
-                qfq_concat_df = qfq_concat_df.append(qfq_chunk_df)
-        qfq_concat_df.reset_index(inplace=True)
-        qfq_concat_df.to_feather(path+f'{end}'+'_qfq.feather')
+    # if qfq_file not in files:
+    #     qfq_concat_df = pd.DataFrame()
+    #     for qfq_async_result in qfq_async_results:
+    #         qfq_chunk_df = qfq_async_result.get()
+    #         if not qfq_chunk_df.empty:
+    #             qfq_concat_df = qfq_concat_df.append(qfq_chunk_df)
+    #     qfq_concat_df.reset_index(inplace=True)
+    #     qfq_concat_df.to_feather(path+f'{end}'+'_qfq.feather')
     
     # pool2.join()
     if stock_file not in files:
@@ -137,9 +137,10 @@ if __name__ == '__main__':
             if not stock_chunk_df.empty:
                 stock_concat_df = stock_concat_df.append(stock_chunk_df)
         stock_concat_df.reset_index(inplace=True)
-        stock_concat_df.to_feather(path+f'{end}'+'_stock.feather')
+        # stock_concat_df.to_feather(path+f'{end}'+'_stock.feather')
+        stock_concat_df.to_feather(path+f'{end}'+'.feather')
 
-    if (stock_file not in files) & (qfq_file not in files):
-        merged_df = pd.merge(stock_concat_df, qfq_concat_df, how='left', on=["ticker", "date"])
-        merged_df.to_feather(path+f'{end}'+'.feather')
+    # if (stock_file not in files) & (qfq_file not in files):
+    #     merged_df = pd.merge(stock_concat_df, qfq_concat_df, how='left', on=["ticker", "date"])
+    #     merged_df.to_feather(path+f'{end}'+'.feather')
     os.popen(f'python C:/Code/One/process_data_MP_One.py')

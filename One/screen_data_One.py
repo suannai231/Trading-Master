@@ -181,9 +181,9 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 end = datetime.date.today()
-processed_data_path=f"//jack-nas/Work/Python/ProcessedData/"
-screened_data_path=f"//jack-nas/Work/Python/ScreenedData/"
-qfq_path = '//jack-nas/Work/Python/RawData/'
+processed_data_path=f"C:/Python/ProcessedData/"
+screened_data_path=f"C:/Python/ScreenedData/"
+qfq_path = 'C:/Python/RawData/'
 
 if __name__ == '__main__':
     isPathExists = os.path.exists(screened_data_path)
