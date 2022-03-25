@@ -196,7 +196,7 @@ if __name__ == '__main__':
         exit()
 
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
-    df = df[df['date'] > '2017-01-01']
+    # df = df[df['date'] > '2017-01-01']
     # qfq = pd.read_feather(qfq_path+f'{end}'+'_qfq.feather')
     # qfq = qfq[qfq['date'] > '2017-01-01']
 
