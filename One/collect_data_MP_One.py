@@ -7,7 +7,7 @@ import multiprocessing
 from multiprocessing import Pool
 import akshare as ak
 
-days=365*6
+days=365
 
 def get_stock(ticker_chunk):
     ticker_chunk_df = pd.DataFrame()
