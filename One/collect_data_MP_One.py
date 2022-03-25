@@ -95,9 +95,11 @@ if __name__ == '__main__':
     if (stock_file in files) & (qfq_file in files):
         exit()
     
+    df = pd.read_csv(path+'OTC.csv')
+    otc = df.Symbol.tolist()
     nasdaq = si.tickers_nasdaq()
     other = si.tickers_other()
-    tickers = nasdaq + other
+    tickers = nasdaq + other + otc
 
     cores = multiprocessing.cpu_count()
     ticker_chunk_list = list(chunks(tickers,int(len(tickers)/(cores*3))))
