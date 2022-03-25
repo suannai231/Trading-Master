@@ -71,14 +71,14 @@ def screen(df):
 
     close = df.iloc[-1]['close']
     last_ema20 = df.iloc[-1]['EMA20']
-    volume = df.iloc[-1]['volume']
+    # volume = df.iloc[-1]['volume']
     turn = df.iloc[-1]['turn']
 
-    close2 = df.iloc[-2]['close']
-    last2_ema20 = df.iloc[-2]['EMA20']
-    volume2 = df.iloc[-2]['volume']
+    # close2 = df.iloc[-2]['close']
+    # last2_ema20 = df.iloc[-2]['EMA20']
+    # volume2 = df.iloc[-2]['volume']
 
-    if (close2<=last2_ema20) and (close>=last_ema20) and (turn >= 0.05):
+    if (close>=last_ema20) and (turn >= 0.05):
         return df.tail(1)
 
     return pd.DataFrame()
