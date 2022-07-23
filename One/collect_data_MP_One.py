@@ -54,7 +54,7 @@ def get_stock(ticker_chunk):
             df["shares"] = shares
             df["marketCap"] = df["close"]*shares
             df.index.name = 'date'
-            ticker_chunk_df = ticker_chunk_df.append(df)
+            ticker_chunk_df = pd.concat([ticker_chunk_df,df])
     return ticker_chunk_df
 
 def get_qfq(ticker_chunk):
@@ -71,7 +71,7 @@ def get_qfq(ticker_chunk):
                 continue
         if not qfq_df.empty:
             qfq_df['ticker'] = ticker
-            ticker_chunk_df = ticker_chunk_df.append(qfq_df)
+            ticker_chunk_df = pd.concat([ticker_chunk_df,qfq_df])
     return ticker_chunk_df
 
 def chunks(lst, n):
@@ -95,14 +95,14 @@ if __name__ == '__main__':
     if (stock_file in files) & (qfq_file in files):
         exit()
     
-    df = pd.read_csv(path+'OTC.csv')
-    otc = df.Symbol.tolist()
+    # df = pd.read_csv(path+'OTC.csv')
+    # otc = df.Symbol.tolist()
     nasdaq = si.tickers_nasdaq()
     other = si.tickers_other()
-    tickers = nasdaq + other + otc
+    tickers = nasdaq + other
 
     cores = multiprocessing.cpu_count()
-    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/(cores*3))))
+    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/(cores))))
     proc_num = len(ticker_chunk_list)
 
     # if qfq_file not in files:
@@ -137,7 +137,7 @@ if __name__ == '__main__':
         for stock_async_result in stock_async_results:
             stock_chunk_df = stock_async_result.get()
             if not stock_chunk_df.empty:
-                stock_concat_df = stock_concat_df.append(stock_chunk_df)
+                stock_concat_df = pd.concat([stock_concat_df,stock_chunk_df])
         stock_concat_df.reset_index(inplace=True)
         # stock_concat_df.to_feather(path+f'{end}'+'_stock.feather')
         stock_concat_df.to_feather(path+f'{end}'+'.feather')

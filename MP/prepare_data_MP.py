@@ -10,7 +10,7 @@ import datetime
 import os
 # import threading
 # import chip
-import wr
+# import wr
 import shutil
 # from multiprocessing import Process
 import multiprocessing
@@ -21,8 +21,8 @@ import socket
 
 # run_days = 200
 backward = 200
-CAP_Limit = 2000000000
-Price_Limit = 50
+CAP_Limit = 10000000000
+Price_Limit = 10
 
 def prepare_data(df):
     origin_lastindex = df.index[-1]
@@ -64,48 +64,55 @@ def prepare_data(df):
         df['turn'] = df.volume/shares
         df['cum_turnover'] = df['turn'].cumsum()
 
-        ema34 = df['close'].ewm(span = 34, adjust = False).mean()
-        ema120 = df['close'].ewm(span = 120, adjust = False).mean()
-        df['EMA34'] = ema34
-        df['EMA120'] = ema120
+        ema5 = df['close'].ewm(span = 5, adjust = False).mean()
+        ema10 = df['close'].ewm(span = 10, adjust = False).mean()
+        ema20 = df['close'].ewm(span = 20, adjust = False).mean()
+        ema60 = df['close'].ewm(span = 60, adjust = False).mean()
+        df['EMA5'] = ema5
+        df['EMA10'] = ema10
+        df['EMA20'] = ema20
+        df['EMA60'] = ema60
 
-        MACD_dif = ema34 - ema120
-        MACD_dea = MACD_dif.ewm(span = 9, adjust = False).mean()
-        df['MACD_dif'] = MACD_dif
-        df['MACD_dea'] = MACD_dea
+        # MACD_dif = ema34 - ema120
+        # MACD_dea = MACD_dif.ewm(span = 9, adjust = False).mean()
+        # df['MACD_dif'] = MACD_dif
+        # df['MACD_dea'] = MACD_dea
                 
         #Calculate the On Balance volume
         OBV = []
         OBV.append(0)
         for i in range(startindex+1, endindex):
-            if df.close[i] > df.close[i-1]: #If the closing price is above the prior close price 
+            high = df.high[i-1]
+            low = df.low[i-1]
+            mid = (high+low)/2
+            if df.close[i] > mid: #If the closing price is above the prior close price 
                 OBV.append(OBV[-1] + df.volume[i]) #then: Current OBV = Previous OBV + Current volume
-            elif df.close[i] < df.close[i-1]:
+            elif df.close[i] < mid:
                 OBV.append( OBV[-1] - df.volume[i])
             else:
                 OBV.append(OBV[-1])
         #Store the OBV and OBV EMA into new columns
         df['OBV'] = OBV
-        df['OBV_EMA34'] = df['OBV'].ewm(com=34).mean()
-        df['OBV_DIFF'] = df['OBV']-df['OBV_EMA34']
-        max_obv_diff = 0
+        # df['OBV_EMA34'] = df['OBV'].ewm(com=34).mean()
+        # df['OBV_DIFF'] = df['OBV']-df['OBV_EMA34']
+        # max_obv_diff = 0
         # obv_above_zero = 0
-        OBV_DIFF_RATE = []
+        # OBV_DIFF_RATE = []
         # OBV_ABOVE_ZERO_DAYS = []
-        for i in range(startindex,endindex):
-            if abs(df['OBV_DIFF'][i]) > max_obv_diff:
-                max_obv_diff = abs(df['OBV_DIFF'][i])
-            if max_obv_diff == 0:
-                OBV_DIFF_RATE.append(0)
-            else:
-                OBV_DIFF_RATE.append(abs(df['OBV_DIFF'][i])/max_obv_diff)
+        # for i in range(startindex,endindex):
+        #     if abs(df['OBV_DIFF'][i]) > max_obv_diff:
+        #         max_obv_diff = abs(df['OBV_DIFF'][i])
+        #     if max_obv_diff == 0:
+        #         OBV_DIFF_RATE.append(0)
+        #     else:
+        #         OBV_DIFF_RATE.append(abs(df['OBV_DIFF'][i])/max_obv_diff)
             # if df['OBV_DIFF'][i] > 0:
             #     obv_above_zero += 1
             # OBV_ABOVE_ZERO_DAYS.append(obv_above_zero)
-        df["OBV_DIFF_RATE"] = OBV_DIFF_RATE
+        # df["OBV_DIFF_RATE"] = OBV_DIFF_RATE
         # df["OBV_ABOVE_ZERO_DAYS"] = OBV_ABOVE_ZERO_DAYS
 
-        df = wr.Cal_Daily_WR(df)
+        # df = wr.Cal_Daily_WR(df)
 
         # ss = chip.Cal_Chip_Distribution(df)
         # if not ss.empty:

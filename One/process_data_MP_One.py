@@ -1,118 +1,12 @@
 import pandas as pd
 import datetime
 import os
-import wr_helper
 import multiprocessing
 from multiprocessing import Pool
-import time
 
-backward = 80
-CAP_Limit = 2000000000
-Price_Limit = 50
-
-def HHV(df,wr_days):
-    high = 0
-    if len(df) < wr_days:
-        wr_days = df.index[-1]
-    for i in range(len(df)-wr_days,len(df)):
-        if df.loc[i,'MACD_dif'] > high:
-            high = df.loc[i,'MACD_dif'] 
-    return high
-
-def Cal_MACD_High(df,i,wr_days):
-    if df.empty:
-        return df
-    high_value = HHV(df.loc[0:i],wr_days)
-    df.loc[i,str(wr_days)+'days_high_value'] = high_value
-    return df
-
-def Cal_Hist_MACD_High(df,wr_days):
-    if df.empty:
-        return df
-    last = len(df) - 1
-    df = Cal_MACD_High(df, last, wr_days)
-    current_index = len(df)-2
-    while current_index>=0:
-        remove_index = current_index+1
-        add_index = current_index-wr_days
-        if (df.loc[remove_index,'MACD_dif'] == df.loc[remove_index,str(wr_days)+'days_high_value']):
-            df = Cal_MACD_High(df, current_index ,wr_days)
-            high_value = df.loc[current_index,str(wr_days)+'days_high_value']
-        else:
-            high_value = df.loc[remove_index,str(wr_days)+'days_high_value']
-        if(add_index>=0):
-            if df.loc[add_index,'MACD_dif'] > high_value:
-                high_value = df.loc[add_index,'MACD_dif']
-        df.loc[current_index,str(wr_days)+'days_high_value'] = high_value
-        current_index-=1
-    return df
-    
-def cal_cum_turnover(df):
-    if len(df) <= backward+2:
-        return pd.DataFrame()
-    current = len(df) - 1
-    # start_time = time.time()
-    while current >= 0:
-        
-        # upper_cum_turn = 0
-        # lower_cum_turn = 0
-
-        # for i in range(current-backward,current):
-        #     if df.loc[i,'close'] <= df.loc[current-1,'close']:
-        #         lower_cum_turn += df.loc[i,'turn']
-        #     else:
-        #         upper_cum_turn += df.loc[i,'turn']
-
-        if(current-backward>=0):
-            start = current-backward
-        else:
-            start = 0
-        
-        lower_cum_turn = df.loc[start:current].loc[df.close <= df.loc[current,'close'],'turn'].sum()
-        upper_cum_turn = df.loc[start:current].loc[df.close > df.loc[current,'close'],'turn'].sum()
-
-        df.loc[current,'upper_cum_turn'] = upper_cum_turn
-        df.loc[current,'lower_cum_turn'] = lower_cum_turn
-        current-=1
-    # print("--- %s seconds ---" % (time.time() - start_time))
-    return df
-
-# def cal_secret_num(df):
-#     if len(df) <= backward+2:
-#         return pd.DataFrame()
-#     obv_above_zero_days = 0
-#     wr120_larger_than_50_days = 0
-#     wr120_larger_than_80_days = 0
-#     for i in range(backward):
-#         if df['OBV_DIFF'][i] > 0:
-#             obv_above_zero_days += 1
-#         if df.WR120[i] > 50:
-#             wr120_larger_than_50_days += 1
-#         if df.WR120[i] > 80:
-#             wr120_larger_than_80_days += 1
-#         df.loc[i,'obv_above_zero_days'] = obv_above_zero_days
-#         df.loc[i,'wr120_larger_than_50_days'] = wr120_larger_than_50_days
-#         df.loc[i,'wr120_larger_than_80_days'] = wr120_larger_than_80_days
-#     i = backward
-#     while i<len(df):
-#         removed_index = i-backward
-#         if df.loc[removed_index,'OBV_DIFF'] > 0:
-#             obv_above_zero_days -= 1
-#         if df.loc[removed_index,'WR120'] > 50:
-#             wr120_larger_than_50_days -= 1
-#         if df.loc[removed_index,'WR120'] > 80:
-#             wr120_larger_than_80_days -= 1
-#         if df.loc[i,'OBV_DIFF'] > 0:
-#             obv_above_zero_days += 1
-#         if df.loc[i,'WR120'] > 50:
-#             wr120_larger_than_50_days += 1
-#         if df.loc[i,'WR120'] > 80:
-#             wr120_larger_than_80_days += 1
-#         df.loc[i,'obv_above_zero_days'] = obv_above_zero_days
-#         df.loc[i,'wr120_larger_than_50_days'] = wr120_larger_than_50_days
-#         df.loc[i,'wr120_larger_than_80_days'] = wr120_larger_than_80_days
-#         i+=1
-#     return df
+# backward = 180
+CAP_Limit = 10000000000
+Price_Limit = 9.5
 
 def cal_basics(df):
     startindex = 0
@@ -135,58 +29,36 @@ def cal_basics(df):
 
     shares = df.loc[lastindex,'shares']
     df['turn'] = df.volume/shares
-    # df['cum_turnover'] = df['turn'].cumsum()
 
-    # ema5 = df['close'].ewm(span = 5, adjust = False).mean()
-    # ema10 = df['close'].ewm(span = 10, adjust = False).mean()
+    ema5 = df['close'].ewm(span = 5, adjust = False).mean()
+    ema10 = df['close'].ewm(span = 10, adjust = False).mean()
     ema20 = df['close'].ewm(span = 20, adjust = False).mean()
     ema60 = df['close'].ewm(span = 60, adjust = False).mean()
-    # ema12 = df['close'].ewm(span = 12, adjust = False).mean()
-    # ema26 = df['close'].ewm(span = 26, adjust = False).mean()
-    # ema34 = df['close'].ewm(span = 34, adjust = False).mean()
-    # ema120 = df['close'].ewm(span = 120, adjust = False).mean()
-    # df['EMA5'] = ema5
-    # df['EMA10'] = ema10
+    df['EMA5'] = ema5
+    df['EMA10'] = ema10
     df['EMA20'] = ema20
     df['EMA60'] = ema60
-    # df['EMA12'] = ema12
-    # df['EMA26'] = ema26
-    # df['EMA34'] = ema34
-    # df['EMA120'] = ema120
 
-    # MACD_dif = ema20 - ema60
-    # MACD_dif = ema12 - ema26
-    # MACD_dea = MACD_dif.ewm(span = 9, adjust = False).mean()
-    # df['MACD_dif'] = MACD_dif
-    # df['MACD_dea'] = MACD_dea
-            
-    # OBV = []
-    # OBV.append(0)
-    # for i in range(startindex+1, endindex):
-    #     if df.loc[i,'close'] > df.loc[i-1,'close']: #If the closing price is above the prior close price 
-    #         OBV.append(OBV[-1] + df.loc[i,'volume']) #then: Current OBV = Previous OBV + Current volume
-    #     elif df.close[i] < df.close[i-1]:
-    #         OBV.append(OBV[-1] - df.loc[i,'volume'])
-    #     else:
-    #         OBV.append(OBV[-1])
+    OBV = []
+    OBV.append(0)
+    OBV_MAX = []
+    OBV_MAX.append(0)
+    for i in range(startindex+1, endindex):
+        high = df.high[i-1]
+        low = df.low[i-1]
+        mid = (high+low)/2
+        if df.close[i] > mid:
+            OBV.append(OBV[-1] + df.volume[i])
+        elif df.close[i] < mid:
+            OBV.append( OBV[-1] - df.volume[i])
+        else:
+            OBV.append(OBV[-1])
+        OBV_MAX.append(max(OBV))
 
-    # df['OBV'] = OBV
-    # df['OBV_EMA34'] = df['OBV'].ewm(com=34).mean()
-    # df['OBV_DIFF'] = df['OBV'] - df['OBV_EMA34']
-    # max_obv_diff = 0
+    df['OBV'] = OBV
+    df['OBV_MAX'] = OBV_MAX
 
-    # OBV_DIFF_RATE = []
-
-    # for i in range(startindex,endindex):
-    #     if abs(df.loc[i,'OBV_DIFF']) > max_obv_diff:
-    #         max_obv_diff = abs(df.loc[i,'OBV_DIFF'])
-    #     if max_obv_diff == 0:
-    #         OBV_DIFF_RATE.append(0)
-    #     else:
-    #         OBV_DIFF_RATE.append(abs(df.loc[i,'OBV_DIFF'])/max_obv_diff)
-
-    # df["OBV_DIFF_RATE"] = OBV_DIFF_RATE
-    return df
+    return df.iloc[60:]
 
 def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
@@ -211,7 +83,7 @@ def run(ticker_chunk_df):
         # df = cal_cum_turnover(df)
         # print("%s seconds\n" %(time.time()-start_time))
         if not df.empty:
-            return_ticker_chunk_df = return_ticker_chunk_df.append(df,ignore_index=True)
+            return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,df],ignore_index=True)
     return return_ticker_chunk_df
 
 def chunks(lst, n):
@@ -250,9 +122,9 @@ if __name__ == '__main__':
     for async_result in async_results:
         result = async_result.get()
         if not result.empty:
-            df = df.append(async_result.get())
+            df = pd.concat([df,async_result.get()])
     df.reset_index(drop=True,inplace=True)
     df.to_feather(processed_data_path + f'{end}' + '.feather')
 
-    # os.popen(f'python C:/Code/One/analyze_data_MP_One.py')
-    os.popen(f'python C:/Code/One/screen_data_One.py')
+    os.popen(f'python C:/Code/One/screen_data_One_Wait.py')
+    os.popen(f'python C:/Code/One/screen_data_One_Breakout.py')
