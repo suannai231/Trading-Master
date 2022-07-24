@@ -40,18 +40,18 @@ def cal_basics(df):
     lastindex = len(df)-1
 
     df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
-    df['change_5days'] = (df.close.shift(-5)- df.close)/df.close
-    df['change_10days'] = (df.close.shift(-10)- df.close)/df.close
-    df['change_15days'] = (df.close.shift(-15)- df.close)/df.close
-    df['change_20days'] = (df.close.shift(-20)- df.close)/df.close
-    df['change_25days'] = (df.close.shift(-25)- df.close)/df.close
-    df['change_30days'] = (df.close.shift(-30)- df.close)/df.close
-    df['change_35days'] = (df.close.shift(-35)- df.close)/df.close
-    df['change_40days'] = (df.close.shift(-40)- df.close)/df.close
-    df['change_45days'] = (df.close.shift(-45)- df.close)/df.close
-    df['change_50days'] = (df.close.shift(-50)- df.close)/df.close
-    df['change_55days'] = (df.close.shift(-55)- df.close)/df.close
-    df['change_60days'] = (df.close.shift(-60)- df.close)/df.close
+    df['change_5days'] = (df.close - df.close.shift(-5))/df.close.shift(-5)
+    df['change_10days'] = (df.close - df.close.shift(-10))/df.close.shift(-10)
+    df['change_15days'] = (df.close - df.close.shift(-15))/df.close.shift(-15)
+    df['change_20days'] = (df.close - df.close.shift(-20))/df.close.shift(-20)
+    df['change_25days'] = (df.close - df.close.shift(-25))/df.close.shift(-25)
+    df['change_30days'] = (df.close - df.close.shift(-30))/df.close.shift(-30)
+    df['change_35days'] = (df.close - df.close.shift(-35))/df.close.shift(-35)
+    df['change_40days'] = (df.close - df.close.shift(-40))/df.close.shift(-40)
+    df['change_45days'] = (df.close - df.close.shift(-45))/df.close.shift(-45)
+    df['change_50days'] = (df.close - df.close.shift(-50))/df.close.shift(-50)
+    df['change_55days'] = (df.close - df.close.shift(-55))/df.close.shift(-55)
+    df['change_60days'] = (df.close - df.close.shift(-60))/df.close.shift(-60)
 
     shares = df.loc[lastindex,'shares']
     df['turn'] = df.volume/shares
