@@ -58,7 +58,7 @@ def cal_basics(df):
     df['OBV'] = OBV
     df['OBV_MAX'] = OBV_MAX
 
-    return df.iloc[60:]
+    return df.iloc[192:]
 
 def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
@@ -124,7 +124,9 @@ if __name__ == '__main__':
         if not result.empty:
             df = pd.concat([df,async_result.get()])
     df.reset_index(drop=True,inplace=True)
-    df.to_feather(processed_data_path + f'{end}' + '.feather')
-
-    os.popen(f'python C:/Code/One/screen_data_One_Wait.py')
-    os.popen(f'python C:/Code/One/screen_data_One_Breakout.py')
+    if(not df.empty):
+        df.to_feather(processed_data_path + f'{end}' + '.feather')
+        os.popen(f'python C:/Code/One/screen_data_One_Wait.py')
+        os.popen(f'python C:/Code/One/screen_data_One_Breakout.py')
+    else:
+        print("df empty")
