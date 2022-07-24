@@ -29,11 +29,13 @@ def get_stock(ticker_chunk):
                         print(e)
                         os._exit(-1)
                     else:
+                        print(e)
                         continue
             elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
                 print(e)
                 os._exit(-1)
             else:
+                print(e)
                 continue
         if (shares is None):
             continue
@@ -49,6 +51,7 @@ def get_stock(ticker_chunk):
                 print(e)
                 os._exit(-1)
             else:
+                print(e)
                 continue
         if not df.empty:
             df["shares"] = shares
