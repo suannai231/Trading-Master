@@ -26,24 +26,21 @@ def get_stock(ticker_chunk):
         try:
             df = si.get_data(ticker,start, end)
         except Exception as e:
-            if (str(e) == "'timestamp'") | (str(e) == "'NoneType' object is not subscriptable"):
-                print(e)
-                continue
-            elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+            if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
                 print(e)
                 return ticker_chunk_df
             else:
                 print(e)
                 continue
         try:
-            df2 = si.get_quote_table(ticker)
+            dic = si.get_quote_table(ticker)
         except Exception as e:
             print(e)
             continue
         
-        if('Market Cap' in df2.keys()):
-            if isinstance(df2['Market Cap'],str):
-                marketcap = string_to_int(df2['Market Cap'])
+        if('Market Cap' in dic.keys()):
+            if isinstance(dic['Market Cap'],str):
+                marketcap = string_to_int(dic['Market Cap'])
             else:
                 print(ticker+" marketcap is not available")
                 continue
@@ -94,25 +91,19 @@ if __name__ == '__main__':
 
     pool = Pool(proc_num)
     stock_async_results = []
-    try:
-        for ticker_chunk in ticker_chunk_list:
-            stock_async_result = pool.apply_async(get_stock,args=(ticker_chunk,))
-            stock_async_results.append(stock_async_result)
-    except Exception as e:
-        print(e)
-        sys.exit(1)
+
+    for ticker_chunk in ticker_chunk_list:
+        stock_async_result = pool.apply_async(get_stock,args=(ticker_chunk,))
+        stock_async_results.append(stock_async_result)
+
     pool.close()
-    pool.join()
 
     stock_concat_df = pd.DataFrame()
     for stock_async_result in stock_async_results:
-        # if(stock_async_result.successful()):
-            stock_chunk_df = stock_async_result.get()
-            if not stock_chunk_df.empty:
+        stock_chunk_df = stock_async_result.get()
+        if not stock_chunk_df.empty:
                 stock_concat_df = pd.concat([stock_concat_df,stock_chunk_df])
-        # else:
-        #     print("stock_async_result failed.")
-        #     sys.exit(1)
+
     if not stock_concat_df.empty:
         stock_concat_df.reset_index(inplace=True)
         stock_concat_df.to_feather(path+f'{end}'+'.feather')
