@@ -26,7 +26,7 @@ def get_stock(ticker_chunk):
         try:
             df = si.get_data(ticker,start, end)
         except Exception as e:
-            print("si.get_data "+ticker+" "+e)
+            print("si.get_data "+ticker+" error: "+str(e))
 
             if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
                 return ticker_chunk_df
@@ -35,7 +35,7 @@ def get_stock(ticker_chunk):
         try:
             dic = si.get_quote_table(ticker)
         except Exception as e:
-            print("si.get_quote_table "+ticker+" "+e)
+            print("si.get_quote_table "+ticker+" error:"+str(e))
             continue
         
         if('Market Cap' in dic.keys()):
