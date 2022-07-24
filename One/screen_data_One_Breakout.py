@@ -92,7 +92,8 @@ if __name__ == '__main__':
     screened_data_files = os.listdir(screened_data_path)
     screened_data_file = str(end) + '_breakout.csv'
     if screened_data_file in screened_data_files:
-        exit()
+        print("error: " + screened_data_file + " existed.")
+        os._exit(-2)
 
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
     # df = df[df['date'] > '2017-01-01']

@@ -27,12 +27,12 @@ def get_stock(ticker_chunk):
                         continue
                     elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
                         print(e)
-                        exit()
+                        os._exit(-1)
                     else:
                         continue
             elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
                 print(e)
-                exit()
+                os._exit(-1)
             else:
                 continue
         if (shares is None):
@@ -47,7 +47,7 @@ def get_stock(ticker_chunk):
                 continue
             elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
                 print(e)
-                exit()
+                os._exit(-1)
             else:
                 continue
         if not df.empty:
@@ -66,7 +66,7 @@ def get_qfq(ticker_chunk):
         except Exception as e:
             if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
                 print(e)
-                exit()
+                os._exit(-1)
             else:
                 continue
         if not qfq_df.empty:
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     # qfq_file = str(end)+'_qfq.feather'
     if (stock_file in files):
         print("error: " + stock_file + " existed.")
-        exit()
+        os._exit(-2)
     
     # df = pd.read_csv(path+'OTC.csv')
     # otc = df.Symbol.tolist()

@@ -114,7 +114,7 @@ if __name__ == '__main__':
     processed_file = str(end)+'.feather'
     if processed_file in processed_files:
         print("error: " + processed_file + " existed.")
-        exit()
+        os._exit(-2)
     
     df = pd.read_feather(raw_data_path + f'{end}' + '.feather')
     tickers = df.ticker.unique()
