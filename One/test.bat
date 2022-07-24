@@ -10,4 +10,4 @@ set FILENAME=%CUR_YYYY%%CUR_MM%%CUR_DD%-%CUR_HH%%CUR_NN%%CUR_SS%
 
 call C:\ProgramData\Anaconda3\Scripts\activate.bat C:\ProgramData\Anaconda3
 cd C:\Code\One
-python process_data_MP_One.py > C:\Python\%FILENAME%.txt
+python process_data_MP_One.py>C:\Python\%FILENAME%.txt
