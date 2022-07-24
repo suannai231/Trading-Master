@@ -45,8 +45,20 @@ def cal_basics(df):
     df['change_3days'] = (df.close.shift(-3)- df.close)/df.close
     df['change_4days'] = (df.close.shift(-4)- df.close)/df.close
     df['change_5days'] = (df.close.shift(-5)- df.close)/df.close
+    df['change_6days'] = (df.close.shift(-6)- df.close)/df.close
+    df['change_7days'] = (df.close.shift(-7)- df.close)/df.close
+    df['change_8days'] = (df.close.shift(-8)- df.close)/df.close
+    df['change_9days'] = (df.close.shift(-9)- df.close)/df.close
     df['change_10days'] = (df.close.shift(-10)- df.close)/df.close
+    df['change_11days'] = (df.close.shift(-11)- df.close)/df.close
+    df['change_12days'] = (df.close.shift(-12)- df.close)/df.close
+    df['change_13days'] = (df.close.shift(-13)- df.close)/df.close
+    df['change_14days'] = (df.close.shift(-14)- df.close)/df.close
     df['change_15days'] = (df.close.shift(-15)- df.close)/df.close
+    df['change_16days'] = (df.close.shift(-16)- df.close)/df.close
+    df['change_17days'] = (df.close.shift(-17)- df.close)/df.close
+    df['change_18days'] = (df.close.shift(-18)- df.close)/df.close
+    df['change_19days'] = (df.close.shift(-19)- df.close)/df.close
     df['change_20days'] = (df.close.shift(-20)- df.close)/df.close
 
     shares = df.loc[lastindex,'shares']
