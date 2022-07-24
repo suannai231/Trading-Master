@@ -8,9 +8,35 @@ from multiprocessing import Pool
 CAP_Limit = 10000000000
 Price_Limit = 9.5
 
-def cal_basics(df):
+def cal_OBV(df):
+
     startindex = 0
     endindex = len(df)
+
+    OBV = []
+    OBV.append(0)
+    OBV_MAX = []
+    OBV_MAX.append(0)
+
+    for i in range(startindex+1, endindex):
+        high = df.high[i-1]
+        low = df.low[i-1]
+        mid = (high+low)/2
+        if df.close[i] > mid:
+            OBV.append(OBV[-1] + df.volume[i])
+        elif df.close[i] < mid:
+            OBV.append( OBV[-1] - df.volume[i])
+        else:
+            OBV.append(OBV[-1])
+        OBV_MAX.append(max(OBV))
+
+    df['OBV'] = OBV
+    df['OBV_MAX'] = OBV_MAX
+
+    return df
+
+def cal_basics(df):
+
     lastindex = len(df)-1
 
     df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
@@ -39,26 +65,7 @@ def cal_basics(df):
     df['EMA20'] = ema20
     df['EMA60'] = ema60
 
-    OBV = []
-    OBV.append(0)
-    OBV_MAX = []
-    OBV_MAX.append(0)
-    for i in range(startindex+1, endindex):
-        high = df.high[i-1]
-        low = df.low[i-1]
-        mid = (high+low)/2
-        if df.close[i] > mid:
-            OBV.append(OBV[-1] + df.volume[i])
-        elif df.close[i] < mid:
-            OBV.append( OBV[-1] - df.volume[i])
-        else:
-            OBV.append(OBV[-1])
-        OBV_MAX.append(max(OBV))
-
-    df['OBV'] = OBV
-    df['OBV_MAX'] = OBV_MAX
-
-    return df.iloc[192:]
+    return df
 
 def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
@@ -71,17 +78,10 @@ def run(ticker_chunk_df):
             continue
         elif df['close'][lastindex] > Price_Limit:
             continue
-        # elif len(df) <= backward+2:
-        #     continue
-        # start_time = time.time()
+
         df = cal_basics(df)
-        # df = Cal_Hist_MACD_High(df,backward)
-        # df = wr_helper.Cal_Hist_WR(df,backward)
-        # df = wr_helper.Cal_Hist_WR(df,21)
-        # df = wr_helper.Cal_Hist_WR(df,42)
-        # df = cal_secret_num(df)
-        # df = cal_cum_turnover(df)
-        # print("%s seconds\n" %(time.time()-start_time))
+        df = cal_OBV(df.iloc[192:])
+
         if not df.empty:
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,df],ignore_index=True)
     return return_ticker_chunk_df
