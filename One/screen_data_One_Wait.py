@@ -92,6 +92,7 @@ if __name__ == '__main__':
     screened_data_files = os.listdir(screened_data_path)
     screened_data_file = str(end) + '_wait.csv'
     if screened_data_file in screened_data_files:
+        print("error: " + screened_data_file + " existed.")
         exit()
 
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')

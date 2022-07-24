@@ -113,6 +113,7 @@ if __name__ == '__main__':
     processed_files = os.listdir(processed_data_path)
     processed_file = str(end)+'.feather'
     if processed_file in processed_files:
+        print("error: " + processed_file + " existed.")
         exit()
     
     df = pd.read_feather(raw_data_path + f'{end}' + '.feather')

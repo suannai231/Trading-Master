@@ -91,8 +91,9 @@ if __name__ == '__main__':
 
     files = os.listdir(path)
     stock_file = str(end)+'_stock.feather'
-    qfq_file = str(end)+'_qfq.feather'
-    if (stock_file in files) & (qfq_file in files):
+    # qfq_file = str(end)+'_qfq.feather'
+    if (stock_file in files):
+        print("error: " + stock_file + " existed.")
         exit()
     
     # df = pd.read_csv(path+'OTC.csv')
