@@ -2,6 +2,7 @@ import multiprocessing
 import pandas as pd
 import datetime
 import os
+import sys
 from multiprocessing import Pool
 import numpy as np
 from datetime import timedelta
@@ -93,7 +94,7 @@ if __name__ == '__main__':
     screened_data_file = str(end) + '_breakout.csv'
     if screened_data_file in screened_data_files:
         print("error: " + screened_data_file + " existed.")
-        os._exit(-2)
+        sys.exit(1)
 
     df = pd.read_feather(processed_data_path + f'{end}' + '.feather')
     # df = df[df['date'] > '2017-01-01']

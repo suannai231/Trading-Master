@@ -23,37 +23,6 @@ def string_to_int(string):
 def get_stock(ticker_chunk):
     ticker_chunk_df = pd.DataFrame()
     for ticker in ticker_chunk:
-        # print('stock '+ticker)
-        # shares = -1
-        # try:
-        #     quote_data = si.get_quote_data(ticker)
-        #     shares = quote_data['sharesOutstanding']
-        # except Exception as e:
-        #     if (str(e) == "'sharesOutstanding'") | (str(e) == 'Invalid response from server.  Check if ticker is\n                              valid.'):
-        #         try:
-        #             info = yf.Ticker(ticker).info
-        #             shares = info['sharesOutstanding']
-        #         except Exception as e:
-        #             if str(e) == "'sharesOutstanding'":
-        #                 print(e)
-        #                 continue
-        #             elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-        #                 print(e)
-        #                 os._exit(-1)
-        #             else:
-        #                 print(e)
-        #                 continue
-        #     elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-        #         print(e)
-        #         os._exit(-1)
-        #     else:
-        #         print(e)
-        #         continue
-        # if (shares is None):
-        #     continue
-        # else:
-        #     if int(shares) < 1:
-        #         continue
         try:
             df = si.get_data(ticker,start, end)
         except Exception as e:
@@ -63,7 +32,6 @@ def get_stock(ticker_chunk):
             elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
                 print(e)
                 return ticker_chunk_df
-                sys.exit(1)
             else:
                 print(e)
                 continue
@@ -109,28 +77,32 @@ if __name__ == '__main__':
         os.makedirs(path)
 
     files = os.listdir(path)
-    stock_file = str(end)+'_stock.feather'
+    stock_file = str(end)+'.feather'
 
     if (stock_file in files):
         print("error: " + stock_file + " existed.")
-        os._exit(2)
+        sys.exit(1)
     
     nasdaq = si.tickers_nasdaq()
     other = si.tickers_other()
     tickers = nasdaq + other
 
     cores = multiprocessing.cpu_count()
-    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/(cores))))
+    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/(cores*4))))
     proc_num = len(ticker_chunk_list)
 
 
     pool = Pool(proc_num)
     stock_async_results = []
-    for ticker_chunk in ticker_chunk_list:
-        stock_async_result = pool.apply_async(get_stock,args=(ticker_chunk,))
-        stock_async_results.append(stock_async_result)
+    try:
+        for ticker_chunk in ticker_chunk_list:
+            stock_async_result = pool.apply_async(get_stock,args=(ticker_chunk,))
+            stock_async_results.append(stock_async_result)
+    except Exception as e:
+        print(e)
+        sys.exit(1)
     pool.close()
-    # pool.join()
+    pool.join()
 
     stock_concat_df = pd.DataFrame()
     for stock_async_result in stock_async_results:

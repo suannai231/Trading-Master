@@ -1,6 +1,7 @@
 import pandas as pd
 import datetime
 import os
+import sys
 import multiprocessing
 from multiprocessing import Pool
 
@@ -112,7 +113,7 @@ if __name__ == '__main__':
     processed_file = str(end)+'.feather'
     if processed_file in processed_files:
         print("error: " + processed_file + " existed.")
-        os._exit(-2)
+        sys.exit(1)
     
     df = pd.read_feather(raw_data_path + f'{end}' + '.feather')
     tickers = df.ticker.unique()
