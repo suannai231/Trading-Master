@@ -110,4 +110,4 @@ if __name__ == '__main__':
         os.popen(f'python C:/Code/One/process_data_MP_One.py')
     else:
         print("stock_concat_df is empty.")
-        sys.exit(1)
+        sys.exit(2)
