@@ -60,22 +60,22 @@ def get_stock(ticker_chunk):
             ticker_chunk_df = pd.concat([ticker_chunk_df,df])
     return ticker_chunk_df
 
-def get_qfq(ticker_chunk):
-    ticker_chunk_df = pd.DataFrame()
-    for ticker in ticker_chunk:
-        # print('qfq '+ticker)
-        try:
-            qfq_df = ak.stock_us_daily(symbol=ticker, adjust="qfq-factor")
-        except Exception as e:
-            if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-                print(e)
-                os._exit(-1)
-            else:
-                continue
-        if not qfq_df.empty:
-            qfq_df['ticker'] = ticker
-            ticker_chunk_df = pd.concat([ticker_chunk_df,qfq_df])
-    return ticker_chunk_df
+# def get_qfq(ticker_chunk):
+#     ticker_chunk_df = pd.DataFrame()
+#     for ticker in ticker_chunk:
+#         # print('qfq '+ticker)
+#         try:
+#             qfq_df = ak.stock_us_daily(symbol=ticker, adjust="qfq-factor")
+#         except Exception as e:
+#             if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+#                 print(e)
+#                 os._exit(-1)
+#             else:
+#                 continue
+#         if not qfq_df.empty:
+#             qfq_df['ticker'] = ticker
+#             ticker_chunk_df = pd.concat([ticker_chunk_df,qfq_df])
+#     return ticker_chunk_df
 
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
