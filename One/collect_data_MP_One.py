@@ -24,6 +24,7 @@ def get_stock(ticker_chunk):
                     shares = info['sharesOutstanding']
                 except Exception as e:
                     if str(e) == "'sharesOutstanding'":
+                        print(e)
                         continue
                     elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
                         print(e)
@@ -46,6 +47,7 @@ def get_stock(ticker_chunk):
             df = si.get_data(ticker,start, end)
         except Exception as e:
             if (str(e) == "'timestamp'") | (str(e) == "'NoneType' object is not subscriptable"):
+                print(e)
                 continue
             elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
                 print(e)
