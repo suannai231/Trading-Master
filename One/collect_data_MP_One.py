@@ -3,46 +3,57 @@ import yfinance as yf
 import pandas as pd
 import datetime
 import os
+import sys
 import multiprocessing
 from multiprocessing import Pool
 import akshare as ak
+import math
 
 days=365
+
+multipliers = {'K':1000, 'M':1000000, 'B':1000000000}
+
+def string_to_int(string):
+    if string[-1].isdigit(): # check if no suffix
+        return int(string)
+    mult = multipliers[string[-1]] # look up suffix to get multiplier
+     # convert number to float, multiply by multiplier, then make int
+    return int(float(string[:-1]) * mult)
 
 def get_stock(ticker_chunk):
     ticker_chunk_df = pd.DataFrame()
     for ticker in ticker_chunk:
         # print('stock '+ticker)
-        shares = -1
-        try:
-            quote_data = si.get_quote_data(ticker)
-            shares = quote_data['sharesOutstanding']
-        except Exception as e:
-            if (str(e) == "'sharesOutstanding'") | (str(e) == 'Invalid response from server.  Check if ticker is\n                              valid.'):
-                try:
-                    info = yf.Ticker(ticker).info
-                    shares = info['sharesOutstanding']
-                except Exception as e:
-                    if str(e) == "'sharesOutstanding'":
-                        print(e)
-                        continue
-                    elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-                        print(e)
-                        os._exit(-1)
-                    else:
-                        print(e)
-                        continue
-            elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-                print(e)
-                os._exit(-1)
-            else:
-                print(e)
-                continue
-        if (shares is None):
-            continue
-        else:
-            if int(shares) < 1:
-                continue
+        # shares = -1
+        # try:
+        #     quote_data = si.get_quote_data(ticker)
+        #     shares = quote_data['sharesOutstanding']
+        # except Exception as e:
+        #     if (str(e) == "'sharesOutstanding'") | (str(e) == 'Invalid response from server.  Check if ticker is\n                              valid.'):
+        #         try:
+        #             info = yf.Ticker(ticker).info
+        #             shares = info['sharesOutstanding']
+        #         except Exception as e:
+        #             if str(e) == "'sharesOutstanding'":
+        #                 print(e)
+        #                 continue
+        #             elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+        #                 print(e)
+        #                 os._exit(-1)
+        #             else:
+        #                 print(e)
+        #                 continue
+        #     elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+        #         print(e)
+        #         os._exit(-1)
+        #     else:
+        #         print(e)
+        #         continue
+        # if (shares is None):
+        #     continue
+        # else:
+        #     if int(shares) < 1:
+        #         continue
         try:
             df = si.get_data(ticker,start, end)
         except Exception as e:
@@ -51,33 +62,36 @@ def get_stock(ticker_chunk):
                 continue
             elif str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
                 print(e)
-                os._exit(-1)
+                return ticker_chunk_df
+                sys.exit(1)
             else:
                 print(e)
                 continue
+        try:
+            df2 = si.get_quote_table(ticker)
+        except Exception as e:
+            print(e)
+            continue
+        
+        if('Market Cap' in df2.keys()):
+            if isinstance(df2['Market Cap'],str):
+                marketcap = string_to_int(df2['Market Cap'])
+            else:
+                print(ticker+" marketcap is not available")
+                continue
+        else:
+            print(ticker+" marketcap is not available")
+            continue
+
         if not df.empty:
-            df["shares"] = shares
-            df["marketCap"] = df["close"]*shares
+            # df["shares"] = shares
+            df["marketCap"] = marketcap
             df.index.name = 'date'
             ticker_chunk_df = pd.concat([ticker_chunk_df,df])
+        else:
+            print(ticker+" data is not available")
+            continue
     return ticker_chunk_df
-
-# def get_qfq(ticker_chunk):
-#     ticker_chunk_df = pd.DataFrame()
-#     for ticker in ticker_chunk:
-#         # print('qfq '+ticker)
-#         try:
-#             qfq_df = ak.stock_us_daily(symbol=ticker, adjust="qfq-factor")
-#         except Exception as e:
-#             if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-#                 print(e)
-#                 os._exit(-1)
-#             else:
-#                 continue
-#         if not qfq_df.empty:
-#             qfq_df['ticker'] = ticker
-#             ticker_chunk_df = pd.concat([ticker_chunk_df,qfq_df])
-#     return ticker_chunk_df
 
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
@@ -96,13 +110,11 @@ if __name__ == '__main__':
 
     files = os.listdir(path)
     stock_file = str(end)+'_stock.feather'
-    # qfq_file = str(end)+'_qfq.feather'
+
     if (stock_file in files):
         print("error: " + stock_file + " existed.")
-        os._exit(-2)
+        os._exit(2)
     
-    # df = pd.read_csv(path+'OTC.csv')
-    # otc = df.Symbol.tolist()
     nasdaq = si.tickers_nasdaq()
     other = si.tickers_other()
     tickers = nasdaq + other
@@ -111,44 +123,28 @@ if __name__ == '__main__':
     ticker_chunk_list = list(chunks(tickers,int(len(tickers)/(cores))))
     proc_num = len(ticker_chunk_list)
 
-    # if qfq_file not in files:
-    #     pool1 = Pool(proc_num)
-    #     qfq_async_results = []
-    #     for ticker_chunk in ticker_chunk_list:
-    #         qfq_async_result = pool1.apply_async(get_qfq,args=(ticker_chunk,))
-    #         qfq_async_results.append(qfq_async_result)
-    #     pool1.close()
 
-    if stock_file not in files:
-        pool2 = Pool(proc_num)
-        stock_async_results = []
-        for ticker_chunk in ticker_chunk_list:
-            stock_async_result = pool2.apply_async(get_stock,args=(ticker_chunk,))
-            stock_async_results.append(stock_async_result)
-        pool2.close()
+    pool = Pool(proc_num)
+    stock_async_results = []
+    for ticker_chunk in ticker_chunk_list:
+        stock_async_result = pool.apply_async(get_stock,args=(ticker_chunk,))
+        stock_async_results.append(stock_async_result)
+    pool.close()
+    # pool.join()
 
-    # pool1.join()
-    # if qfq_file not in files:
-    #     qfq_concat_df = pd.DataFrame()
-    #     for qfq_async_result in qfq_async_results:
-    #         qfq_chunk_df = qfq_async_result.get()
-    #         if not qfq_chunk_df.empty:
-    #             qfq_concat_df = qfq_concat_df.append(qfq_chunk_df)
-    #     qfq_concat_df.reset_index(inplace=True)
-    #     qfq_concat_df.to_feather(path+f'{end}'+'_qfq.feather')
-    
-    # pool2.join()
-    if stock_file not in files:
-        stock_concat_df = pd.DataFrame()
-        for stock_async_result in stock_async_results:
+    stock_concat_df = pd.DataFrame()
+    for stock_async_result in stock_async_results:
+        # if(stock_async_result.successful()):
             stock_chunk_df = stock_async_result.get()
             if not stock_chunk_df.empty:
                 stock_concat_df = pd.concat([stock_concat_df,stock_chunk_df])
+        # else:
+        #     print("stock_async_result failed.")
+        #     sys.exit(1)
+    if not stock_concat_df.empty:
         stock_concat_df.reset_index(inplace=True)
-        # stock_concat_df.to_feather(path+f'{end}'+'_stock.feather')
         stock_concat_df.to_feather(path+f'{end}'+'.feather')
-
-    # if (stock_file not in files) & (qfq_file not in files):
-    #     merged_df = pd.merge(stock_concat_df, qfq_concat_df, how='left', on=["ticker", "date"])
-    #     merged_df.to_feather(path+f'{end}'+'.feather')
-    os.popen(f'python C:/Code/One/process_data_MP_One.py')
+        os.popen(f'python C:/Code/One/process_data_MP_One.py')
+    else:
+        print("stock_concat_df is empty.")
+        sys.exit(1)

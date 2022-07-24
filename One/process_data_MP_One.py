@@ -86,11 +86,9 @@ def run(ticker_chunk_df):
             continue
         elif df['close'][lastindex] > Price_Limit:
             continue
-        elif len(df) < 252:
-            continue
 
         df = cal_basics(df)
-        df = cal_OBV(df.iloc[192:].reset_index(drop=True))
+        df = cal_OBV(df.iloc[len(df)-60:].reset_index(drop=True))
 
         if not df.empty:
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,df],ignore_index=True)
