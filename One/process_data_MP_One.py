@@ -87,6 +87,9 @@ def run(ticker_chunk_df):
         #     continue
         if df['close'][lastindex] > Price_Limit:
             continue
+        elif(len(df)<=60):
+            print(ticker+" length is less than 60 business days.")
+            continue
 
         df = cal_basics(df)
         df = cal_OBV(df.iloc[len(df)-60:].reset_index(drop=True))
