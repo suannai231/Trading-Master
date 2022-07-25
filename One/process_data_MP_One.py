@@ -62,8 +62,8 @@ def cal_basics(df):
     df['change_19days'] = (df.close.shift(-19)- df.close)/df.close
     df['change_20days'] = (df.close.shift(-20)- df.close)/df.close
 
-    shares = df.loc[lastindex,'shares']
-    df['turn'] = df.volume/shares
+    # shares = df.loc[lastindex,'shares']
+    # df['turn'] = df.volume/shares
 
     ema5 = df['close'].ewm(span = 5, adjust = False).mean()
     ema10 = df['close'].ewm(span = 10, adjust = False).mean()
