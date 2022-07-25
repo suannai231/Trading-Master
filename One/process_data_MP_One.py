@@ -82,10 +82,10 @@ def run(ticker_chunk_df):
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker].reset_index(drop=True)
         lastindex = df.index[-1]
-        cap = df["marketCap"][lastindex]
-        if cap > CAP_Limit:
-            continue
-        elif df['close'][lastindex] > Price_Limit:
+        # cap = df["marketCap"][lastindex]
+        # if cap > CAP_Limit:
+        #     continue
+        if df['close'][lastindex] > Price_Limit:
             continue
 
         df = cal_basics(df)

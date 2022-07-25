@@ -32,25 +32,25 @@ def get_stock(ticker_chunk):
                 return ticker_chunk_df
             else:
                 continue
-        try:
-            dic = si.get_quote_table(ticker)
-        except Exception as e:
-            print("si.get_quote_table "+ticker+" error:"+str(e))
-            continue
+        # try:
+        #     dic = si.get_quote_table(ticker)
+        # except Exception as e:
+        #     print("si.get_quote_table "+ticker+" error:"+str(e))
+        #     continue
         
-        if('Market Cap' in dic.keys()):
-            if isinstance(dic['Market Cap'],str):
-                marketcap = string_to_int(dic['Market Cap'])
-            else:
-                print(ticker+" marketcap is not available")
-                continue
-        else:
-            print(ticker+" marketcap is not available")
-            continue
+        # if('Market Cap' in dic.keys()):
+        #     if isinstance(dic['Market Cap'],str):
+        #         marketcap = string_to_int(dic['Market Cap'])
+        #     else:
+        #         print(ticker+" marketcap is not available")
+        #         continue
+        # else:
+        #     print(ticker+" marketcap is not available")
+        #     continue
 
         if not df.empty:
             # df["shares"] = shares
-            df["marketCap"] = marketcap
+            # df["marketCap"] = marketcap
             df.index.name = 'date'
             ticker_chunk_df = pd.concat([ticker_chunk_df,df])
         else:
