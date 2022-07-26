@@ -67,8 +67,10 @@ def cal_basics(df):
     lastindex = len(df)-1
 
     df['Breakout'] = 0
+    df['BreakoutCum'] = 0
     df['Wait'] = 0
-    
+    df['Wait_Cum'] = 0
+
     df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
     df['change_1days'] = (df.close.shift(-1)- df.close)/df.close
     df['change_2days'] = (df.close.shift(-2)- df.close)/df.close
@@ -135,7 +137,10 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-end = datetime.date.today()
+date_time = datetime.datetime.now() 
+datetime_str = date_time.strftime("%m%d%Y-%H%M%S")
+
+# end = datetime.date.today()
 raw_data_path=f"C:/Python/RawData/"
 processed_data_path=f"C:/Python/ProcessedData/"
 
@@ -145,12 +150,12 @@ if __name__ == '__main__':
         os.makedirs(processed_data_path)
 
     processed_files = os.listdir(processed_data_path)
-    processed_file = str(end)+'.feather'
+    processed_file = datetime_str + '.feather'
     if processed_file in processed_files:
         print("error: " + processed_file + " existed.")
         sys.exit(1)
     
-    df = pd.read_feather(raw_data_path + f'{end}' + '.feather')
+    df = pd.read_feather(raw_data_path + datetime_str + '.feather')
     tickers = df.ticker.unique()
 
     cores = multiprocessing.cpu_count()
@@ -170,8 +175,8 @@ if __name__ == '__main__':
             df = pd.concat([df,async_result.get()])
     df.reset_index(drop=True,inplace=True)
     if(not df.empty):
-        df.to_feather(processed_data_path + f'{end}' + '.feather')
-        df.to_csv(processed_data_path + f'{end}' + '.csv')
+        df.to_feather(processed_data_path + datetime_str + '.feather')
+        df.to_csv(processed_data_path + datetime_str + '.csv')
         os.popen(f'python C:/Code/One/screen_data_One_Wait.py')
         os.popen(f'python C:/Code/One/screen_data_One_Breakout.py')
     else:

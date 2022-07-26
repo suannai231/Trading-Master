@@ -88,7 +88,10 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-end = datetime.date.today()
+date_time = datetime.datetime.now() 
+datetime_str = date_time.strftime("%m%d%Y-%H%M%S")
+
+# end = datetime.date.today()
 processed_data_path=f"C:/Python/ProcessedData/"
 screened_data_path=f"C:/Python/ScreenedData/"
 qfq_path = 'C:/Python/RawData/'
@@ -99,7 +102,7 @@ if __name__ == '__main__':
         os.makedirs(screened_data_path)
 
     screened_data_files = os.listdir(screened_data_path)
-    screened_data_file = str(end) + '_wait.csv'
+    screened_data_file = datetime_str + '_wait.csv'
     if screened_data_file in screened_data_files:
         print("error: " + screened_data_file + " existed.")
         sys.exit(1)
@@ -127,4 +130,4 @@ if __name__ == '__main__':
             return_df = pd.concat([return_df,result])
     
     return_df.reset_index(drop=False,inplace=True)
-    return_df.to_csv(screened_data_path + f'{end}' + '_wait.csv')
+    return_df.to_csv(screened_data_path + datetime_str + '_wait.csv')

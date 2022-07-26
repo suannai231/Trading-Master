@@ -63,8 +63,11 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-start = datetime.datetime.now() - datetime.timedelta(days)
+date_time = datetime.datetime.now() 
+start = date_time - datetime.timedelta(days)
 end = datetime.date.today()
+
+datetime_str = date_time.strftime("%m%d%Y-%H%M%S")
 
 path = 'C:/Python/RawData/'
 
@@ -74,7 +77,7 @@ if __name__ == '__main__':
         os.makedirs(path)
 
     files = os.listdir(path)
-    stock_file = str(end)+'.feather'
+    stock_file = datetime_str + '.feather'
 
     if (stock_file in files):
         print("error: " + stock_file + " existed.")
@@ -106,7 +109,7 @@ if __name__ == '__main__':
 
     if not stock_concat_df.empty:
         stock_concat_df.reset_index(inplace=True)
-        stock_concat_df.to_feather(path+f'{end}'+'.feather')
+        stock_concat_df.to_feather(path+datetime_str)
         os.popen(f'python C:/Code/One/process_data_MP_One.py')
     else:
         print("stock_concat_df is empty.")
