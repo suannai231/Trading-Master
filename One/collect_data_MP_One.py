@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
     if not stock_concat_df.empty:
         stock_concat_df.reset_index(inplace=True)
-        stock_concat_df.to_feather(path+datetime_str)
+        stock_concat_df.to_feather(path+stock_file)
         os.popen(f'python C:/Code/One/process_data_MP_One.py')
     else:
         print("stock_concat_df is empty.")
