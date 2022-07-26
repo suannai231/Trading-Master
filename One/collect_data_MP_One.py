@@ -24,7 +24,7 @@ def get_stock(ticker_chunk):
     ticker_chunk_df = pd.DataFrame()
     for ticker in ticker_chunk:
         try:
-            df = si.get_data(ticker,start, end)
+            df = si.get_data(ticker,start, end + datetime.timedelta(1))
         except Exception as e:
             print("si.get_data "+ticker+" error: "+str(e))
 
@@ -64,7 +64,7 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 start = datetime.datetime.now() - datetime.timedelta(days)
-end = datetime.date.today() + datetime.timedelta(1)
+end = datetime.date.today()
 
 path = 'C:/Python/RawData/'
 
