@@ -14,18 +14,17 @@ def screen(df):
     ema10 = df.iloc[-1]['EMA10']
     ema20 = df.iloc[-1]['EMA20']
     ema60 = df.iloc[-1]['EMA60']
-    ema150 = df.iloc[-1]['EMA150']
+    # ema150 = df.iloc[-1]['EMA150']
     OBV = df.iloc[-1]['OBV']
     OBV_MAX = df.iloc[-1]['OBV_MAX']
     turnover = df.iloc[-1]['volume']*close
 
     if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (ema10 >= ema60) and (OBV==OBV_MAX) and (turnover >= 100000):
-        df['Breakout'] += 1 
-        return df.tail(1)
+        return True
     else:
-        df['Breakout'] = 0 
+        return False
 
-    return pd.DataFrame()
+    # return pd.DataFrame()
 
 # def is_qfq_in_period(df,qfq,period):
 #     ticker = df.loc[df.index[-1],'ticker']
@@ -54,6 +53,7 @@ def run(ticker_chunk_df):
         #     continue
         return_ticker_df = pd.DataFrame()
         # start_time = time.time()
+        Breakout = 0
         for date in ticker_df.index:
             # date2 = date - timedelta(days=1)
             # i = 0
@@ -68,8 +68,12 @@ def run(ticker_chunk_df):
             if date_ticker_df.empty:
                 continue
             result = screen(date_ticker_df)
-            if not result.empty:
-                return_ticker_df = pd.concat([return_ticker_df,result])
+            if result:
+                Breakout += 1
+                date_ticker_df['Breakout'][0] = Breakout
+                return_ticker_df = pd.concat([return_ticker_df,date_ticker_df])
+            else:
+                Breakout = 0
         # print("%s seconds\n" %(time.time()-start_time))
         # result = screen(ticker_df)
         # if not result.empty:
