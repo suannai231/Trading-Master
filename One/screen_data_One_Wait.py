@@ -20,7 +20,10 @@ def screen(df):
     turnover = df.iloc[-1]['volume']*close
 
     if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (ema10 >= ema60) and (OBV_MAX>OBV>=OBV_MAX*0.85) and (turnover >= 100000):
+        df['Wait'] += 1
         return df.tail(1)
+    else:
+        df['Wait'] = 0
 
     return pd.DataFrame()
 

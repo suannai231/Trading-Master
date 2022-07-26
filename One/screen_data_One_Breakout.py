@@ -20,22 +20,25 @@ def screen(df):
     turnover = df.iloc[-1]['volume']*close
 
     if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (ema10 >= ema60) and (OBV==OBV_MAX) and (turnover >= 100000):
+        df['Breakout'] += 1 
         return df.tail(1)
+    else:
+        df['Breakout'] = 0 
 
     return pd.DataFrame()
 
-def is_qfq_in_period(df,qfq,period):
-    ticker = df.loc[df.index[-1],'ticker']
-    ticker_date = df.index[-1]
-    for date in qfq[qfq.ticker==ticker].date:   # remove qfq
-        start = ticker_date.date()
-        end = date.date()
-        busdays = np.busday_count( start, end)
-        if (busdays > 0) & (busdays<=period+1):
-            return True
-        elif (busdays < 0) & (busdays>=-200):
-            return True
-    return False
+# def is_qfq_in_period(df,qfq,period):
+#     ticker = df.loc[df.index[-1],'ticker']
+#     ticker_date = df.index[-1]
+#     for date in qfq[qfq.ticker==ticker].date:   # remove qfq
+#         start = ticker_date.date()
+#         end = date.date()
+#         busdays = np.busday_count( start, end)
+#         if (busdays > 0) & (busdays<=period+1):
+#             return True
+#         elif (busdays < 0) & (busdays>=-200):
+#             return True
+#     return False
 
 def run(ticker_chunk_df):
     if ticker_chunk_df.empty:

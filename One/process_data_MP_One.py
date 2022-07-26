@@ -102,6 +102,9 @@ def cal_basics(df):
     df['EMA60'] = ema60
     df['EMA150'] = ema150
 
+    df['Breakout'] = 0
+    df['Wait'] = 0
+
     return df
 
 def run(ticker_chunk_df):
