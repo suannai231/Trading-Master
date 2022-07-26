@@ -64,7 +64,7 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 start = datetime.datetime.now() - datetime.timedelta(days)
-end = datetime.date.today()
+end = datetime.date.today() + datetime.timedelta(1)
 
 path = 'C:/Python/RawData/'
 
