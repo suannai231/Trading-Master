@@ -70,7 +70,7 @@ def run(ticker_chunk_df):
             result = screen(date_ticker_df)
             if result:
                 Breakout += 1
-                date_ticker_df['Breakout'][0] = Breakout
+                date_ticker_df.loc[0,'Breakout'] = Breakout
                 return_ticker_df = pd.concat([return_ticker_df,date_ticker_df])
             else:
                 Breakout = 0
