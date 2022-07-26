@@ -89,7 +89,7 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 date_time = datetime.datetime.now() 
-datetime_str = date_time.strftime("%m%d%Y-%H%M%S")
+datetime_str = date_time.strftime("%m%d%Y-%H")
 
 # end = datetime.date.today()
 processed_data_path=f"C:/Python/ProcessedData/"

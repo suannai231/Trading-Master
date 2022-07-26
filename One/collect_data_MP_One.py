@@ -67,7 +67,7 @@ date_time = datetime.datetime.now()
 start = date_time - datetime.timedelta(days)
 end = datetime.date.today()
 
-datetime_str = date_time.strftime("%m%d%Y-%H%M%S")
+datetime_str = date_time.strftime("%m%d%Y-%H")
 
 path = 'C:/Python/RawData/'
 
