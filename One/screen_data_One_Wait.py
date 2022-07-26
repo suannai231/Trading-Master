@@ -19,7 +19,7 @@ def screen(df):
     OBV_MAX = df.iloc[-1]['OBV_MAX']
     turnover = df.iloc[-1]['volume']*close
 
-    if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (ema20 >= ema60) and (ema60 >= ema150) and (OBV_MAX>OBV>=OBV_MAX*0.90) and (turnover >= 100000):
+    if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (ema10 >= ema60) and (OBV_MAX>OBV>=OBV_MAX*0.85) and (turnover >= 100000):
         return df.tail(1)
 
     return pd.DataFrame()
