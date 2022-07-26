@@ -70,7 +70,7 @@ def run(ticker_chunk_df):
             result = screen(date_ticker_df)
             if result:
                 Wait += 1
-                date_ticker_df.loc[0,'Wait'] = Wait
+                date_ticker_df.loc[date,'Wait'] = Wait
                 return_ticker_df = pd.concat([return_ticker_df,date_ticker_df])
             else:
                 Wait = 0
