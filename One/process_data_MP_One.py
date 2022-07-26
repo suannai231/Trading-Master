@@ -67,7 +67,7 @@ def cal_basics(df):
     lastindex = len(df)-1
 
     df['Breakout'] = 0
-    df['BreakoutCum'] = 0
+    df['Breakout_Cum'] = 0
     df['Wait'] = 0
     df['Wait_Cum'] = 0
 
