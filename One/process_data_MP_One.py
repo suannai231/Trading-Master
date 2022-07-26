@@ -9,6 +9,32 @@ from multiprocessing import Pool
 CAP_Limit = 10000000000
 Price_Limit = 9.5
 
+def cal_OBV(df):
+    startindex = 0
+    endindex = len(df)
+
+    OBV = []
+    OBV.append(0)
+    OBV_MAX = []
+    OBV_MAX.append(0)
+
+    for i in range(startindex+1, endindex):
+        high = df.high[i-1]
+        low = df.low[i-1]
+        mid = (high+low)/2
+        if df.close[i] > mid:
+            OBV.append(OBV[-1] + df.volume[i])
+        elif df.close[i] < mid:
+            OBV.append( OBV[-1] - df.volume[i])
+        else:
+            OBV.append(OBV[-1])
+        OBV_MAX.append(max(OBV))
+
+    df['OBV'] = OBV
+    df['OBV_MAX'] = OBV_MAX
+
+    return df
+
 def cal_60_OBV(df):
     df = df.iloc[len(df)-60:].reset_index(drop=True)
     startindex = 0
@@ -94,7 +120,7 @@ def run(ticker_chunk_df):
             continue
 
         df = cal_basics(df)
-        df = cal_60_OBV(df)
+        df = cal_OBV(df)
 
         if not df.empty:
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,df],ignore_index=True)
