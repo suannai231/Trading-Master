@@ -168,6 +168,7 @@ if __name__ == '__main__':
     df.reset_index(drop=True,inplace=True)
     if(not df.empty):
         df.to_feather(processed_data_path + f'{end}' + '.feather')
+        df.to_csv(processed_data_path + f'{end}' + '.csv')
         os.popen(f'python C:/Code/One/screen_data_One_Wait.py')
         os.popen(f'python C:/Code/One/screen_data_One_Breakout.py')
     else:
