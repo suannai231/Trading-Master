@@ -9,8 +9,8 @@ from multiprocessing import Pool
 CAP_Limit = 10000000000
 Price_Limit = 9.5
 
-def cal_OBV(df):
-
+def cal_60_OBV(df):
+    df = df.iloc[len(df)-60:].reset_index(drop=True)
     startindex = 0
     endindex = len(df)
 
@@ -32,7 +32,7 @@ def cal_OBV(df):
         OBV_MAX.append(max(OBV))
 
     df['OBV'] = OBV
-    df['OBV_MAX'] = OBV_MAX
+    df['OBV_60_MAX'] = OBV_MAX
 
     return df
 
@@ -69,10 +69,12 @@ def cal_basics(df):
     ema10 = df['close'].ewm(span = 10, adjust = False).mean()
     ema20 = df['close'].ewm(span = 20, adjust = False).mean()
     ema60 = df['close'].ewm(span = 60, adjust = False).mean()
+    ema150 = df['close'].ewm(span = 150, adjust = False).mean()
     df['EMA5'] = ema5
     df['EMA10'] = ema10
     df['EMA20'] = ema20
     df['EMA60'] = ema60
+    df['EMA150'] = ema150
 
     return df
 
@@ -92,7 +94,7 @@ def run(ticker_chunk_df):
             continue
 
         df = cal_basics(df)
-        df = cal_OBV(df.iloc[len(df)-60:].reset_index(drop=True))
+        df = cal_60_OBV(df)
 
         if not df.empty:
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,df],ignore_index=True)
