@@ -66,6 +66,9 @@ def cal_basics(df):
 
     lastindex = len(df)-1
 
+    df['Breakout'] = 0
+    df['Wait'] = 0
+    
     df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
     df['change_1days'] = (df.close.shift(-1)- df.close)/df.close
     df['change_2days'] = (df.close.shift(-2)- df.close)/df.close
@@ -101,9 +104,6 @@ def cal_basics(df):
     df['EMA20'] = ema20
     df['EMA60'] = ema60
     df['EMA150'] = ema150
-
-    df['Breakout'] = 0
-    df['Wait'] = 0
 
     return df
 
