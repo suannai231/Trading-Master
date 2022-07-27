@@ -138,4 +138,4 @@ if __name__ == '__main__':
     
     return_df.reset_index(drop=False,inplace=True)
     return_df.to_csv(screened_data_path + datetime_str + '_breakout.csv')
-    return_df.loc[end,'ticker'].to_csv(screened_data_path + datetime_str + '_breakout.txt',header=False, index=False)
+    return_df.loc[return_df.date==end,'ticker'].to_csv(screened_data_path + datetime_str + '_breakout.txt',header=False, index=False)
