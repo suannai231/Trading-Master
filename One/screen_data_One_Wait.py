@@ -54,6 +54,7 @@ def run(ticker_chunk_df):
         return_ticker_df = pd.DataFrame()
         # start_time = time.time()
 
+        Wait = 0
         for date in ticker_df.index:
             # date2 = date - timedelta(days=1)
             # i = 0
@@ -69,10 +70,12 @@ def run(ticker_chunk_df):
                 continue
             result = screen(date_ticker_df)
             if result:
-                date_ticker_df.loc[date,'Wait'] += 1
+                Wait += 1
+                date_ticker_df.loc[date,'Wait'] += Wait
                 return_ticker_df = pd.concat([return_ticker_df,date_ticker_df])
             else:
-                date_ticker_df.loc[date,'Wait_Cum'] += date_ticker_df.loc[date,'Wait']
+                date_ticker_df.loc[date,'Wait_Cum'] += Wait
+                Wait = 0
                 date_ticker_df.loc[date,'Wait'] = 0
         # print("%s seconds\n" %(time.time()-start_time))
         # result = screen(ticker_df)
