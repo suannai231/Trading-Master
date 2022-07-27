@@ -73,13 +73,14 @@ def run(ticker_chunk_df):
             if result:
                 Breakout += 1
                 date_ticker_df.loc[date,'Breakout'] = Breakout
+                date_ticker_df.loc[date,'Breakout_Cum'] = Breakout_Cum
                 return_ticker_df = pd.concat([return_ticker_df,date_ticker_df])
             else:
+                Breakout_Cum += Breakout
                 Breakout = 0
-                date_ticker_df.loc[date,'Breakout'] = 0
-                
-            Breakout_Cum += Breakout
-            date_ticker_df.loc[date,'Breakout_Cum'] = Breakout_Cum
+                # date_ticker_df.loc[date,'Breakout'] = 0
+
+            # date_ticker_df.loc[date,'Breakout_Cum'] = Breakout_Cum
         # print("%s seconds\n" %(time.time()-start_time))
         # result = screen(ticker_df)
         # if not result.empty:
