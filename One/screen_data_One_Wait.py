@@ -75,14 +75,14 @@ def run(ticker_chunk_df):
                 date_ticker_df.loc[date,'Wait'] = Wait
                 return_ticker_df = pd.concat([return_ticker_df,date_ticker_df])
             else:
-                Wait_Cum += Wait
-                date_ticker_df.loc[date,'Wait_Cum'] = Wait_Cum
                 Wait = 0
                 date_ticker_df.loc[date,'Wait'] = 0
         # print("%s seconds\n" %(time.time()-start_time))
         # result = screen(ticker_df)
         # if not result.empty:
         #     return_ticker_df = return_ticker_df.append(result)
+            Wait_Cum += Wait
+            date_ticker_df.loc[date,'Wait_Cum'] = Wait_Cum
 
         if not return_ticker_df.empty:
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,return_ticker_df])
