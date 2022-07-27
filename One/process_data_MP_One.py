@@ -125,7 +125,7 @@ def run(ticker_chunk_df):
             continue
 
         df = cal_basics(df)
-        df = df.iloc[len(df)-200:].reset_index(drop=True)
+        df = df.iloc[len(df)-150:].reset_index(drop=True)
         df = cal_OBV(df)
 
         if not df.empty:
