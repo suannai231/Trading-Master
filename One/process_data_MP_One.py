@@ -114,7 +114,7 @@ def run(ticker_chunk_df):
         #     continue
         if df['close'][lastindex] > Price_Limit:
             continue
-        elif(len(df)<=200):
+        elif(len(df)<=60):
             print(ticker+" length is less than 200 business days.")
             continue
 
