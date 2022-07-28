@@ -18,7 +18,7 @@ def cal_EMA_Max(df):
     EMA10_Max = []
     EMA20 = []
     EMA20_Max = []
-    for i in range(startindex+1, endindex):
+    for i in range(startindex, endindex):
         EMA5.append(df.EMA5[i])
         EMA5_Max.append(max(EMA5))
         EMA10.append(df.EMA10[i])
