@@ -18,6 +18,8 @@ def cal_EMA_Max(df):
     EMA10_Max = []
     EMA20 = []
     EMA20_Max = []
+    EMA60 = []
+    EMA60_Max = []
     for i in range(startindex, endindex):
         EMA5.append(df.EMA5[i])
         EMA5_Max.append(max(EMA5))
@@ -25,9 +27,12 @@ def cal_EMA_Max(df):
         EMA10_Max.append(max(EMA10))
         EMA20.append(df.EMA20[i])
         EMA20_Max.append(max(EMA20))
+        EMA60.append(df.EMA60[i])
+        EMA60_Max.append(max(EMA60))
     df['EMA5_Max'] = EMA5_Max
     df['EMA10_Max'] = EMA10_Max
     df['EMA20_Max'] = EMA20_Max
+    df['EMA60_Max'] = EMA60_Max
     return df
 
 def cal_OBV(df):
