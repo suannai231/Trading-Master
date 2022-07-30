@@ -16,7 +16,7 @@ def screen(df):
     ema60 = df.iloc[-1]['EMA60']
     # ema150 = df.iloc[-1]['EMA150']
     OBV = df.iloc[-1]['OBV']
-    OBV_MAX = df.iloc[-1]['OBV_MAX']
+    OBV_Max = df.iloc[-1]['OBV_Max']
     turnover = df.iloc[-1]['volume']*close
 
     ema5_max = df.iloc[-1]['EMA5_Max']
@@ -24,7 +24,7 @@ def screen(df):
     ema20_max = df.iloc[-1]['EMA20_Max']
     ema60_max = df.iloc[-1]['EMA60_Max']
 
-    if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (ema20 >= ema60) and (OBV>=OBV_MAX*0.85) and (turnover >= 100000) \
+    if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (ema20 >= ema60) and (OBV>=OBV_Max*0.90) and (turnover >= 100000) \
         and (close >= ema5_max) and (close >= ema10_max) and (close >= ema20_max) and (close >= ema60_max):
         return True
     else:

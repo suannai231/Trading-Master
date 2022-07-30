@@ -9,9 +9,9 @@ from multiprocessing import Pool
 CAP_Limit = 10000000000
 Price_Limit = 9.5
 
-def cal_EMA_Max(df):
-    startindex = 0
-    endindex = len(df)
+def cal_Max(df):
+    # startindex = 0
+    # endindex = len(df)
     EMA5 = []
     EMA5_Max = []
     EMA10 = []
@@ -20,20 +20,37 @@ def cal_EMA_Max(df):
     EMA20_Max = []
     EMA60 = []
     EMA60_Max = []
-    for i in range(startindex, endindex):
-        EMA5.append(df.EMA5[i])
-        EMA5_Max.append(max(EMA5))
-        EMA10.append(df.EMA10[i])
-        EMA10_Max.append(max(EMA10))
-        EMA20.append(df.EMA20[i])
-        EMA20_Max.append(max(EMA20))
-        EMA60.append(df.EMA60[i])
-        EMA60_Max.append(max(EMA60))
-    df['EMA5_Max'] = EMA5_Max
-    df['EMA10_Max'] = EMA10_Max
-    df['EMA20_Max'] = EMA20_Max
-    df['EMA60_Max'] = EMA60_Max
-    return df
+    OBV_Max = []
+    # for i in range(startindex, endindex):
+    #     EMA5.append(df.EMA5[i])
+    #     EMA10.append(df.EMA10[i])
+    #     EMA20.append(df.EMA20[i])
+    #     EMA60.append(df.EMA60[i])
+
+    # EMA5_Max.append(max(EMA5))
+    # EMA10_Max.append(max(EMA10))
+    # EMA20_Max.append(max(EMA20))
+    # EMA60_Max.append(max(EMA60))
+
+    # EMA5_Max.append(max(df.loc[0:60,'EMA5']))
+    # EMA10_Max.append(max(df.loc[0:60,'EMA10']))
+    # EMA20_Max.append(max(df.loc[0:60,'EMA20']))
+    # EMA60_Max.append(max(df.loc[0:60,'EMA25']))
+
+    for startindex in range(0,len(df)-59):
+        endindex = startindex + 59
+        EMA5_Max.append(max(df.loc[startindex:endindex,'EMA5']))
+        EMA10_Max.append(max(df.loc[startindex:endindex,'EMA10']))
+        EMA20_Max.append(max(df.loc[startindex:endindex,'EMA20']))
+        EMA60_Max.append(max(df.loc[startindex:endindex,'EMA60']))
+        OBV_Max.append(max(df.loc[startindex:endindex,'OBV']))
+
+    df.loc[59:len(df)-1,'EMA5_Max'] = EMA5_Max
+    df.loc[59:len(df)-1,'EMA10_Max'] = EMA10_Max
+    df.loc[59:len(df)-1,'EMA20_Max'] = EMA20_Max
+    df.loc[59:len(df)-1,'EMA60_Max'] = EMA60_Max
+    df.loc[59:len(df)-1,'OBV_Max'] = OBV_Max
+    return df.loc[59:]
 
 def cal_OBV(df):
     startindex = 0
@@ -41,8 +58,8 @@ def cal_OBV(df):
 
     OBV = []
     OBV.append(0)
-    OBV_MAX = []
-    OBV_MAX.append(0)
+    # OBV_MAX = []
+    # OBV_MAX.append(0)
 
     for i in range(startindex+1, endindex):
         high = df.high[i-1]
@@ -54,10 +71,10 @@ def cal_OBV(df):
             OBV.append( OBV[-1] - df.volume[i])
         else:
             OBV.append(OBV[-1])
-        OBV_MAX.append(max(OBV))
+        # OBV_MAX.append(max(OBV))
 
     df['OBV'] = OBV
-    df['OBV_MAX'] = OBV_MAX
+    # df['OBV_MAX'] = OBV_MAX
 
     return df
 
@@ -124,9 +141,9 @@ def run(ticker_chunk_df):
             continue
 
         df = cal_basics(df)
-        df = df.iloc[len(df)-60:].reset_index(drop=True)
+        # df = df.iloc[len(df)-60:].reset_index(drop=True)
         df = cal_OBV(df)
-        df = cal_EMA_Max(df)
+        df = cal_Max(df)
 
         if not df.empty:
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,df],ignore_index=True)
