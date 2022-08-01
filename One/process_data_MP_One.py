@@ -4,6 +4,7 @@ import os
 import sys
 import multiprocessing
 from multiprocessing import Pool
+import time
 
 # backward = 180
 CAP_Limit = 10000000000
@@ -137,7 +138,7 @@ def run(ticker_chunk_df):
         if df['close'][lastindex] > Price_Limit:
             continue
         elif(len(df)<=60):
-            print(ticker+" length is less than 60 business days.")
+            # print(ticker+" length is less than 60 business days.")
             continue
 
         df = cal_basics(df)
@@ -154,47 +155,63 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-date_time = datetime.datetime.now() 
-datetime_str = date_time.strftime("%m%d%Y-%H")
-
-# end = datetime.date.today()
-raw_data_path=f"C:/Python/RawData/"
-processed_data_path=f"C:/Python/ProcessedData/"
-
 if __name__ == '__main__':
+
+    raw_data_path='//jack-nas/Work/Python/RawData/'
+    processed_data_path='//jack-nas/Work/Python/ProcessedData/'
+
     isPathExists = os.path.exists(processed_data_path)
     if not isPathExists:
         os.makedirs(processed_data_path)
 
-    processed_files = os.listdir(processed_data_path)
-    processed_file = datetime_str + '.feather'
-    if processed_file in processed_files:
-        print("error: " + processed_file + " existed.")
-        sys.exit(1)
-    
-    df = pd.read_feather(raw_data_path + datetime_str + '.feather')
-    tickers = df.ticker.unique()
+    while True:
+        start_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+        print("start time:" + start_time)
+        raw_data_files = os.listdir(raw_data_path)
+        if len(raw_data_files) == 0:
+            print("raw data not ready, sleep 60 seconds...")
+            time.sleep(60)
+        # date_time = datetime.datetime.now() 
+        # datetime_str = date_time.strftime("%m%d%Y-%H")
+        # processed_data_file = datetime_str + '.feather'
 
-    cores = multiprocessing.cpu_count()
-    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/cores)))
-    pool = Pool(cores)
-    async_results = []
-    for ticker_chunk in ticker_chunk_list:
-        ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
-        async_results.append(async_result)
-    pool.close()
-    del(df)
-    df = pd.DataFrame()
-    for async_result in async_results:
-        result = async_result.get()
-        if not result.empty:
-            df = pd.concat([df,async_result.get()])
-    df.reset_index(drop=True,inplace=True)
-    if(not df.empty):
-        df.to_feather(processed_data_path + datetime_str + '.feather')
-        df.to_csv(processed_data_path + datetime_str + '.csv')
-        # os.popen(f'python C:/Code/One/screen_data_One_Wait.py')
-        os.popen(f'python C:/Code/One/screen_data_One_Breakout.py')
-    else:
-        print("df empty")
+        processed_data_files = os.listdir(processed_data_path)
+        if raw_data_files[-1] in processed_data_files:
+            print("error: " + raw_data_files[-1] + " existed, sleep 60 seconds...")
+            time.sleep(60)
+            continue
+        
+        print("processing "+raw_data_files[-1])
+        try:
+            df = pd.read_feather(raw_data_path + raw_data_files[-1])
+        except Exception as e:
+            print(e)
+            continue
+
+        tickers = df.ticker.unique()
+
+        cores = multiprocessing.cpu_count()
+        ticker_chunk_list = list(chunks(tickers,int(len(tickers)/cores)))
+        pool = Pool(cores)
+        async_results = []
+        for ticker_chunk in ticker_chunk_list:
+            ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
+            async_result = pool.apply_async(run, args=(ticker_chunk_df,))
+            async_results.append(async_result)
+        pool.close()
+        del(df)
+        df = pd.DataFrame()
+        for async_result in async_results:
+            result = async_result.get()
+            if not result.empty:
+                df = pd.concat([df,async_result.get()])
+        df.reset_index(drop=True,inplace=True)
+        if(not df.empty):
+            df.to_feather(processed_data_path + raw_data_files[-1])
+            # df.to_csv(processed_data_path + raw_data_files[-1] + '.csv')
+            stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+            print("stop time:" +stop_time)
+            # os.popen(f'python C:/Code/One/screen_data_One_Wait.py')
+            # os.popen(f'python C:/Code/One/screen_data_One_Breakout.py')
+        else:
+            print("df empty")

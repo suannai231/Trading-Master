@@ -10,5 +10,5 @@ set FILENAME=%CUR_YYYY%%CUR_MM%%CUR_DD%-%CUR_HH%%CUR_NN%%CUR_SS%
 
 call C:\ProgramData\Anaconda3\Scripts\activate.bat C:\ProgramData\Anaconda3
 cd C:\Code\One
-python collect_data_MP_One.py>C:\Python\%FILENAME%.txt
+python collect_data_MP_One.py>\\jack-nas\Work\Python\RawData\%FILENAME%.txt
 exit

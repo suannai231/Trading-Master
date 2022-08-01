@@ -24,8 +24,10 @@ def screen(df):
     ema20_max = df.iloc[-1]['EMA20_Max']
     ema60_max = df.iloc[-1]['EMA60_Max']
 
-    if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (ema20 >= ema60) and (OBV>=OBV_Max*0.90) and (turnover >= 100000) \
-        and (close >= ema5_max) and (close >= ema10_max) and (close >= ema20_max) and (close >= ema60_max):
+    # if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (ema20 >= ema60) and (OBV>=OBV_Max*0.90) and (turnover >= 100000) \
+    #     and (close >= ema5_max) and (close >= ema10_max) and (close >= ema20_max) and (close >= ema60_max):
+    if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (OBV>=OBV_Max*0.90) and (turnover >= 100000) \
+        and (close >= ema5_max) and (close >= ema10_max) and (close >= ema20_max):
         return True
     else:
         return False
