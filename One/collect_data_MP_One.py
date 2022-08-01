@@ -135,7 +135,7 @@ if __name__ == '__main__':
         stock_concat_df = pd.DataFrame()
         for stock_async_result in stock_async_results:
             try:
-                stock_chunk_df = stock_async_result.get(timeout=60)
+                stock_chunk_df = stock_async_result.get(timeout=120)
             except TimeoutError:
                 pool.terminate()
                 pool.join()
