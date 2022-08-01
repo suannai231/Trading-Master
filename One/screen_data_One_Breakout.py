@@ -170,7 +170,7 @@ if __name__ == '__main__':
             return_df.reset_index(drop=False,inplace=True)
             return_df.to_csv(screened_data_path + processed_data_files[-1] + '_breakout.csv')
             end = datetime.date.today()
-            return_df.loc[return_df.date==str(end) and return_df.Breakout==1,'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_breakout.txt',header=False, index=False)
+            return_df.loc[(return_df.date==str(end)) & (return_df.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_breakout.txt',header=False, index=False)
             stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
             print("stop time:" +stop_time)
         else:
