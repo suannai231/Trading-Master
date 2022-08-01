@@ -6,6 +6,7 @@ import sys
 from multiprocessing import Pool
 import numpy as np
 from datetime import timedelta
+import time
 
 def screen(df):
 
@@ -103,47 +104,74 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-date_time = datetime.datetime.now() 
-datetime_str = date_time.strftime("%m%d%Y-%H")
-end = datetime.date.today()
-
-processed_data_path=f"C:/Python/ProcessedData/"
-screened_data_path=f"C:/Python/ScreenedData/"
-qfq_path = 'C:/Python/RawData/'
-
 if __name__ == '__main__':
+    processed_data_path="//jack-nas/Work/Python/ProcessedData/"
+    screened_data_path="//jack-nas/Work/Python/ScreenedData/"
+
     isPathExists = os.path.exists(screened_data_path)
     if not isPathExists:
         os.makedirs(screened_data_path)
 
-    screened_data_files = os.listdir(screened_data_path)
-    screened_data_file = datetime_str + '_breakout.csv'
-    if screened_data_file in screened_data_files:
-        print("error: " + screened_data_file + " existed.")
-        sys.exit(1)
+    while True:
+        start_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+        print("start time:" + start_time)
 
-    df = pd.read_feather(processed_data_path + datetime_str + '.feather')
-    # df = df[df['date'] > '2017-01-01']
-    # qfq = pd.read_feather(qfq_path+f'{end}'+'_qfq.feather')
-    # qfq = qfq[qfq['date'] > '2017-01-01']
+        processed_data_files = os.listdir(processed_data_path)
+        if len(processed_data_files) == 0:
+            print("processed data not ready, sleep 60 seconds...")
+            time.sleep(60)
 
-    tickers = df.ticker.unique()
-    cores = multiprocessing.cpu_count()
-    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/cores)))
-    pool=Pool(cores)
-    async_results = []
-    for ticker_chunk in ticker_chunk_list:
-        ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
-        async_results.append(async_result)
-    pool.close()
+        screened_data_files = os.listdir(screened_data_path)
+        if processed_data_files[-1] in screened_data_files:
+            print("error: " + processed_data_files[-1] + " existed, sleep 60 seconds...")
+            time.sleep(60)
+            continue
+        # date_time = datetime.datetime.now() 
+        # datetime_str = date_time.strftime("%m%d%Y-%H")
+        # end = datetime.date.today()
+        print("processing "+processed_data_files[-1])
 
-    return_df = pd.DataFrame()
-    for async_result in async_results:
-        result = async_result.get()
-        if not result.empty:
-            return_df = pd.concat([return_df,result])
-    
-    return_df.reset_index(drop=False,inplace=True)
-    return_df.to_csv(screened_data_path + datetime_str + '_breakout.csv')
-    return_df.loc[return_df.date==str(end),'ticker'].to_csv(screened_data_path + datetime_str + '_breakout.txt',header=False, index=False)
+        try:
+            df = pd.read_feather(processed_data_path + processed_data_files[-1])
+        except Exception as e:
+            print(e)
+            continue
+
+        # processed_data_files = os.listdir(processed_data_path)
+        # screened_data_file = datetime_str + '_breakout.csv'
+        # if screened_data_file in screened_data_files:
+        #     print("error: " + screened_data_file + " existed.")
+        #     sys.exit(1)
+
+        # df = pd.read_feather(processed_data_path + datetime_str + '.feather')
+        # df = df[df['date'] > '2017-01-01']
+        # qfq = pd.read_feather(qfq_path+f'{end}'+'_qfq.feather')
+        # qfq = qfq[qfq['date'] > '2017-01-01']
+
+        tickers = df.ticker.unique()
+        cores = multiprocessing.cpu_count()
+        ticker_chunk_list = list(chunks(tickers,int(len(tickers)/cores)))
+        pool=Pool(cores)
+        async_results = []
+        for ticker_chunk in ticker_chunk_list:
+            ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
+            async_result = pool.apply_async(run, args=(ticker_chunk_df,))
+            async_results.append(async_result)
+        pool.close()
+        del(df)
+
+        return_df = pd.DataFrame()
+        for async_result in async_results:
+            result = async_result.get()
+            if not result.empty:
+                return_df = pd.concat([return_df,result])
+        
+        if(not return_df.empty):
+            return_df.reset_index(drop=False,inplace=True)
+            return_df.to_csv(screened_data_path + processed_data_files[-1] + '_breakout.csv')
+            end = datetime.date.today()
+            return_df.loc[return_df.date==str(end),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_breakout.txt',header=False, index=False)
+            stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+            print("stop time:" +stop_time)
+        else:
+            print("df empty")
