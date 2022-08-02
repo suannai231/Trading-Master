@@ -37,11 +37,11 @@ def get_stock(ticker):
     if not df.empty:
         if(len(df.loc[df.index==str(end)])==0):         #get real time stock price
             try:
-                close = si.get_live_price(ticker)
-                open = si.get_quote_table(ticker)['Open']
-                low = si.get_quote_table(ticker)["Day's Range"].split(" - ")[0]
-                high = si.get_quote_table(ticker)["Day's Range"].split(" - ")[1]
-                volume = si.get_quote_table(ticker)['Volume']
+                close = float(si.get_live_price(ticker))
+                open = float(si.get_quote_table(ticker)['Open'])
+                low = float(si.get_quote_table(ticker)["Day's Range"].split(" - ")[0])
+                high = float(si.get_quote_table(ticker)["Day's Range"].split(" - ")[1])
+                volume = int(si.get_quote_table(ticker)['Volume'])
             except Exception as e:
                 logging.critical(ticker+" "+str(e))
                 # open = close
@@ -180,7 +180,10 @@ if __name__ == '__main__':
         if not stock_concat_df.empty:
             stock_concat_df.reset_index(inplace=True)
             stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-            stock_concat_df.to_feather(path + stop_time + ".feather")
+            try:
+                stock_concat_df.to_feather(path + stop_time + ".feather")
+            except Exception as e:
+                logging.critical("to_feather:"+str(e))
             logging.info("stop time:" + stop_time)
             # os.popen(f'python C:/Code/One/process_data_MP_One.py')
         else:
