@@ -43,7 +43,7 @@ def get_stock(ticker):
                 high = float(si.get_quote_table(ticker)["Day's Range"].split(" - ")[1])
                 volume = int(si.get_quote_table(ticker)['Volume'])
             except Exception as e:
-                logging.critical(ticker+" "+str(e))
+                logging.debug(ticker+" "+str(e))
                 # open = close
                 # low = close
                 # high = close
