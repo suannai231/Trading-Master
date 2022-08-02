@@ -127,7 +127,8 @@ if __name__ == '__main__':
             time.sleep(60)
 
         screened_data_files = os.listdir(screened_data_path)
-        if processed_data_files[-1] in screened_data_files:
+        processed_data_files_str = processed_data_files[-1] + '_breakout.csv'
+        if processed_data_files_str in screened_data_files:
             logging.warning("error: " + processed_data_files[-1] + " existed, sleep 60 seconds...")
             time.sleep(60)
             continue
