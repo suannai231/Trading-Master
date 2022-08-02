@@ -36,7 +36,7 @@ def get_stock(ticker):
     df.index.name = 'date'
     if not df.empty:
         if(len(df.loc[df.index==str(end)])==0):
-            logging.warning(end+" data is not available, sleep 60 seconds...")
+            logging.warning(ticker+" "+str(end)+" data is not available, sleep 60 seconds...")
             time.sleep(60)
     return df
 
