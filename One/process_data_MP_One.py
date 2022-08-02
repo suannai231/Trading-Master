@@ -5,6 +5,7 @@ import sys
 import multiprocessing
 from multiprocessing import Pool
 import time
+import logging
 
 # backward = 180
 CAP_Limit = 10000000000
@@ -160,16 +161,19 @@ if __name__ == '__main__':
     raw_data_path='//jack-nas/Work/Python/RawData/'
     processed_data_path='//jack-nas/Work/Python/ProcessedData/'
 
+    logfile = processed_data_path + datetime.datetime.now().strftime("%m%d%Y") + ".log"
+    logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
+
     isPathExists = os.path.exists(processed_data_path)
     if not isPathExists:
         os.makedirs(processed_data_path)
 
     while True:
         start_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-        print("start time:" + start_time)
+        logging.info("start time:" + start_time)
         raw_data_files = os.listdir(raw_data_path)
         if len(raw_data_files) == 0:
-            print("raw data not ready, sleep 60 seconds...")
+            logging.warning("raw data not ready, sleep 60 seconds...")
             time.sleep(60)
         # date_time = datetime.datetime.now() 
         # datetime_str = date_time.strftime("%m%d%Y-%H")
@@ -177,15 +181,15 @@ if __name__ == '__main__':
 
         processed_data_files = os.listdir(processed_data_path)
         if raw_data_files[-1] in processed_data_files:
-            print("error: " + raw_data_files[-1] + " existed, sleep 60 seconds...")
+            logging.warning("error: " + raw_data_files[-1] + " existed, sleep 60 seconds...")
             time.sleep(60)
             continue
         
-        print("processing "+raw_data_files[-1])
+        logging.info("processing "+raw_data_files[-1])
         try:
             df = pd.read_feather(raw_data_path + raw_data_files[-1])
         except Exception as e:
-            print(e)
+            logging.critical(e)
             continue
 
         tickers = df.ticker.unique()
@@ -200,7 +204,7 @@ if __name__ == '__main__':
             async_results.append(async_result)
         pool.close()
         del(df)
-        
+
         df = pd.DataFrame()
         for async_result in async_results:
             result = async_result.get()
@@ -212,8 +216,8 @@ if __name__ == '__main__':
             df.to_feather(processed_data_path + raw_data_files[-1])
             # df.to_csv(processed_data_path + raw_data_files[-1] + '.csv')
             stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-            print("stop time:" +stop_time)
+            logging.info("stop time:" +stop_time)
             # os.popen(f'python C:/Code/One/screen_data_One_Wait.py')
             # os.popen(f'python C:/Code/One/screen_data_One_Breakout.py')
         else:
-            print("df empty")
+            logging.error("df empty")
