@@ -38,6 +38,7 @@ def get_stock(ticker):
         if(len(df.loc[df.index==str(end)])==0):
             logging.warning(ticker+" "+str(end)+" data is not available, sleep 60 seconds...")
             time.sleep(60)
+            return pd.DataFrame()
     return df
 
 def get_stock_mt(ticker_chunk):
