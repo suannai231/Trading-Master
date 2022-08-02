@@ -109,7 +109,9 @@ if __name__ == '__main__':
     processed_data_path="//jack-nas/Work/Python/ProcessedData/"
     screened_data_path="//jack-nas/Work/Python/ScreenedData/"
 
-    logging.basicConfig(filename=screened_data_path, encoding='utf-8', level=logging.INFO)
+    logpath = '//jack-nas/Work/Python/'
+    logfile = screened_data_path + datetime.datetime.now().strftime("%m%d%Y") + "_process.log"
+    logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
     isPathExists = os.path.exists(screened_data_path)
     if not isPathExists:
