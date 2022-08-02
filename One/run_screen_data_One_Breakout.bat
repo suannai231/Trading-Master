@@ -10,5 +10,7 @@ set FILENAME=%CUR_YYYY%%CUR_MM%%CUR_DD%-%CUR_HH%%CUR_NN%%CUR_SS%
 
 call C:\ProgramData\Anaconda3\Scripts\activate.bat C:\ProgramData\Anaconda3
 cd C:\Code\One
+
 python screen_data_One_Breakout.py>\\jack-nas\Work\Python\ScreenedData\%FILENAME%.txt
+
 exit
