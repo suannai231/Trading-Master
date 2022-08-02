@@ -162,7 +162,7 @@ if __name__ == '__main__':
     processed_data_path='//jack-nas/Work/Python/ProcessedData/'
 
     logpath = '//jack-nas/Work/Python/'
-    logfile = processed_data_path + datetime.datetime.now().strftime("%m%d%Y") + "_process.log"
+    logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_process.log"
     logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
     isPathExists = os.path.exists(processed_data_path)
