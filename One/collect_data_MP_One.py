@@ -10,6 +10,7 @@ from multiprocessing import Pool,TimeoutError
 # import akshare as ak
 import concurrent.futures as cf
 from concurrent.futures import ThreadPoolExecutor
+import logging
 
 days=365
 
@@ -28,7 +29,7 @@ def get_stock(ticker):
         df = si.get_data(ticker,start, end + datetime.timedelta(1))
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-            print("si.get_data "+ticker+" error: "+str(e))
+            logging.critical("si.get_data "+ticker+" error: "+str(e)+". sys.exit...")
             sys.exit(3)
     df.index.name = 'date'
     return df
@@ -56,7 +57,7 @@ def get_stock_mp(ticker_chunk):
         try:
             df = si.get_data(ticker,start, end + datetime.timedelta(1))
         except Exception as e:
-            print("si.get_data "+ticker+" error: "+str(e))
+            logging.critical("si.get_data "+ticker+" error: "+str(e))
 
             if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
                 return ticker_chunk_df
@@ -84,7 +85,7 @@ def get_stock_mp(ticker_chunk):
             df.index.name = 'date'
             ticker_chunk_df = pd.concat([ticker_chunk_df,df])
         else:
-            print(ticker+" data is not available")
+            logging.info(ticker+" data is not available")
             continue
     return ticker_chunk_df
 
@@ -98,6 +99,13 @@ start = date_time - datetime.timedelta(days)
 end = datetime.date.today()
 
 path = '//jack-nas/Work/Python/RawData/'
+
+logfile = path + datetime.datetime.now().strftime("%m%d%Y") + ".log"
+logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
+# logging.debug('This message should go to the log file')
+# logging.info('So should this')
+# logging.warning('And this, too')
+# logging.error('And non-ASCII stuff, too, like Øresund and Malmö')
 
 if __name__ == '__main__':
     isPathExists = os.path.exists(path)
@@ -121,7 +129,7 @@ if __name__ == '__main__':
 
     while True:
         start_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-        print("start time:" + start_time)
+        logging.info("start time:" + start_time)
 
         pool = Pool(proc_num)
         stock_async_results = []
@@ -136,7 +144,8 @@ if __name__ == '__main__':
         for stock_async_result in stock_async_results:
             try:
                 stock_chunk_df = stock_async_result.get(timeout=120)
-            except TimeoutError:
+            except TimeoutError as e:
+                logging.error(str(e), " timeout 120 seconds, terminating process pool...")
                 pool.terminate()
                 pool.join()
                 break
@@ -146,11 +155,11 @@ if __name__ == '__main__':
         if not stock_concat_df.empty:
             stock_concat_df.reset_index(inplace=True)
             stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-            stock_concat_df.to_feather(path+stop_time+".feather")
-            print("stop time:" +stop_time)
+            stock_concat_df.to_feather(path + stop_time + ".feather")
+            logging.info("stop time:" + stop_time)
             # os.popen(f'python C:/Code/One/process_data_MP_One.py')
         else:
-            print("stock_concat_df is empty.")
+            logging.error("stock_concat_df is empty.")
             # sys.exit(2)
 
     # thread_number = proc_num
