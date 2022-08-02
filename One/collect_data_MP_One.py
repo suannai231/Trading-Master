@@ -35,10 +35,19 @@ def get_stock(ticker):
             sys.exit(3)
     df.index.name = 'date'
     if not df.empty:
-        if(len(df.loc[df.index==str(end)])==0):
-            logging.warning(ticker+" "+str(end)+" data is not available, sleep 60 seconds...")
-            time.sleep(60)
-            return pd.DataFrame()
+        if(len(df.loc[df.index==str(end)])==0):         #get real time stock price
+            close = si.get_live_price(ticker)
+            open = si.get_quote_table(ticker)['Open']
+            low = si.get_quote_table(ticker)["Day's Range"].split(" - ")[0]
+            high = si.get_quote_table(ticker)["Day's Range"].split(" - ")[1]
+            volume = si.get_quote_table(ticker)['Volume']
+            d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
+            # ser = pd.Series(data=d, name=str(end), index=['open', 'high', 'low', 'close', 'adjclose', 'volume', 'ticker'])
+            df2=pd.DataFrame(d,index=[str(end)])
+            df3= pd.concat([df,df2])
+            # logging.warning(ticker+" "+str(end)+" data is not available, sleep 60 seconds...")
+            # time.sleep(60)
+            return df3
     return df
 
 def get_stock_mt(ticker_chunk):
