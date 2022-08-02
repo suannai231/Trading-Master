@@ -215,7 +215,10 @@ if __name__ == '__main__':
         
         if(not df.empty):
             df.reset_index(drop=True,inplace=True)
-            df.to_feather(processed_data_path + raw_data_files[-1])
+            try:
+                df.to_feather(processed_data_path + raw_data_files[-1])
+            except Exception as e:
+                logging.critical("to_feather:"+str(e))
             # df.to_csv(processed_data_path + raw_data_files[-1] + '.csv')
             stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
             logging.info("stop time:" +stop_time)
