@@ -200,13 +200,15 @@ if __name__ == '__main__':
             async_results.append(async_result)
         pool.close()
         del(df)
+        
         df = pd.DataFrame()
         for async_result in async_results:
             result = async_result.get()
             if not result.empty:
                 df = pd.concat([df,async_result.get()])
-        df.reset_index(drop=True,inplace=True)
+        
         if(not df.empty):
+            df.reset_index(drop=True,inplace=True)
             df.to_feather(processed_data_path + raw_data_files[-1])
             # df.to_csv(processed_data_path + raw_data_files[-1] + '.csv')
             stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
