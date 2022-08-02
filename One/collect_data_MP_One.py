@@ -101,7 +101,7 @@ end = datetime.date.today()
 path = '//jack-nas/Work/Python/RawData/'
 
 logpath = '//jack-nas/Work/Python/'
-logfile = path + datetime.datetime.now().strftime("%m%d%Y") + "_collect.log"
+logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_collect.log"
 logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 # logging.debug('This message should go to the log file')
 # logging.info('So should this')
