@@ -1,3 +1,4 @@
+from operator import index
 from urllib3 import Timeout
 from yahoo_fin import stock_info as si
 import yfinance as yf
@@ -11,6 +12,7 @@ from multiprocessing import Pool,TimeoutError
 import concurrent.futures as cf
 from concurrent.futures import ThreadPoolExecutor
 import logging
+import time
 
 days=365
 
@@ -26,12 +28,16 @@ def string_to_int(string):
 def get_stock(ticker):
     df = pd.DataFrame()
     try:
-        df = si.get_data(ticker,start, end + datetime.timedelta(1))
+        df = si.get_data(ticker,start,end + datetime.timedelta(1),index_as_date=True)
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             logging.critical("si.get_data "+ticker+" error: "+str(e)+". sys.exit...")
             sys.exit(3)
     df.index.name = 'date'
+    if not df.empty:
+        if(len(df.loc[df.index==str(end)])==0):
+            logging.warning(end+" data is not available, sleep 60 seconds...")
+            time.sleep(60)
     return df
 
 def get_stock_mt(ticker_chunk):
