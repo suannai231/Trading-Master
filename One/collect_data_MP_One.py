@@ -44,10 +44,11 @@ def get_stock(ticker):
                 volume = si.get_quote_table(ticker)['Volume']
             except Exception as e:
                 logging.critical(ticker+" "+str(e))
-                open = close
-                low = close
-                high = close
-                volume = df.iloc[-1].volume
+                # open = close
+                # low = close
+                # high = close
+                # volume = df.iloc[-1].volume
+                return pd.DataFrame()
             d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
             # ser = pd.Series(data=d, name=str(end), index=['open', 'high', 'low', 'close', 'adjclose', 'volume', 'ticker'])
             df2=pd.DataFrame(d,index=[str(end)])
