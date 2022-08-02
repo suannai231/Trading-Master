@@ -36,8 +36,8 @@ def get_stock(ticker):
     df.index.name = 'date'
     if not df.empty:
         if(len(df.loc[df.index==str(end)])==0):         #get real time stock price
-            close = si.get_live_price(ticker)
             try:
+                close = si.get_live_price(ticker)
                 open = si.get_quote_table(ticker)['Open']
                 low = si.get_quote_table(ticker)["Day's Range"].split(" - ")[0]
                 high = si.get_quote_table(ticker)["Day's Range"].split(" - ")[1]
