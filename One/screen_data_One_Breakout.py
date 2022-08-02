@@ -129,7 +129,7 @@ if __name__ == '__main__':
         screened_data_files = os.listdir(screened_data_path)
         processed_data_files_str = processed_data_files[-1] + '_breakout.csv'
         if processed_data_files_str in screened_data_files:
-            logging.warning("error: " + processed_data_files[-1] + " existed, sleep 60 seconds...")
+            logging.warning("error: " + processed_data_files_str + " existed, sleep 60 seconds...")
             time.sleep(60)
             continue
         # date_time = datetime.datetime.now() 
