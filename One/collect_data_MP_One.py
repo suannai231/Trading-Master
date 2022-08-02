@@ -55,6 +55,7 @@ def get_stock(ticker):
             df3= pd.concat([df,df2])
             # logging.warning(ticker+" "+str(end)+" data is not available, sleep 60 seconds...")
             # time.sleep(60)
+            df3.index.name = 'date'
             return df3
     return df
 
