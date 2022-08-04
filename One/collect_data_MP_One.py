@@ -38,10 +38,11 @@ def get_stock(ticker):
         if(len(df.loc[df.index==str(end)])==0):         #get real time stock price
             try:
                 close = float(si.get_live_price(ticker))
-                open = float(si.get_quote_table(ticker)['Open'])
-                low = float(si.get_quote_table(ticker)["Day's Range"].split(" - ")[0])
-                high = float(si.get_quote_table(ticker)["Day's Range"].split(" - ")[1])
-                volume = int(si.get_quote_table(ticker)['Volume'])
+                quote_table = si.get_quote_table(ticker)
+                open = float(quote_table['Open'])
+                low = float(quote_table["Day's Range"].split(" - ")[0])
+                high = float(quote_table["Day's Range"].split(" - ")[1])
+                volume = int(quote_table['Volume'])
             except Exception as e:
                 logging.debug(ticker+" "+str(e))
                 # open = close
