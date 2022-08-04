@@ -43,7 +43,7 @@ def get_stock(ticker):
                 high = float(si.get_quote_table(ticker)["Day's Range"].split(" - ")[1])
                 volume = int(si.get_quote_table(ticker)['Volume'])
             except Exception as e:
-                logging.critical(ticker+" "+str(e))
+                logging.debug(ticker+" "+str(e))
                 # open = close
                 # low = close
                 # high = close
@@ -55,6 +55,7 @@ def get_stock(ticker):
             df3= pd.concat([df,df2])
             # logging.warning(ticker+" "+str(end)+" data is not available, sleep 60 seconds...")
             # time.sleep(60)
+            df3.index.name = 'date'
             return df3
     return df
 
@@ -173,7 +174,7 @@ if __name__ == '__main__':
         stock_concat_df = pd.DataFrame()
         for stock_async_result in stock_async_results:
             try:
-                stock_chunk_df = stock_async_result.get(timeout=120)
+                stock_chunk_df = stock_async_result.get(timeout=180)
             except TimeoutError as e:
                 logging.error(str(e), " timeout 120 seconds, terminating process pool...")
                 pool.terminate()
