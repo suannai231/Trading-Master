@@ -170,7 +170,12 @@ if __name__ == '__main__':
         os.makedirs(processed_data_path)
 
     while True:
-        start_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+        now = datetime.datetime.now()
+        today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
+        if(now>today3pm):
+            logging.info("time passed 3:05pm.")
+            break
+        start_time = now.strftime("%m%d%Y-%H%M%S")
         logging.info("start time:" + start_time)
         raw_data_files = os.listdir(raw_data_path)
         if len(raw_data_files) == 0:
