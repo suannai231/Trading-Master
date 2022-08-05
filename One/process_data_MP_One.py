@@ -6,6 +6,7 @@ import multiprocessing
 from multiprocessing import Pool
 import time
 import logging
+import math
 
 # backward = 180
 CAP_Limit = 10000000000
@@ -202,7 +203,7 @@ if __name__ == '__main__':
         tickers = df.ticker.unique()
 
         cores = multiprocessing.cpu_count()
-        ticker_chunk_list = list(chunks(tickers,int(len(tickers)/cores)))
+        ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
         pool = Pool(cores)
         async_results = []
         for ticker_chunk in ticker_chunk_list:

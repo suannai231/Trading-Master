@@ -13,6 +13,7 @@ import concurrent.futures as cf
 from concurrent.futures import ThreadPoolExecutor
 import logging
 import time
+import math
 
 days=365
 
@@ -151,7 +152,7 @@ if __name__ == '__main__':
     tickers = nasdaq + other
 
     cores = multiprocessing.cpu_count()
-    ticker_chunk_list = list(chunks(tickers,int(len(tickers)/(cores))))
+    ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
     proc_num = len(ticker_chunk_list)
 
     while True:

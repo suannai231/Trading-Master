@@ -8,6 +8,7 @@ import numpy as np
 from datetime import timedelta
 import time
 import logging
+import math
 
 def screen(df):
 
@@ -161,7 +162,7 @@ if __name__ == '__main__':
 
         tickers = df.ticker.unique()
         cores = multiprocessing.cpu_count()
-        ticker_chunk_list = list(chunks(tickers,int(len(tickers)/cores)))
+        ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
         pool=Pool(cores)
         async_results = []
         for ticker_chunk in ticker_chunk_list:
