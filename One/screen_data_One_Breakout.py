@@ -149,6 +149,9 @@ if __name__ == '__main__':
             logging.critical(e)
             continue
 
+        today = datetime.date.today()
+        yesterday = today - timedelta(days=1)
+        df = df.loc[(df.date == str(today)) | (df.date == str(yesterday))]
         # processed_data_files = os.listdir(processed_data_path)
         # screened_data_file = datetime_str + '_breakout.csv'
         # if screened_data_file in screened_data_files:
