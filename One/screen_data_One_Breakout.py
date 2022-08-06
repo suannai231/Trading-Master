@@ -17,7 +17,8 @@ def screen(df):
     ema10 = df.iloc[-1]['EMA10']
     ema20 = df.iloc[-1]['EMA20']
     ema60 = df.iloc[-1]['EMA60']
-    # ema150 = df.iloc[-1]['EMA150']
+    ema120 = df.iloc[-1]['EMA120']
+    ema250 = df.iloc[-1]['EMA250']
     OBV = df.iloc[-1]['OBV']
     OBV_Max = df.iloc[-1]['OBV_Max']
     turnover = df.iloc[-1]['volume']*close
@@ -26,11 +27,21 @@ def screen(df):
     ema10_max = df.iloc[-1]['EMA10_Max']
     ema20_max = df.iloc[-1]['EMA20_Max']
     ema60_max = df.iloc[-1]['EMA60_Max']
+    ema120_max = df.iloc[-1]['EMA120_Max']
+    ema250_max = df.iloc[-1]['EMA250_Max']
+
+    ema5_min = df.iloc[-1]['EMA5_Min']
+    ema10_min = df.iloc[-1]['EMA10_Min']
+    ema20_min = df.iloc[-1]['EMA20_Min']
+    ema60_min = df.iloc[-1]['EMA60_Min']
+    ema250_min = df.iloc[-1]['EMA250_Min']
 
     # if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (ema20 >= ema60) and (OBV>=OBV_Max*0.90) and (turnover >= 100000) \
     #     and (close >= ema5_max) and (close >= ema10_max) and (close >= ema20_max) and (close >= ema60_max):
-    if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (OBV>=OBV_Max*0.90) and (turnover >= 300000) \
-        and (close >= ema5_max) and (close >= ema10_max) and (close >= ema20_max):
+    # if (close>=ema5) and (ema5 >= ema10) and (ema10 >= ema20) and (OBV>=OBV_Max*0.90) and (turnover >= 300000) \
+    #     and (close >= ema5_max) and (close >= ema10_max) and (close >= ema20_max):
+    if (close>=ema5) and (ema5>=ema10) and (ema10>=ema20) and (OBV>=OBV_Max*0.8) and (turnover >= 100000) \
+        and (close >= ema5_max) and ((close-ema5_min)/ema5_min<=2.5) and ((ema5_max-ema5_min)/ema5_min <= 2.5):
         return True
     else:
         return False
@@ -129,14 +140,15 @@ if __name__ == '__main__':
 
         processed_data_files = os.listdir(processed_data_path)
         if len(processed_data_files) == 0:
-            logging.warning("processed data not ready, sleep 60 seconds...")
-            time.sleep(60)
+            logging.warning("processed data not ready, sleep 10 seconds...")
+            time.sleep(10)
+            continue
 
         screened_data_files = os.listdir(screened_data_path)
         processed_data_files_str = processed_data_files[-1] + '_breakout.csv'
         if processed_data_files_str in screened_data_files:
-            logging.warning("error: " + processed_data_files_str + " existed, sleep 60 seconds...")
-            time.sleep(60)
+            logging.warning("error: " + processed_data_files_str + " existed, sleep 10 seconds...")
+            time.sleep(10)
             continue
         # date_time = datetime.datetime.now() 
         # datetime_str = date_time.strftime("%m%d%Y-%H")
@@ -150,8 +162,9 @@ if __name__ == '__main__':
             continue
 
         today = datetime.date.today()
-        yesterday = today - timedelta(days=1)
-        df = df.loc[(df.date == str(today)) | (df.date == str(yesterday))]
+        day1 = today - timedelta(days=1)
+        day2 = today - timedelta(days=2)
+        df = df.loc[(df.date == str(today)) | (df.date == str(day1)) | (df.date == str(day2))]
         # processed_data_files = os.listdir(processed_data_path)
         # screened_data_file = datetime_str + '_breakout.csv'
         # if screened_data_file in screened_data_files:
@@ -186,7 +199,7 @@ if __name__ == '__main__':
             try:
                 return_df.to_csv(screened_data_path + processed_data_files[-1] + '_breakout.csv')
                 end = datetime.date.today()
-                return_df.loc[(return_df.date==str(end)) & (return_df.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_breakout.txt',header=False, index=False)
+                return_df.loc[(return_df.date==str(end)) & (return_df.breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_breakout.txt',header=False, index=False)
             except Exception as e:
                 logging.critical("to_feather:"+str(e))
             stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")

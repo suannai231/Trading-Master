@@ -9,51 +9,62 @@ import logging
 import math
 
 # backward = 180
-CAP_Limit = 10000000000
+# CAP_Limit = 10000000000
 Price_Limit = 9.5
+base_days = 29
 
-def cal_Max(df):
-    # startindex = 0
-    # endindex = len(df)
-    EMA5 = []
+def cal_Max_Min(df):
+
     EMA5_Max = []
-    EMA10 = []
     EMA10_Max = []
-    EMA20 = []
     EMA20_Max = []
-    EMA60 = []
     EMA60_Max = []
+    EMA120_Max = []
+    EMA250_Max = []
     OBV_Max = []
-    # for i in range(startindex, endindex):
-    #     EMA5.append(df.EMA5[i])
-    #     EMA10.append(df.EMA10[i])
-    #     EMA20.append(df.EMA20[i])
-    #     EMA60.append(df.EMA60[i])
 
-    # EMA5_Max.append(max(EMA5))
-    # EMA10_Max.append(max(EMA10))
-    # EMA20_Max.append(max(EMA20))
-    # EMA60_Max.append(max(EMA60))
-
-    # EMA5_Max.append(max(df.loc[0:60,'EMA5']))
-    # EMA10_Max.append(max(df.loc[0:60,'EMA10']))
-    # EMA20_Max.append(max(df.loc[0:60,'EMA20']))
-    # EMA60_Max.append(max(df.loc[0:60,'EMA25']))
-
-    for startindex in range(0,len(df)-59):
-        endindex = startindex + 59
+    EMA5_Min = []
+    EMA10_Min = []
+    EMA20_Min = []
+    EMA60_Min = []
+    EMA120_Min = []
+    EMA250_Min = []
+    OBV_Min = []
+    
+    for startindex in range(0,len(df)-base_days):
+        endindex = startindex + base_days
         EMA5_Max.append(max(df.loc[startindex:endindex,'EMA5']))
         EMA10_Max.append(max(df.loc[startindex:endindex,'EMA10']))
         EMA20_Max.append(max(df.loc[startindex:endindex,'EMA20']))
         EMA60_Max.append(max(df.loc[startindex:endindex,'EMA60']))
+        EMA120_Max.append(max(df.loc[startindex:endindex,'EMA120']))
+        EMA250_Max.append(max(df.loc[startindex:endindex,'EMA250']))
         OBV_Max.append(max(df.loc[startindex:endindex,'OBV']))
+        EMA5_Min.append(min(df.loc[startindex:endindex,'EMA5']))
+        EMA10_Min.append(min(df.loc[startindex:endindex,'EMA10']))
+        EMA20_Min.append(min(df.loc[startindex:endindex,'EMA20']))
+        EMA60_Min.append(min(df.loc[startindex:endindex,'EMA60']))
+        EMA120_Min.append(min(df.loc[startindex:endindex,'EMA120']))
+        EMA250_Min.append(min(df.loc[startindex:endindex,'EMA250']))
+        OBV_Min.append(min(df.loc[startindex:endindex,'OBV']))
 
-    df.loc[59:len(df)-1,'EMA5_Max'] = EMA5_Max
-    df.loc[59:len(df)-1,'EMA10_Max'] = EMA10_Max
-    df.loc[59:len(df)-1,'EMA20_Max'] = EMA20_Max
-    df.loc[59:len(df)-1,'EMA60_Max'] = EMA60_Max
-    df.loc[59:len(df)-1,'OBV_Max'] = OBV_Max
-    return df.loc[59:]
+    df.loc[base_days:len(df)-1,'EMA5_Max'] = EMA5_Max
+    df.loc[base_days:len(df)-1,'EMA10_Max'] = EMA10_Max
+    df.loc[base_days:len(df)-1,'EMA20_Max'] = EMA20_Max
+    df.loc[base_days:len(df)-1,'EMA60_Max'] = EMA60_Max
+    df.loc[base_days:len(df)-1,'EMA120_Max'] = EMA120_Max
+    df.loc[base_days:len(df)-1,'EMA250_Max'] = EMA250_Max
+    df.loc[base_days:len(df)-1,'OBV_Max'] = OBV_Max
+
+    df.loc[base_days:len(df)-1,'EMA5_Min'] = EMA5_Min
+    df.loc[base_days:len(df)-1,'EMA10_Min'] = EMA10_Min
+    df.loc[base_days:len(df)-1,'EMA20_Min'] = EMA20_Min
+    df.loc[base_days:len(df)-1,'EMA60_Min'] = EMA60_Min
+    df.loc[base_days:len(df)-1,'EMA120_Min'] = EMA120_Min
+    df.loc[base_days:len(df)-1,'EMA250_Min'] = EMA250_Min
+    df.loc[base_days:len(df)-1,'OBV_Min'] = OBV_Min
+
+    return df.loc[base_days:]
 
 def cal_OBV(df):
     startindex = 0
@@ -91,26 +102,26 @@ def cal_basics(df):
     df['Wait_Cum'] = 0
 
     df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
-    df['change_1days'] = (df.close.shift(-1)- df.close)/df.close
-    df['change_2days'] = (df.close.shift(-2)- df.close)/df.close
-    df['change_3days'] = (df.close.shift(-3)- df.close)/df.close
-    df['change_4days'] = (df.close.shift(-4)- df.close)/df.close
-    df['change_5days'] = (df.close.shift(-5)- df.close)/df.close
-    df['change_6days'] = (df.close.shift(-6)- df.close)/df.close
-    df['change_7days'] = (df.close.shift(-7)- df.close)/df.close
-    df['change_8days'] = (df.close.shift(-8)- df.close)/df.close
-    df['change_9days'] = (df.close.shift(-9)- df.close)/df.close
-    df['change_10days'] = (df.close.shift(-10)- df.close)/df.close
-    df['change_11days'] = (df.close.shift(-11)- df.close)/df.close
-    df['change_12days'] = (df.close.shift(-12)- df.close)/df.close
-    df['change_13days'] = (df.close.shift(-13)- df.close)/df.close
-    df['change_14days'] = (df.close.shift(-14)- df.close)/df.close
-    df['change_15days'] = (df.close.shift(-15)- df.close)/df.close
-    df['change_16days'] = (df.close.shift(-16)- df.close)/df.close
-    df['change_17days'] = (df.close.shift(-17)- df.close)/df.close
-    df['change_18days'] = (df.close.shift(-18)- df.close)/df.close
-    df['change_19days'] = (df.close.shift(-19)- df.close)/df.close
-    df['change_20days'] = (df.close.shift(-20)- df.close)/df.close
+    # df['change_1days'] = (df.close.shift(-1)- df.close)/df.close
+    # df['change_2days'] = (df.close.shift(-2)- df.close)/df.close
+    # df['change_3days'] = (df.close.shift(-3)- df.close)/df.close
+    # df['change_4days'] = (df.close.shift(-4)- df.close)/df.close
+    # df['change_5days'] = (df.close.shift(-5)- df.close)/df.close
+    # df['change_6days'] = (df.close.shift(-6)- df.close)/df.close
+    # df['change_7days'] = (df.close.shift(-7)- df.close)/df.close
+    # df['change_8days'] = (df.close.shift(-8)- df.close)/df.close
+    # df['change_9days'] = (df.close.shift(-9)- df.close)/df.close
+    # df['change_10days'] = (df.close.shift(-10)- df.close)/df.close
+    # df['change_11days'] = (df.close.shift(-11)- df.close)/df.close
+    # df['change_12days'] = (df.close.shift(-12)- df.close)/df.close
+    # df['change_13days'] = (df.close.shift(-13)- df.close)/df.close
+    # df['change_14days'] = (df.close.shift(-14)- df.close)/df.close
+    # df['change_15days'] = (df.close.shift(-15)- df.close)/df.close
+    # df['change_16days'] = (df.close.shift(-16)- df.close)/df.close
+    # df['change_17days'] = (df.close.shift(-17)- df.close)/df.close
+    # df['change_18days'] = (df.close.shift(-18)- df.close)/df.close
+    # df['change_19days'] = (df.close.shift(-19)- df.close)/df.close
+    # df['change_20days'] = (df.close.shift(-20)- df.close)/df.close
 
     # shares = df.loc[lastindex,'shares']
     # df['turn'] = df.volume/shares
@@ -119,12 +130,14 @@ def cal_basics(df):
     ema10 = df['close'].ewm(span = 10, adjust = False).mean()
     ema20 = df['close'].ewm(span = 20, adjust = False).mean()
     ema60 = df['close'].ewm(span = 60, adjust = False).mean()
-    ema150 = df['close'].ewm(span = 150, adjust = False).mean()
+    ema120 = df['close'].ewm(span = 120, adjust = False).mean()
+    ema250 = df['close'].ewm(span = 250, adjust = False).mean()
     df['EMA5'] = ema5
     df['EMA10'] = ema10
     df['EMA20'] = ema20
     df['EMA60'] = ema60
-    df['EMA150'] = ema150
+    df['EMA120'] = ema120
+    df['EMA250'] = ema250
 
     return df
 
@@ -134,19 +147,16 @@ def run(ticker_chunk_df):
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker].reset_index(drop=True)
         lastindex = df.index[-1]
-        # cap = df["marketCap"][lastindex]
-        # if cap > CAP_Limit:
-        #     continue
+
         if df['close'][lastindex] > Price_Limit:
             continue
-        elif(len(df)<=60):
-            # print(ticker+" length is less than 60 business days.")
+        elif(len(df)<=base_days):
+            # print(ticker+" length is less than base_days business days.")
             continue
 
         df = cal_basics(df)
-        # df = df.iloc[len(df)-60:].reset_index(drop=True)
         df = cal_OBV(df)
-        df = cal_Max(df)
+        df = cal_Max_Min(df)
 
         if not df.empty:
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,df],ignore_index=True)
@@ -180,16 +190,17 @@ if __name__ == '__main__':
         logging.info("start time:" + start_time)
         raw_data_files = os.listdir(raw_data_path)
         if len(raw_data_files) == 0:
-            logging.warning("raw data not ready, sleep 60 seconds...")
-            time.sleep(60)
+            logging.warning("raw data not ready, sleep 10 seconds...")
+            time.sleep(10)
+            continue
         # date_time = datetime.datetime.now() 
         # datetime_str = date_time.strftime("%m%d%Y-%H")
         # processed_data_file = datetime_str + '.feather'
 
         processed_data_files = os.listdir(processed_data_path)
         if raw_data_files[-1] in processed_data_files:
-            logging.warning("error: " + raw_data_files[-1] + " existed, sleep 60 seconds...")
-            time.sleep(60)
+            logging.warning("error: " + raw_data_files[-1] + " existed, sleep 10 seconds...")
+            time.sleep(10)
             continue
         
         logging.info("processing "+raw_data_files[-1])
