@@ -15,7 +15,7 @@ import logging
 import time
 import math
 
-days=365
+days=365*2
 
 multipliers = {'K':1000, 'M':1000000, 'B':1000000000, 'T':1000000000000}
 
@@ -158,9 +158,9 @@ if __name__ == '__main__':
     while True:
         now = datetime.datetime.now()
         today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
-        if(now>today3pm):
-            logging.info("time passed 3:05pm.")
-            break
+        # if(now>today3pm):
+        #     logging.info("time passed 3:05pm.")
+        #     break
         start_time = now.strftime("%m%d%Y-%H%M%S")
         logging.info("start time:" + start_time)
 
@@ -192,12 +192,12 @@ if __name__ == '__main__':
                 stock_concat_df.to_feather(path + stop_time + ".feather")
             except Exception as e:
                 logging.critical("to_feather:"+str(e))
-            logging.info("stop time:" + stop_time)
             # os.popen(f'python C:/Code/One/process_data_MP_One.py')
         else:
             logging.error("stock_concat_df is empty.")
             # sys.exit(2)
-
+        stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+        logging.info("stop time:" + stop_time)
     # thread_number = proc_num
 
     # with ThreadPoolExecutor(thread_number) as tp:
