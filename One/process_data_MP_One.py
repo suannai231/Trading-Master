@@ -11,7 +11,7 @@ import math
 # backward = 180
 # CAP_Limit = 10000000000
 Price_Limit = 9.5
-base_days = 29
+base_days = 59
 
 def cal_Max_Min(df):
 
@@ -22,6 +22,7 @@ def cal_Max_Min(df):
     EMA120_Max = []
     EMA250_Max = []
     OBV_Max = []
+    Close_Max = []
 
     EMA5_Min = []
     EMA10_Min = []
@@ -30,6 +31,7 @@ def cal_Max_Min(df):
     EMA120_Min = []
     EMA250_Min = []
     OBV_Min = []
+    Close_Min = []
     
     for startindex in range(0,len(df)-base_days):
         endindex = startindex + base_days
@@ -40,6 +42,7 @@ def cal_Max_Min(df):
         EMA120_Max.append(max(df.loc[startindex:endindex,'EMA120']))
         EMA250_Max.append(max(df.loc[startindex:endindex,'EMA250']))
         OBV_Max.append(max(df.loc[startindex:endindex,'OBV']))
+        Close_Max.append(max(df.loc[startindex:endindex,'close']))
         EMA5_Min.append(min(df.loc[startindex:endindex,'EMA5']))
         EMA10_Min.append(min(df.loc[startindex:endindex,'EMA10']))
         EMA20_Min.append(min(df.loc[startindex:endindex,'EMA20']))
@@ -47,6 +50,7 @@ def cal_Max_Min(df):
         EMA120_Min.append(min(df.loc[startindex:endindex,'EMA120']))
         EMA250_Min.append(min(df.loc[startindex:endindex,'EMA250']))
         OBV_Min.append(min(df.loc[startindex:endindex,'OBV']))
+        Close_Min.append(min(df.loc[startindex:endindex,'close']))
 
     df.loc[base_days:len(df)-1,'EMA5_Max'] = EMA5_Max
     df.loc[base_days:len(df)-1,'EMA10_Max'] = EMA10_Max
@@ -55,6 +59,7 @@ def cal_Max_Min(df):
     df.loc[base_days:len(df)-1,'EMA120_Max'] = EMA120_Max
     df.loc[base_days:len(df)-1,'EMA250_Max'] = EMA250_Max
     df.loc[base_days:len(df)-1,'OBV_Max'] = OBV_Max
+    df.loc[base_days:len(df)-1,'Close_Max'] = Close_Max
 
     df.loc[base_days:len(df)-1,'EMA5_Min'] = EMA5_Min
     df.loc[base_days:len(df)-1,'EMA10_Min'] = EMA10_Min
@@ -63,6 +68,7 @@ def cal_Max_Min(df):
     df.loc[base_days:len(df)-1,'EMA120_Min'] = EMA120_Min
     df.loc[base_days:len(df)-1,'EMA250_Min'] = EMA250_Min
     df.loc[base_days:len(df)-1,'OBV_Min'] = OBV_Min
+    df.loc[base_days:len(df)-1,'Close_Min'] = Close_Min
 
     return df.loc[base_days:]
 
@@ -182,10 +188,10 @@ if __name__ == '__main__':
 
     while True:
         now = datetime.datetime.now()
-        today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
-        if(now>today3pm):
-            logging.info("time passed 3:05pm.")
-            break
+        # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
+        # if(now>today3pm):
+        #     logging.info("time passed 3:05pm.")
+        #     break
         start_time = now.strftime("%m%d%Y-%H%M%S")
         logging.info("start time:" + start_time)
         raw_data_files = os.listdir(raw_data_path)
