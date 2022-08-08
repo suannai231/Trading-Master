@@ -213,7 +213,7 @@ if __name__ == '__main__':
                     pool.join()
                     break
                 if not stock_chunk_df.empty:
-                    stock_realtime_concat_df = pd.concat([stock_realtime_concat_df,stock_chunk_df])
+                    stock_realtime_concat_df = pd.concat([stock_history_concat_df,stock_chunk_df])
 
             if not stock_realtime_concat_df.empty: 
                 stock_concat_df = pd.concat([stock_history_concat_df,stock_realtime_concat_df])
