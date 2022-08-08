@@ -203,7 +203,7 @@ if __name__ == '__main__':
                 stock_async_results.append(stock_async_result)
 
             pool.close()
-
+            df = pd.DataFrame()
             for stock_async_result in stock_async_results:
                 try:
                     stock_chunk_df = stock_async_result.get(timeout=360)
@@ -213,24 +213,22 @@ if __name__ == '__main__':
                     pool.join()
                     break
                 if not stock_chunk_df.empty:
-                    stock_realtime_concat_df = pd.concat([stock_history_concat_df,stock_chunk_df])
+                    df = pd.concat([df,stock_chunk_df])
 
-            if not stock_realtime_concat_df.empty: 
-                stock_concat_df = pd.concat([stock_history_concat_df,stock_realtime_concat_df])
+            if not df.empty: 
+                stock_concat_df = pd.concat([stock_history_concat_df,df])
                 stock_concat_df.reset_index(inplace=True)
+                stock_realtime_concat_df = stock_concat_df
                 stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
                 try:
                     stock_concat_df.to_feather(path + stop_time + ".feather")
                 except Exception as e:
                     logging.critical("to_feather:"+str(e))
 
-    if (not stock_history_concat_df.empty) & (not stock_realtime_concat_df.empty):
-        stock_concat_df = pd.concat([stock_history_concat_df,stock_realtime_concat_df])
-    elif (not stock_history_concat_df.empty) & (stock_realtime_concat_df.empty):
-        stock_concat_df = stock_history_concat_df
+    if (not stock_realtime_concat_df.empty):
+        stock_concat_df = stock_realtime_concat_df
     else:
-        logging.error("stock_concat_df is empty.")
-        sys.exit(3)
+        stock_concat_df = stock_history_concat_df
 
     stock_concat_df.reset_index(inplace=True)
     stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
