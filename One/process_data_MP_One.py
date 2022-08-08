@@ -211,7 +211,7 @@ if __name__ == '__main__':
         
         logging.info("processing "+raw_data_files[-1])
         try:
-            # time.sleep(10)
+            time.sleep(10)
             df = pd.read_feather(raw_data_path + raw_data_files[-1])
         except Exception as e:
             logging.critical(e)
