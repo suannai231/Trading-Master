@@ -310,6 +310,7 @@ if __name__ == '__main__':
         logging.info("processing "+processed_data_files[-1])
 
         try:
+            time.sleep(10)
             df = pd.read_feather(processed_data_path + processed_data_files[-1])
         except Exception as e:
             logging.critical(e)
