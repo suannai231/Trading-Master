@@ -26,7 +26,7 @@ def string_to_int(string):
      # convert number to float, multiply by multiplier, then make int
     return int(float(string[:-1]) * mult)
 
-def get_stock(ticker):
+def get_stock_history(ticker):
     df = pd.DataFrame()
     try:
         df = si.get_data(ticker,start,end + datetime.timedelta(1),index_as_date=True)
@@ -35,47 +35,52 @@ def get_stock(ticker):
             logging.critical("si.get_data "+ticker+" error: "+str(e)+". sys.exit...")
             sys.exit(3)
     df.index.name = 'date'
-    if not df.empty:
-        if(len(df.loc[df.index==str(end)])==0):         #get real time stock price
-            try:
-                close = float(si.get_live_price(ticker))
-                quote_table = si.get_quote_table(ticker)
-                open = float(quote_table['Open'])
-                low = float(quote_table["Day's Range"].split(" - ")[0])
-                high = float(quote_table["Day's Range"].split(" - ")[1])
-                volume = int(quote_table['Volume'])
-            except Exception as e:
-                logging.debug(ticker+" "+str(e))
-                # open = close
-                # low = close
-                # high = close
-                # volume = df.iloc[-1].volume
-                return pd.DataFrame()
-            d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
-            # ser = pd.Series(data=d, name=str(end), index=['open', 'high', 'low', 'close', 'adjclose', 'volume', 'ticker'])
-            df2=pd.DataFrame(d,index=[str(end)])
-            df3= pd.concat([df,df2])
-            # logging.warning(ticker+" "+str(end)+" data is not available, sleep 60 seconds...")
-            # time.sleep(60)
-            df3.index.name = 'date'
-            return df3
     return df
 
-def get_stock_mt(ticker_chunk):
+def get_stock_realtime(ticker):
+    try:
+        close = float(si.get_live_price(ticker))
+        quote_table = si.get_quote_table(ticker)
+        open = float(quote_table['Open'])
+        low = float(quote_table["Day's Range"].split(" - ")[0])
+        high = float(quote_table["Day's Range"].split(" - ")[1])
+        volume = int(quote_table['Volume'])
+    except Exception as e:
+        logging.debug(ticker+" "+str(e))
+        # open = close
+        # low = close
+        # high = close
+        # volume = df.iloc[-1].volume
+        return pd.DataFrame()
+    d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
+    df=pd.DataFrame(d,index=[str(end)])
+    df.index.name = 'date'
+    return df
+
+def get_stock_history_mt(ticker_chunk):
 
     thread_number = 20
 
     with ThreadPoolExecutor(thread_number) as tp:
-        jobs = [tp.submit(get_stock,ticker)  for ticker in ticker_chunk]
+        jobs = [tp.submit(get_stock_history,ticker)  for ticker in ticker_chunk]
         ticker_chunk_df = pd.DataFrame()
         for job in cf.as_completed(jobs):
             df = job.result()
             if not df.empty:
                 ticker_chunk_df = pd.concat([ticker_chunk_df,df])
-            # else:
-            #     print(df.tail(-1).ticker+" data is not available")
-            #     continue
+    return ticker_chunk_df
 
+def get_stock_realtime_mt(ticker_chunk):
+
+    thread_number = 20
+
+    with ThreadPoolExecutor(thread_number) as tp:
+        jobs = [tp.submit(get_stock_realtime,ticker)  for ticker in ticker_chunk]
+        ticker_chunk_df = pd.DataFrame()
+        for job in cf.as_completed(jobs):
+            df = job.result()
+            if not df.empty:
+                ticker_chunk_df = pd.concat([ticker_chunk_df,df])
     return ticker_chunk_df
 
 def get_stock_mp(ticker_chunk):
@@ -155,49 +160,89 @@ if __name__ == '__main__':
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
     proc_num = len(ticker_chunk_list)
 
-    while True:
-        now = datetime.datetime.now()
-        today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
-        # if(now>today3pm):
-        #     logging.info("time passed 3:05pm.")
-        #     break
-        start_time = now.strftime("%m%d%Y-%H%M%S")
-        logging.info("start time:" + start_time)
+    
+    now = datetime.datetime.now()
+    start_time = now.strftime("%m%d%Y-%H%M%S")
+    logging.info("start time:" + start_time)
 
+    stock_history_concat_df = pd.DataFrame()
+    while(stock_history_concat_df.empty):
         pool = Pool(proc_num)
         stock_async_results = []
 
         for ticker_chunk in ticker_chunk_list:
-            stock_async_result = pool.apply_async(get_stock_mt,args=(ticker_chunk,))
+            stock_async_result = pool.apply_async(get_stock_history_mt,args=(ticker_chunk,))
             stock_async_results.append(stock_async_result)
 
         pool.close()
-
-        stock_concat_df = pd.DataFrame()
+        
         for stock_async_result in stock_async_results:
             try:
-                stock_chunk_df = stock_async_result.get(timeout=180)
+                stock_chunk_df = stock_async_result.get(timeout=360)
             except TimeoutError as e:
-                logging.error(str(e) + " timeout 180 seconds, terminating process pool...")
+                logging.error(str(e) + " timeout 360 seconds, terminating process pool...")
                 pool.terminate()
                 pool.join()
                 break
             if not stock_chunk_df.empty:
-                stock_concat_df = pd.concat([stock_concat_df,stock_chunk_df])
+                stock_history_concat_df = pd.concat([stock_history_concat_df,stock_chunk_df])
 
-        if not stock_concat_df.empty:
-            stock_concat_df.reset_index(inplace=True)
-            stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-            try:
-                stock_concat_df.to_feather(path + stop_time + ".feather")
-            except Exception as e:
-                logging.critical("to_feather:"+str(e))
-            # os.popen(f'python C:/Code/One/process_data_MP_One.py')
-        else:
-            logging.error("stock_concat_df is empty.")
-            # sys.exit(2)
-        stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-        logging.info("stop time:" + stop_time)
+    today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
+    today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
+    # if(now>today3pm):
+    #     logging.info("time passed 3:05pm.")
+    #     break
+
+    stock_realtime_concat_df = pd.DataFrame()
+    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):         #get real time stock price
+            pool = Pool(proc_num)
+            stock_async_results = []
+
+            for ticker_chunk in ticker_chunk_list:
+                stock_async_result = pool.apply_async(get_stock_realtime_mt,args=(ticker_chunk,))
+                stock_async_results.append(stock_async_result)
+
+            pool.close()
+
+            for stock_async_result in stock_async_results:
+                try:
+                    stock_chunk_df = stock_async_result.get(timeout=180)
+                except TimeoutError as e:
+                    logging.error(str(e) + " timeout 180 seconds, terminating process pool...")
+                    pool.terminate()
+                    pool.join()
+                    break
+                if not stock_chunk_df.empty:
+                    stock_realtime_concat_df = pd.concat([stock_realtime_concat_df,stock_chunk_df])
+
+            if not stock_realtime_concat_df.empty: 
+                stock_concat_df = pd.concat([stock_history_concat_df,stock_realtime_concat_df])
+                stock_concat_df.reset_index(inplace=True)
+                stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+                try:
+                    stock_concat_df.to_feather(path + stop_time + ".feather")
+                except Exception as e:
+                    logging.critical("to_feather:"+str(e))
+
+    if (not stock_history_concat_df.empty) & (not stock_realtime_concat_df.empty):
+        stock_concat_df = pd.concat([stock_history_concat_df,stock_realtime_concat_df])
+    elif (not stock_history_concat_df.empty) & (stock_realtime_concat_df.empty):
+        stock_concat_df = stock_history_concat_df
+    else:
+        logging.error("stock_concat_df is empty.")
+        sys.exit(3)
+
+    stock_concat_df.reset_index(inplace=True)
+    stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+    try:
+        stock_concat_df.to_feather(path + stop_time + ".feather")
+    except Exception as e:
+        logging.critical("to_feather:"+str(e))
+    # os.popen(f'python C:/Code/One/process_data_MP_One.py')
+
+    # sys.exit(2)
+    stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+    logging.info("stop time:" + stop_time)
     # thread_number = proc_num
 
     # with ThreadPoolExecutor(thread_number) as tp:
