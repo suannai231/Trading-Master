@@ -29,7 +29,7 @@ def string_to_int(string):
 def get_stock_history(ticker):
     df = pd.DataFrame()
     try:
-        df = si.get_data(ticker,start,end + datetime.timedelta(1),index_as_date=True)
+        df = si.get_data(ticker,start,end,index_as_date=True)
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             logging.critical("si.get_data "+ticker+" error: "+str(e)+". sys.exit...")
@@ -39,12 +39,16 @@ def get_stock_history(ticker):
 
 def get_stock_realtime(ticker):
     try:
-        close = float(si.get_live_price(ticker))
-        quote_table = si.get_quote_table(ticker)
-        open = float(quote_table['Open'])
-        low = float(quote_table["Day's Range"].split(" - ")[0])
-        high = float(quote_table["Day's Range"].split(" - ")[1])
-        volume = int(quote_table['Volume'])
+        df = si.get_data(ticker,end,end + datetime.timedelta(1),index_as_date=True)
+        if(df.empty):
+            close = float(si.get_live_price(ticker))
+            quote_table = si.get_quote_table(ticker)
+            open = float(quote_table['Open'])
+            low = float(quote_table["Day's Range"].split(" - ")[0])
+            high = float(quote_table["Day's Range"].split(" - ")[1])
+            volume = int(quote_table['Volume'])
+            d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
+            df=pd.DataFrame(d,index=[str(end)])
     except Exception as e:
         logging.debug(ticker+" "+str(e))
         # open = close
@@ -52,8 +56,6 @@ def get_stock_realtime(ticker):
         # high = close
         # volume = df.iloc[-1].volume
         return pd.DataFrame()
-    d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
-    df=pd.DataFrame(d,index=[str(end)])
     df.index.name = 'date'
     return df
 
