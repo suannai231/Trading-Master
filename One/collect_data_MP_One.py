@@ -206,9 +206,9 @@ if __name__ == '__main__':
 
             for stock_async_result in stock_async_results:
                 try:
-                    stock_chunk_df = stock_async_result.get(timeout=180)
+                    stock_chunk_df = stock_async_result.get(timeout=360)
                 except TimeoutError as e:
-                    logging.error(str(e) + " timeout 180 seconds, terminating process pool...")
+                    logging.error(str(e) + " timeout 360 seconds, terminating process pool...")
                     pool.terminate()
                     pool.join()
                     break
