@@ -10,7 +10,10 @@ import time
 import logging
 import math
 
-def screen_20_60(df):
+processed_data_path="//jack-nas/Work/Python/ProcessedData/"
+screened_data_path="//jack-nas/Work/Python/ScreenedData/"
+
+def screen(df,lines):
 
     close = df.iloc[-1]['close']
     ema5 = df.iloc[-1]['EMA5']
@@ -38,115 +41,38 @@ def screen_20_60(df):
     ema250_min = df.iloc[-1]['EMA250_Min']
     close_min = df.iloc[-1]['Close_Min']
 
-    if (ema5>=ema10) and (ema20<=ema5<=ema60) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
-        and ((close-ema10)/ema10 <= 0.3) and (ema5 >= ema5_max*0.9) and ((ema5_max-ema5_min)/ema5_min <= 2):
-        return True
-    else:
-        return False
+    if lines=="6_line":
+        if (ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema60>=ema120) and (ema120>=ema250) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
+            and ((close-ema250)/ema250 <= 1) and (ema5 >= ema5_max*0.98) and ((ema5_max-ema5_min)/ema5_min <= 2):
+            return True
+        else:
+            return False
+    elif lines=="2_line":
+        if (ema5>=ema10) and (ema5<=ema20) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
+            and ((close-ema10)/ema10 <= 1) and (ema5 >= ema5_max*0.98) and ((ema5_max-ema5_min)/ema5_min <= 2):
+            return True
+        else:
+            return False
+    elif lines=="3_line":
+        if (ema5>=ema10) and (ema10>=ema20) and (ema5<=ema60) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
+            and ((close-ema20)/ema20 <= 1) and (ema5 >= ema5_max*0.98) and ((ema5_max-ema5_min)/ema5_min <= 2):
+            return True
+        else:
+            return False
+    elif lines=="4_line":
+        if (ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema5<=ema120) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
+            and ((close-ema60)/ema60 <= 1) and (ema5 >= ema5_max*0.98) and ((ema5_max-ema5_min)/ema5_min <= 2):
+            return True
+        else:
+            return False
+    elif lines=="5_line":
+        if (ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema60>=ema120) and (ema5<=ema250) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
+            and ((close-ema120)/ema120 <= 1) and (ema5 >= ema5_max*0.98) and ((ema5_max-ema5_min)/ema5_min <= 2):
+            return True
+        else:
+            return False
 
-def screen_60_120(df):
-
-    close = df.iloc[-1]['close']
-    ema5 = df.iloc[-1]['EMA5']
-    ema10 = df.iloc[-1]['EMA10']
-    ema20 = df.iloc[-1]['EMA20']
-    ema60 = df.iloc[-1]['EMA60']
-    ema120 = df.iloc[-1]['EMA120']
-    ema250 = df.iloc[-1]['EMA250']
-    OBV = df.iloc[-1]['OBV']
-    OBV_Max = df.iloc[-1]['OBV_Max']
-    turnover = df.iloc[-1]['volume']*close
-
-    ema5_max = df.iloc[-1]['EMA5_Max']
-    ema10_max = df.iloc[-1]['EMA10_Max']
-    ema20_max = df.iloc[-1]['EMA20_Max']
-    ema60_max = df.iloc[-1]['EMA60_Max']
-    ema120_max = df.iloc[-1]['EMA120_Max']
-    ema250_max = df.iloc[-1]['EMA250_Max']
-    close_max = df.iloc[-1]['Close_Max']
-
-    ema5_min = df.iloc[-1]['EMA5_Min']
-    ema10_min = df.iloc[-1]['EMA10_Min']
-    ema20_min = df.iloc[-1]['EMA20_Min']
-    ema60_min = df.iloc[-1]['EMA60_Min']
-    ema250_min = df.iloc[-1]['EMA250_Min']
-    close_min = df.iloc[-1]['Close_Min']
-
-    if (ema5>=ema10) and (ema10>=ema20) and (ema60<=ema5<=ema120) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
-        and ((close-ema20)/ema20 <= 0.3) and (ema5 >= ema5_max*0.9) and ((ema5_max-ema5_min)/ema5_min <= 2):
-        return True
-    else:
-        return False
-
-def screen_120_250(df):
-
-    close = df.iloc[-1]['close']
-    ema5 = df.iloc[-1]['EMA5']
-    ema10 = df.iloc[-1]['EMA10']
-    ema20 = df.iloc[-1]['EMA20']
-    ema60 = df.iloc[-1]['EMA60']
-    ema120 = df.iloc[-1]['EMA120']
-    ema250 = df.iloc[-1]['EMA250']
-    OBV = df.iloc[-1]['OBV']
-    OBV_Max = df.iloc[-1]['OBV_Max']
-    turnover = df.iloc[-1]['volume']*close
-
-    ema5_max = df.iloc[-1]['EMA5_Max']
-    ema10_max = df.iloc[-1]['EMA10_Max']
-    ema20_max = df.iloc[-1]['EMA20_Max']
-    ema60_max = df.iloc[-1]['EMA60_Max']
-    ema120_max = df.iloc[-1]['EMA120_Max']
-    ema250_max = df.iloc[-1]['EMA250_Max']
-    close_max = df.iloc[-1]['Close_Max']
-
-    ema5_min = df.iloc[-1]['EMA5_Min']
-    ema10_min = df.iloc[-1]['EMA10_Min']
-    ema20_min = df.iloc[-1]['EMA20_Min']
-    ema60_min = df.iloc[-1]['EMA60_Min']
-    ema250_min = df.iloc[-1]['EMA250_Min']
-    close_min = df.iloc[-1]['Close_Min']
-
-    if (ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema120<=ema5<=ema250) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
-        and ((close-ema60)/ema60 <= 0.3) and (ema5 >= ema5_max*0.9) and ((ema5_max-ema5_min)/ema5_min <= 2):
-        return True
-    else:
-        return False
-
-def screen_250(df):
-
-    close = df.iloc[-1]['close']
-    ema5 = df.iloc[-1]['EMA5']
-    ema10 = df.iloc[-1]['EMA10']
-    ema20 = df.iloc[-1]['EMA20']
-    ema60 = df.iloc[-1]['EMA60']
-    ema120 = df.iloc[-1]['EMA120']
-    ema250 = df.iloc[-1]['EMA250']
-    OBV = df.iloc[-1]['OBV']
-    OBV_Max = df.iloc[-1]['OBV_Max']
-    turnover = df.iloc[-1]['volume']*close
-
-    ema5_max = df.iloc[-1]['EMA5_Max']
-    ema10_max = df.iloc[-1]['EMA10_Max']
-    ema20_max = df.iloc[-1]['EMA20_Max']
-    ema60_max = df.iloc[-1]['EMA60_Max']
-    ema120_max = df.iloc[-1]['EMA120_Max']
-    ema250_max = df.iloc[-1]['EMA250_Max']
-    close_max = df.iloc[-1]['Close_Max']
-
-    ema5_min = df.iloc[-1]['EMA5_Min']
-    ema10_min = df.iloc[-1]['EMA10_Min']
-    ema20_min = df.iloc[-1]['EMA20_Min']
-    ema60_min = df.iloc[-1]['EMA60_Min']
-    ema250_min = df.iloc[-1]['EMA250_Min']
-    close_min = df.iloc[-1]['Close_Min']
-
-    if (ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema60>=ema120) and (ema5>=ema250) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
-        and ((close-ema120)/ema120 <= 0.3) and (ema5 >= ema5_max*0.98) and ((ema5_max-ema5_min)/ema5_min <= 2):
-        return True
-    else:
-        return False
-
-def run_20_60(ticker_chunk_df):
+def run(ticker_chunk_df,lines):
     if ticker_chunk_df.empty:
         return pd.DataFrame()
     tickers = ticker_chunk_df.ticker.unique()
@@ -163,7 +89,19 @@ def run_20_60(ticker_chunk_df):
             date_ticker_df = ticker_df[ticker_df.index==date]
             if date_ticker_df.empty:
                 continue
-            result = screen_20_60(date_ticker_df)
+            result = False
+            if lines=="6_line":
+                result = screen(date_ticker_df,lines)
+            elif lines=="2_line":
+                result = screen(date_ticker_df,lines)
+            elif lines=="3_line":
+                result = screen(date_ticker_df,lines)
+            elif lines=="4_line":
+                result = screen(date_ticker_df,lines)
+            elif lines=="5_line":
+                result = screen(date_ticker_df,lines)
+            else:
+                return pd.DataFrame()
             if result:
                 Breakout += 1
                 date_ticker_df.loc[date,'Breakout'] = Breakout
@@ -176,95 +114,26 @@ def run_20_60(ticker_chunk_df):
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,return_ticker_df])
     return return_ticker_chunk_df
 
-def run_60_120(ticker_chunk_df):
-    if ticker_chunk_df.empty:
-        return pd.DataFrame()
-    tickers = ticker_chunk_df.ticker.unique()
-    if len(tickers) == 0:
-        return pd.DataFrame()
-    ticker_chunk_df.set_index('date',inplace=True)
-    return_ticker_chunk_df = pd.DataFrame()
-    for ticker in tickers:
-        ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-        return_ticker_df = pd.DataFrame()
-        Breakout = 0
-        Breakout_Cum = 0
-        for date in ticker_df.index:
-            date_ticker_df = ticker_df[ticker_df.index==date]
-            if date_ticker_df.empty:
-                continue
-            result = screen_60_120(date_ticker_df)
-            if result:
-                Breakout += 1
-                date_ticker_df.loc[date,'Breakout'] = Breakout
-                date_ticker_df.loc[date,'Breakout_Cum'] = Breakout_Cum
-                return_ticker_df = pd.concat([return_ticker_df,date_ticker_df])
-            else:
-                Breakout_Cum += Breakout
-                Breakout = 0
-        if not return_ticker_df.empty:
-            return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,return_ticker_df])
-    return return_ticker_chunk_df
-
-def run_120_250(ticker_chunk_df):
-    if ticker_chunk_df.empty:
-        return pd.DataFrame()
-    tickers = ticker_chunk_df.ticker.unique()
-    if len(tickers) == 0:
-        return pd.DataFrame()
-    ticker_chunk_df.set_index('date',inplace=True)
-    return_ticker_chunk_df = pd.DataFrame()
-    for ticker in tickers:
-        ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-        return_ticker_df = pd.DataFrame()
-        Breakout = 0
-        Breakout_Cum = 0
-        for date in ticker_df.index:
-            date_ticker_df = ticker_df[ticker_df.index==date]
-            if date_ticker_df.empty:
-                continue
-            result = screen_120_250(date_ticker_df)
-            if result:
-                Breakout += 1
-                date_ticker_df.loc[date,'Breakout'] = Breakout
-                date_ticker_df.loc[date,'Breakout_Cum'] = Breakout_Cum
-                return_ticker_df = pd.concat([return_ticker_df,date_ticker_df])
-            else:
-                Breakout_Cum += Breakout
-                Breakout = 0
-        if not return_ticker_df.empty:
-            return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,return_ticker_df])
-    return return_ticker_chunk_df
-
-def run_250(ticker_chunk_df):
-    if ticker_chunk_df.empty:
-        return pd.DataFrame()
-    tickers = ticker_chunk_df.ticker.unique()
-    if len(tickers) == 0:
-        return pd.DataFrame()
-    ticker_chunk_df.set_index('date',inplace=True)
-    return_ticker_chunk_df = pd.DataFrame()
-    for ticker in tickers:
-        ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-        return_ticker_df = pd.DataFrame()
-        Breakout = 0
-        Breakout_Cum = 0
-        for date in ticker_df.index:
-            date_ticker_df = ticker_df[ticker_df.index==date]
-            if date_ticker_df.empty:
-                continue
-            result = screen_250(date_ticker_df)
-            if result:
-                Breakout += 1
-                date_ticker_df.loc[date,'Breakout'] = Breakout
-                date_ticker_df.loc[date,'Breakout_Cum'] = Breakout_Cum
-                return_ticker_df = pd.concat([return_ticker_df,date_ticker_df])
-            else:
-                Breakout_Cum += Breakout
-                Breakout = 0
-        if not return_ticker_df.empty:
-            return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,return_ticker_df])
-    return return_ticker_chunk_df
+def save(return_df,async_results,processed_data_file):
+    df = pd.DataFrame()
+    for async_result in async_results:
+        result = async_result.get()
+        if not result.empty:
+            df = pd.concat([df,result])
+    
+    if(not df.empty):
+        df.reset_index(drop=False,inplace=True)
+        try:
+            df.to_csv(screened_data_path + processed_data_file + '_breakout.csv')
+            end = datetime.date.today()
+            df = df.loc[(df.date==str(end)) & (df.change>0) & (df.Breakout==1),'ticker']
+            df.to_csv(screened_data_path + processed_data_file + '_breakout.txt',header=False, index=False)
+            return_df = pd.concat([return_df,df])
+        except Exception as e:
+            logging.critical("return_df to_csv:"+str(e))
+    else:
+        logging.error("return_df empty")
+    return return_df
 
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
@@ -272,9 +141,6 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 if __name__ == '__main__':
-    processed_data_path="//jack-nas/Work/Python/ProcessedData/"
-    screened_data_path="//jack-nas/Work/Python/ScreenedData/"
-
     logpath = '//jack-nas/Work/Python/'
     logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_screen.log"
     logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
@@ -287,8 +153,8 @@ if __name__ == '__main__':
     today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
-    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
-    # while(True):
+    # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+    while(True):
         now = datetime.datetime.now()
         # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
         # if(now>today3pm):
@@ -304,7 +170,7 @@ if __name__ == '__main__':
             continue
 
         screened_data_files = os.listdir(screened_data_path)
-        processed_data_files_str = processed_data_files[-1] + '_250_breakout.csv'
+        processed_data_files_str = processed_data_files[-1] + '_5_line_breakout.csv'
         if processed_data_files_str in screened_data_files:
             logging.warning("error: " + processed_data_files_str + " existed, sleep 10 seconds...")
             time.sleep(10)
@@ -341,98 +207,31 @@ if __name__ == '__main__':
         cores = multiprocessing.cpu_count()
         ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
         pool=Pool(cores)
-        async_results_20_60 = []
-        async_results_60_120 = []
-        async_results_120_250 = []
-        async_results_250 = []
+        async_results_2_line = []
+        async_results_3_line = []
+        async_results_4_line = []
+        async_results_5_line = []
+        async_results_6_line = []
         for ticker_chunk in ticker_chunk_list:
             ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-            async_result_20_60 = pool.apply_async(run_20_60, args=(ticker_chunk_df,))
-            async_results_20_60.append(async_result_20_60)
-            async_result_60_120 = pool.apply_async(run_60_120, args=(ticker_chunk_df,))
-            async_results_60_120.append(async_result_60_120)
-            async_result_120_250 = pool.apply_async(run_120_250, args=(ticker_chunk_df,))
-            async_results_120_250.append(async_result_120_250)
-            async_result_250 = pool.apply_async(run_250, args=(ticker_chunk_df,))
-            async_results_250.append(async_result_250)
+            async_result_2_line = pool.apply_async(run, args=(ticker_chunk_df,"2_line"))
+            async_results_2_line.append(async_result_2_line)
+            async_result_3_line = pool.apply_async(run, args=(ticker_chunk_df,"3_line"))
+            async_results_3_line.append(async_result_3_line)
+            async_result_4_line = pool.apply_async(run, args=(ticker_chunk_df,"4_line"))
+            async_results_4_line.append(async_result_4_line)
+            async_result_5_line = pool.apply_async(run, args=(ticker_chunk_df,"5_line"))
+            async_results_5_line.append(async_result_5_line)
+            async_result_6_line = pool.apply_async(run, args=(ticker_chunk_df,"6_line"))
+            async_results_6_line.append(async_result_6_line)
         pool.close()
         del(df)
         return_df = pd.DataFrame()
-        return_df_20_60 = pd.DataFrame()
-        for async_result_20_60 in async_results_20_60:
-            result_20_60 = async_result_20_60.get()
-            if not result_20_60.empty:
-                return_df_20_60 = pd.concat([return_df_20_60,result_20_60])
-        
-        if(not return_df_20_60.empty):
-            return_df_20_60.reset_index(drop=False,inplace=True)
-            try:
-                return_df_20_60.to_csv(screened_data_path + processed_data_files[-1] + '_20_60_breakout.csv')
-                end = datetime.date.today()
-                df = return_df_20_60.loc[(return_df_20_60.date==str(end)) & (return_df_20_60.change>0) & (return_df_20_60.Breakout==1),'ticker']
-                df.to_csv(screened_data_path + processed_data_files[-1] + '_20_60_breakout.txt',header=False, index=False)
-                return_df = pd.concat([return_df,df])
-            except Exception as e:
-                logging.critical("return_df_20_60 to_csv:"+str(e))
-        else:
-            logging.error("return_df_20_60 empty")
-
-        return_df_60_120 = pd.DataFrame()
-        for async_result_60_120 in async_results_60_120:
-            result_60_120 = async_result_60_120.get()
-            if not result_60_120.empty:
-                return_df_60_120 = pd.concat([return_df_60_120,result_60_120])
-        
-        if(not return_df_60_120.empty):
-            return_df_60_120.reset_index(drop=False,inplace=True)
-            try:
-                return_df_60_120.to_csv(screened_data_path + processed_data_files[-1] + '_60_120_breakout.csv')
-                end = datetime.date.today()
-                df = return_df_60_120.loc[(return_df_60_120.date==str(end)) & (return_df_60_120.change>0) & (return_df_60_120.Breakout==1),'ticker']
-                df.to_csv(screened_data_path + processed_data_files[-1] + '_60_120_breakout.txt',header=False, index=False)
-                return_df = pd.concat([return_df,df])
-            except Exception as e:
-                logging.critical("return_df_60_120 to_csv:"+str(e))
-        else:
-            logging.error("return_df_60_120 empty")
-
-        return_df_120_250 = pd.DataFrame()
-        for async_result_120_250 in async_results_120_250:
-            result_120_250 = async_result_120_250.get()
-            if not result_120_250.empty:
-                return_df_120_250 = pd.concat([return_df_120_250,result_120_250])
-        
-        if(not return_df_120_250.empty):
-            return_df_120_250.reset_index(drop=False,inplace=True)
-            try:
-                return_df_120_250.to_csv(screened_data_path + processed_data_files[-1] + '_120_250_breakout.csv')
-                end = datetime.date.today()
-                df = return_df_120_250.loc[(return_df_120_250.date==str(end)) & (return_df_120_250.change>0) & (return_df_120_250.Breakout==1),'ticker']
-                df.to_csv(screened_data_path + processed_data_files[-1] + '_120_250_breakout.txt',header=False, index=False)
-                return_df = pd.concat([return_df,df])
-            except Exception as e:
-                logging.critical("return_df_120_250 to_csv:"+str(e))
-        else:
-            logging.error("return_df_120_250 empty")
-
-        return_df_250 = pd.DataFrame()
-        for async_result_250 in async_results_250:
-            result_250 = async_result_250.get()
-            if not result_250.empty:
-                return_df_250 = pd.concat([return_df_250,result_250])
-        
-        if(not return_df_250.empty):
-            return_df_250.reset_index(drop=False,inplace=True)
-            try:
-                return_df_250.to_csv(screened_data_path + processed_data_files[-1] + '_250_breakout.csv')
-                end = datetime.date.today()
-                df = return_df_250.loc[(return_df_250.date==str(end)) & (return_df_250.change>0) & (return_df_250.Breakout==1),'ticker']
-                df.to_csv(screened_data_path + processed_data_files[-1] + '_250_breakout.txt',header=False, index=False)
-                return_df = pd.concat([return_df,df])
-            except Exception as e:
-                logging.critical("return_df_250 to_csv:"+str(e))
-        else:
-            logging.error("return_df_250 empty")
+        return_df = save(return_df,async_results_6_line,processed_data_files[-1]+"_6_line")
+        return_df = save(return_df,async_results_2_line,processed_data_files[-1]+"_2_line")
+        return_df = save(return_df,async_results_3_line,processed_data_files[-1]+"_3_line")
+        return_df = save(return_df,async_results_4_line,processed_data_files[-1]+"_4_line")
+        return_df = save(return_df,async_results_5_line,processed_data_files[-1]+"_5_line")
 
         if(not return_df.empty):
             try:
