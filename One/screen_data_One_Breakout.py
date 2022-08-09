@@ -371,7 +371,7 @@ if __name__ == '__main__':
                 end = datetime.date.today()
                 df = return_df_20_60.loc[(return_df_20_60.date==str(end)) & (return_df_20_60.change>0) & (return_df_20_60.Breakout==1),'ticker']
                 df.to_csv(screened_data_path + processed_data_files[-1] + '_20_60_breakout.txt',header=False, index=False)
-                pd.concat([return_df,df])
+                return_df = pd.concat([return_df,df])
             except Exception as e:
                 logging.critical("return_df_20_60 to_csv:"+str(e))
         else:
@@ -390,7 +390,7 @@ if __name__ == '__main__':
                 end = datetime.date.today()
                 df = return_df_60_120.loc[(return_df_60_120.date==str(end)) & (return_df_60_120.change>0) & (return_df_60_120.Breakout==1),'ticker']
                 df.to_csv(screened_data_path + processed_data_files[-1] + '_60_120_breakout.txt',header=False, index=False)
-                pd.concat([return_df,df])
+                return_df = pd.concat([return_df,df])
             except Exception as e:
                 logging.critical("return_df_60_120 to_csv:"+str(e))
         else:
@@ -409,7 +409,7 @@ if __name__ == '__main__':
                 end = datetime.date.today()
                 df = return_df_120_250.loc[(return_df_120_250.date==str(end)) & (return_df_120_250.change>0) & (return_df_120_250.Breakout==1),'ticker']
                 df.to_csv(screened_data_path + processed_data_files[-1] + '_120_250_breakout.txt',header=False, index=False)
-                pd.concat([return_df,df])
+                return_df = pd.concat([return_df,df])
             except Exception as e:
                 logging.critical("return_df_120_250 to_csv:"+str(e))
         else:
@@ -428,7 +428,7 @@ if __name__ == '__main__':
                 end = datetime.date.today()
                 df = return_df_250.loc[(return_df_250.date==str(end)) & (return_df_250.change>0) & (return_df_250.Breakout==1),'ticker']
                 df.to_csv(screened_data_path + processed_data_files[-1] + '_250_breakout.txt',header=False, index=False)
-                pd.concat([return_df,df])
+                return_df = pd.concat([return_df,df])
             except Exception as e:
                 logging.critical("return_df_250 to_csv:"+str(e))
         else:
