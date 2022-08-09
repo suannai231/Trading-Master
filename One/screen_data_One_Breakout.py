@@ -357,7 +357,7 @@ if __name__ == '__main__':
             async_results_250.append(async_result_250)
         pool.close()
         del(df)
-
+        return_df = pd.DataFrame()
         return_df_20_60 = pd.DataFrame()
         for async_result_20_60 in async_results_20_60:
             result_20_60 = async_result_20_60.get()
@@ -369,9 +369,11 @@ if __name__ == '__main__':
             try:
                 return_df_20_60.to_csv(screened_data_path + processed_data_files[-1] + '_20_60_breakout.csv')
                 end = datetime.date.today()
-                return_df_20_60.loc[(return_df_20_60.date==str(end)) & (return_df_20_60.change>0) & (return_df_20_60.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_20_60_breakout.txt',header=False, index=False)
+                df = return_df_20_60.loc[(return_df_20_60.date==str(end)) & (return_df_20_60.change>0) & (return_df_20_60.Breakout==1),'ticker']
+                df.to_csv(screened_data_path + processed_data_files[-1] + '_20_60_breakout.txt',header=False, index=False)
+                pd.concat([return_df,df])
             except Exception as e:
-                logging.critical("to_feather:"+str(e))
+                logging.critical("return_df_20_60 to_csv:"+str(e))
         else:
             logging.error("return_df_20_60 empty")
 
@@ -386,9 +388,11 @@ if __name__ == '__main__':
             try:
                 return_df_60_120.to_csv(screened_data_path + processed_data_files[-1] + '_60_120_breakout.csv')
                 end = datetime.date.today()
-                return_df_60_120.loc[(return_df_60_120.date==str(end)) & (return_df_60_120.change>0) & (return_df_60_120.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_60_120_breakout.txt',header=False, index=False)
+                df = return_df_60_120.loc[(return_df_60_120.date==str(end)) & (return_df_60_120.change>0) & (return_df_60_120.Breakout==1),'ticker']
+                df.to_csv(screened_data_path + processed_data_files[-1] + '_60_120_breakout.txt',header=False, index=False)
+                pd.concat([return_df,df])
             except Exception as e:
-                logging.critical("to_feather:"+str(e))
+                logging.critical("return_df_60_120 to_csv:"+str(e))
         else:
             logging.error("return_df_60_120 empty")
 
@@ -403,9 +407,11 @@ if __name__ == '__main__':
             try:
                 return_df_120_250.to_csv(screened_data_path + processed_data_files[-1] + '_120_250_breakout.csv')
                 end = datetime.date.today()
-                return_df_120_250.loc[(return_df_120_250.date==str(end)) & (return_df_120_250.change>0) & (return_df_120_250.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_120_250_breakout.txt',header=False, index=False)
+                df = return_df_120_250.loc[(return_df_120_250.date==str(end)) & (return_df_120_250.change>0) & (return_df_120_250.Breakout==1),'ticker']
+                df.to_csv(screened_data_path + processed_data_files[-1] + '_120_250_breakout.txt',header=False, index=False)
+                pd.concat([return_df,df])
             except Exception as e:
-                logging.critical("to_feather:"+str(e))
+                logging.critical("return_df_120_250 to_csv:"+str(e))
         else:
             logging.error("return_df_120_250 empty")
 
@@ -420,11 +426,20 @@ if __name__ == '__main__':
             try:
                 return_df_250.to_csv(screened_data_path + processed_data_files[-1] + '_250_breakout.csv')
                 end = datetime.date.today()
-                return_df_250.loc[(return_df_250.date==str(end)) & (return_df_250.change>0) & (return_df_250.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_250_breakout.txt',header=False, index=False)
+                df = return_df_250.loc[(return_df_250.date==str(end)) & (return_df_250.change>0) & (return_df_250.Breakout==1),'ticker']
+                df.to_csv(screened_data_path + processed_data_files[-1] + '_250_breakout.txt',header=False, index=False)
+                pd.concat([return_df,df])
             except Exception as e:
-                logging.critical("to_feather:"+str(e))
+                logging.critical("return_df_250 to_csv:"+str(e))
         else:
             logging.error("return_df_250 empty")
-        
+
+        if(not return_df.empty):
+            try:
+                return_df.to_csv(screened_data_path + processed_data_files[-1] + '_all_breakout.txt',header=False, index=False)
+            except Exception as e:
+                logging.critical("return_df to_csv:"+str(e))
+        else:
+            logging.error("return_df empty")
         stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
         logging.info("stop time:" +stop_time)
