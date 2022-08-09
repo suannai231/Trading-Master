@@ -369,7 +369,7 @@ if __name__ == '__main__':
             try:
                 return_df_20_60.to_csv(screened_data_path + processed_data_files[-1] + '_20_60_breakout.csv')
                 end = datetime.date.today()
-                return_df_20_60.loc[(return_df_20_60.change>0) & (return_df_20_60.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_20_60_breakout.txt',header=False, index=False)
+                return_df_20_60.loc[(return_df_20_60.date==str(end)) & (return_df_20_60.change>0) & (return_df_20_60.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_20_60_breakout.txt',header=False, index=False)
             except Exception as e:
                 logging.critical("to_feather:"+str(e))
         else:
@@ -386,7 +386,7 @@ if __name__ == '__main__':
             try:
                 return_df_60_120.to_csv(screened_data_path + processed_data_files[-1] + '_60_120_breakout.csv')
                 end = datetime.date.today()
-                return_df_60_120.loc[(return_df_60_120.change>0) & (return_df_60_120.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_60_120_breakout.txt',header=False, index=False)
+                return_df_60_120.loc[(return_df_60_120.date==str(end)) & (return_df_60_120.change>0) & (return_df_60_120.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_60_120_breakout.txt',header=False, index=False)
             except Exception as e:
                 logging.critical("to_feather:"+str(e))
         else:
@@ -403,7 +403,7 @@ if __name__ == '__main__':
             try:
                 return_df_120_250.to_csv(screened_data_path + processed_data_files[-1] + '_120_250_breakout.csv')
                 end = datetime.date.today()
-                return_df_120_250.loc[(return_df_120_250.change>0) & (return_df_120_250.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_120_250_breakout.txt',header=False, index=False)
+                return_df_120_250.loc[(return_df_120_250.date==str(end)) & (return_df_120_250.change>0) & (return_df_120_250.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_120_250_breakout.txt',header=False, index=False)
             except Exception as e:
                 logging.critical("to_feather:"+str(e))
         else:
@@ -420,7 +420,7 @@ if __name__ == '__main__':
             try:
                 return_df_250.to_csv(screened_data_path + processed_data_files[-1] + '_250_breakout.csv')
                 end = datetime.date.today()
-                return_df_250.loc[(return_df_250.change>0) & (return_df_250.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_250_breakout.txt',header=False, index=False)
+                return_df_250.loc[(return_df_250.date==str(end)) & (return_df_250.change>0) & (return_df_250.Breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_250_breakout.txt',header=False, index=False)
             except Exception as e:
                 logging.critical("to_feather:"+str(e))
         else:
