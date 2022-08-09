@@ -140,8 +140,8 @@ def screen_250(df):
     ema250_min = df.iloc[-1]['EMA250_Min']
     close_min = df.iloc[-1]['Close_Min']
 
-    if (ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema60>=ema120) and (ema5>=ema250) and (OBV>=OBV_Max*0.8) and (turnover >= 100000) \
-        and ((close-ema120)/ema120 <= 0.3) and (ema5 >= ema5_max*0.9) and ((ema5_max-ema5_min)/ema5_min <= 2):
+    if (ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema60>=ema120) and (ema5>=ema250) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
+        and ((close-ema120)/ema120 <= 0.3) and (ema5 >= ema5_max*0.98) and ((ema5_max-ema5_min)/ema5_min <= 2):
         return True
     else:
         return False
@@ -288,6 +288,7 @@ if __name__ == '__main__':
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
     while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+    # while(True):
         now = datetime.datetime.now()
         # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
         # if(now>today3pm):
@@ -323,7 +324,8 @@ if __name__ == '__main__':
         today = datetime.date.today()
         day1 = today - timedelta(days=1)
         day2 = today - timedelta(days=2)
-        df = df.loc[(df.date == str(today)) | (df.date == str(day1)) | (df.date == str(day2))]
+        day3 = today - timedelta(days=3)
+        df = df.loc[(df.date == str(today)) | (df.date == str(day1)) | (df.date == str(day2)) | (df.date == str(day3))]
         # processed_data_files = os.listdir(processed_data_path)
         # screened_data_file = datetime_str + '_breakout.csv'
         # if screened_data_file in screened_data_files:
@@ -367,7 +369,7 @@ if __name__ == '__main__':
             try:
                 return_df_20_60.to_csv(screened_data_path + processed_data_files[-1] + '_20_60_breakout.csv')
                 end = datetime.date.today()
-                return_df_20_60.loc[(return_df_20_60.date==str(end)) & (return_df_20_60.breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_20_60_breakout.txt',header=False, index=False)
+                return_df_20_60.loc[return_df_20_60.Breakout==1,'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_20_60_breakout.txt',header=False, index=False)
             except Exception as e:
                 logging.critical("to_feather:"+str(e))
         else:
@@ -384,7 +386,7 @@ if __name__ == '__main__':
             try:
                 return_df_60_120.to_csv(screened_data_path + processed_data_files[-1] + '_60_120_breakout.csv')
                 end = datetime.date.today()
-                return_df_60_120.loc[(return_df_60_120.date==str(end)) & (return_df_60_120.breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_60_120_breakout.txt',header=False, index=False)
+                return_df_60_120.loc[return_df_60_120.Breakout==1,'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_60_120_breakout.txt',header=False, index=False)
             except Exception as e:
                 logging.critical("to_feather:"+str(e))
         else:
@@ -401,7 +403,7 @@ if __name__ == '__main__':
             try:
                 return_df_120_250.to_csv(screened_data_path + processed_data_files[-1] + '_120_250_breakout.csv')
                 end = datetime.date.today()
-                return_df_120_250.loc[(return_df_120_250.date==str(end)) & (return_df_120_250.breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_120_250_breakout.txt',header=False, index=False)
+                return_df_120_250.loc[return_df_120_250.Breakout==1,'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_120_250_breakout.txt',header=False, index=False)
             except Exception as e:
                 logging.critical("to_feather:"+str(e))
         else:
@@ -418,7 +420,7 @@ if __name__ == '__main__':
             try:
                 return_df_250.to_csv(screened_data_path + processed_data_files[-1] + '_250_breakout.csv')
                 end = datetime.date.today()
-                return_df_250.loc[(return_df_250.date==str(end)) & (return_df_250.breakout==1),'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_250_breakout.txt',header=False, index=False)
+                return_df_250.loc[return_df_250.Breakout==1,'ticker'].to_csv(screened_data_path + processed_data_files[-1] + '_250_breakout.txt',header=False, index=False)
             except Exception as e:
                 logging.critical("to_feather:"+str(e))
         else:
