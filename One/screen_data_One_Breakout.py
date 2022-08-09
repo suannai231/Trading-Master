@@ -38,7 +38,7 @@ def screen_20_60(df):
     ema250_min = df.iloc[-1]['EMA250_Min']
     close_min = df.iloc[-1]['Close_Min']
 
-    if (ema5>=ema10) and (ema20<=ema5<=ema60) and (OBV>=OBV_Max*0.8) and (turnover >= 100000) \
+    if (ema5>=ema10) and (ema20<=ema5<=ema60) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
         and ((close-ema10)/ema10 <= 0.3) and (ema5 >= ema5_max*0.9) and ((ema5_max-ema5_min)/ema5_min <= 2):
         return True
     else:
@@ -72,7 +72,7 @@ def screen_60_120(df):
     ema250_min = df.iloc[-1]['EMA250_Min']
     close_min = df.iloc[-1]['Close_Min']
 
-    if (ema5>=ema10) and (ema10>=ema20) and (ema60<=ema5<=ema120) and (OBV>=OBV_Max*0.8) and (turnover >= 100000) \
+    if (ema5>=ema10) and (ema10>=ema20) and (ema60<=ema5<=ema120) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
         and ((close-ema20)/ema20 <= 0.3) and (ema5 >= ema5_max*0.9) and ((ema5_max-ema5_min)/ema5_min <= 2):
         return True
     else:
@@ -106,7 +106,7 @@ def screen_120_250(df):
     ema250_min = df.iloc[-1]['EMA250_Min']
     close_min = df.iloc[-1]['Close_Min']
 
-    if (ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema120<=ema5<=ema250) and (OBV>=OBV_Max*0.8) and (turnover >= 100000) \
+    if (ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema120<=ema5<=ema250) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
         and ((close-ema60)/ema60 <= 0.3) and (ema5 >= ema5_max*0.9) and ((ema5_max-ema5_min)/ema5_min <= 2):
         return True
     else:
