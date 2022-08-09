@@ -11,7 +11,7 @@ import math
 # backward = 180
 # CAP_Limit = 10000000000
 Price_Limit = 9.5
-base_days = 119
+base_days = 59
 
 def cal_Max_Min(df):
 
