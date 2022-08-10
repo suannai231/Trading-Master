@@ -15,31 +15,31 @@ screened_data_path="//jack-nas/Work/Python/ScreenedData/"
 
 def screen(df,lines):
 
-    close = df.iloc[-1]['close']
+    # close = df.iloc[-1]['close']
     ema5 = df.iloc[-1]['EMA5']
     ema10 = df.iloc[-1]['EMA10']
     ema20 = df.iloc[-1]['EMA20']
     ema60 = df.iloc[-1]['EMA60']
     ema120 = df.iloc[-1]['EMA120']
     ema250 = df.iloc[-1]['EMA250']
-    OBV = df.iloc[-1]['OBV']
-    OBV_Max = df.iloc[-1]['OBV_Max']
-    turnover = df.iloc[-1]['volume']*close
+    # OBV = df.iloc[-1]['OBV']
+    # OBV_Max = df.iloc[-1]['OBV_Max']
+    # turnover = df.iloc[-1]['volume']*close
 
-    ema5_max = df.iloc[-1]['EMA5_Max']
-    ema10_max = df.iloc[-1]['EMA10_Max']
-    ema20_max = df.iloc[-1]['EMA20_Max']
-    ema60_max = df.iloc[-1]['EMA60_Max']
-    ema120_max = df.iloc[-1]['EMA120_Max']
-    ema250_max = df.iloc[-1]['EMA250_Max']
-    close_max = df.iloc[-1]['Close_Max']
+    # ema5_max = df.iloc[-1]['EMA5_Max']
+    # ema10_max = df.iloc[-1]['EMA10_Max']
+    # ema20_max = df.iloc[-1]['EMA20_Max']
+    # ema60_max = df.iloc[-1]['EMA60_Max']
+    # ema120_max = df.iloc[-1]['EMA120_Max']
+    # ema250_max = df.iloc[-1]['EMA250_Max']
+    # close_max = df.iloc[-1]['Close_Max']
 
-    ema5_min = df.iloc[-1]['EMA5_Min']
-    ema10_min = df.iloc[-1]['EMA10_Min']
-    ema20_min = df.iloc[-1]['EMA20_Min']
-    ema60_min = df.iloc[-1]['EMA60_Min']
-    ema250_min = df.iloc[-1]['EMA250_Min']
-    close_min = df.iloc[-1]['Close_Min']
+    # ema5_min = df.iloc[-1]['EMA5_Min']
+    # ema10_min = df.iloc[-1]['EMA10_Min']
+    # ema20_min = df.iloc[-1]['EMA20_Min']
+    # ema60_min = df.iloc[-1]['EMA60_Min']
+    # ema250_min = df.iloc[-1]['EMA250_Min']
+    # close_min = df.iloc[-1]['Close_Min']
 
     if lines=="60_120":
         if (ema120>=ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and ((ema120-ema60)/ema60<=1):
@@ -135,8 +135,8 @@ if __name__ == '__main__':
     today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
-    # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
-    while(True):
+    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+    # while(True):
         now = datetime.datetime.now()
         # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
         # if(now>today3pm):
@@ -168,7 +168,7 @@ if __name__ == '__main__':
         except Exception as e:
             logging.critical(e)
             continue
-
+        df = df.loc[df.date>"2022-01-01"]
         # today = datetime.date.today()
         # day1 = today - timedelta(days=1)
         # day2 = today - timedelta(days=2)
