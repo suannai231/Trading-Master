@@ -161,8 +161,8 @@ def run(ticker_chunk_df):
             continue
 
         df = cal_basics(df)
-        df = cal_OBV(df)
-        df = cal_Max_Min(df)
+        # df = cal_OBV(df)
+        # df = cal_Max_Min(df)
 
         if not df.empty:
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,df],ignore_index=True)
@@ -216,7 +216,7 @@ if __name__ == '__main__':
         
         logging.info("processing "+raw_data_files[-1])
         try:
-            time.sleep(10)
+            time.sleep(1)
             df = pd.read_feather(raw_data_path + raw_data_files[-1])
         except Exception as e:
             logging.critical(e)

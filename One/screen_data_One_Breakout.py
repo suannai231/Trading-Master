@@ -41,33 +41,18 @@ def screen(df,lines):
     ema250_min = df.iloc[-1]['EMA250_Min']
     close_min = df.iloc[-1]['Close_Min']
 
-    if lines=="6_line":
-        if (ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema60>=ema120) and (ema120>=ema250) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
-            and ((close-ema250)/ema250 <= 1) and (ema5 >= ema5_max*0.98) and ((ema5_max-ema5_min)/ema5_min <= 2):
+    if lines=="60_120":
+        if (ema120>=ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and ((ema120-ema60)/ema60<=1):
             return True
         else:
             return False
-    elif lines=="2_line":
-        if (ema5>=ema10) and (ema5<=ema20) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
-            and ((close-ema10)/ema10 <= 1) and (ema5 >= ema5_max*0.98) and ((ema5_max-ema5_min)/ema5_min <= 2):
+    elif lines=="120_250":
+        if (ema250>=ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema60>=ema120) and ((ema250-ema120)/ema120<=1):
             return True
         else:
             return False
-    elif lines=="3_line":
-        if (ema5>=ema10) and (ema10>=ema20) and (ema5<=ema60) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
-            and ((close-ema20)/ema20 <= 1) and (ema5 >= ema5_max*0.98) and ((ema5_max-ema5_min)/ema5_min <= 2):
-            return True
-        else:
-            return False
-    elif lines=="4_line":
-        if (ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema5<=ema120) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
-            and ((close-ema60)/ema60 <= 1) and (ema5 >= ema5_max*0.98) and ((ema5_max-ema5_min)/ema5_min <= 2):
-            return True
-        else:
-            return False
-    elif lines=="5_line":
-        if (ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema60>=ema120) and (ema5<=ema250) and (OBV>=OBV_Max*0.9) and (turnover >= 100000) \
-            and ((close-ema120)/ema120 <= 1) and (ema5 >= ema5_max*0.98) and ((ema5_max-ema5_min)/ema5_min <= 2):
+    elif lines=="250":
+        if (ema250*2>=ema5>=ema10) and (ema10>=ema20) and (ema20>=ema60) and (ema60>=ema120) and (ema120>=ema250):
             return True
         else:
             return False
@@ -83,33 +68,30 @@ def run(ticker_chunk_df,lines):
     for ticker in tickers:
         ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
         return_ticker_df = pd.DataFrame()
-        Breakout = 0
-        Breakout_Cum = 0
+        # Breakout = 0
+        Wait_Cum = 0
         for date in ticker_df.index:
             date_ticker_df = ticker_df[ticker_df.index==date]
             if date_ticker_df.empty:
                 continue
             result = False
-            if lines=="6_line":
+
+            if lines=="60_120":
                 result = screen(date_ticker_df,lines)
-            elif lines=="2_line":
+            elif lines=="120_250":
                 result = screen(date_ticker_df,lines)
-            elif lines=="3_line":
-                result = screen(date_ticker_df,lines)
-            elif lines=="4_line":
-                result = screen(date_ticker_df,lines)
-            elif lines=="5_line":
+            elif lines=="250":
                 result = screen(date_ticker_df,lines)
             else:
                 return pd.DataFrame()
             if result:
-                Breakout += 1
-                date_ticker_df.loc[date,'Breakout'] = Breakout
-                date_ticker_df.loc[date,'Breakout_Cum'] = Breakout_Cum
+                # Breakout += 1
+                Wait_Cum += 1
+                # date_ticker_df.loc[date,'Breakout'] = Breakout
+                date_ticker_df.loc[date,'Wait_Cum'] = Wait_Cum
                 return_ticker_df = pd.concat([return_ticker_df,date_ticker_df])
-            else:
-                Breakout_Cum += Breakout
-                Breakout = 0
+            # else:
+            #     Breakout = 0
         if not return_ticker_df.empty:
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,return_ticker_df])
     return return_ticker_chunk_df
@@ -124,10 +106,10 @@ def save(return_df,async_results,processed_data_file):
     if(not df.empty):
         df.reset_index(drop=False,inplace=True)
         try:
-            df.to_csv(screened_data_path + processed_data_file + '_breakout.csv')
+            df.to_csv(screened_data_path + processed_data_file + '.csv')
             end = datetime.date.today()
-            df = df.loc[(df.date==str(end)) & (df.change>0) & (df.Breakout==1),'ticker']
-            df.to_csv(screened_data_path + processed_data_file + '_breakout.txt',header=False, index=False)
+            df = df.loc[(df.date==str(end)) & (df.Wait_Cum>=15),'ticker']
+            df.to_csv(screened_data_path + processed_data_file + '.txt',header=False, index=False)
             return_df = pd.concat([return_df,df])
         except Exception as e:
             logging.critical("return_df to_csv:"+str(e))
@@ -170,7 +152,7 @@ if __name__ == '__main__':
             continue
 
         screened_data_files = os.listdir(screened_data_path)
-        processed_data_files_str = processed_data_files[-1] + '_5_line_breakout.csv'
+        processed_data_files_str = processed_data_files[-1] + '_all.txt'
         if processed_data_files_str in screened_data_files:
             logging.warning("error: " + processed_data_files_str + " existed, sleep 10 seconds...")
             time.sleep(10)
@@ -181,17 +163,17 @@ if __name__ == '__main__':
         logging.info("processing "+processed_data_files[-1])
 
         try:
-            time.sleep(10)
+            time.sleep(1)
             df = pd.read_feather(processed_data_path + processed_data_files[-1])
         except Exception as e:
             logging.critical(e)
             continue
 
-        today = datetime.date.today()
-        day1 = today - timedelta(days=1)
-        day2 = today - timedelta(days=2)
-        day3 = today - timedelta(days=3)
-        df = df.loc[(df.date == str(today)) | (df.date == str(day1)) | (df.date == str(day2)) | (df.date == str(day3))]
+        # today = datetime.date.today()
+        # day1 = today - timedelta(days=1)
+        # day2 = today - timedelta(days=2)
+        # day3 = today - timedelta(days=3)
+        # df = df.loc[(df.date == str(today)) | (df.date == str(day1)) | (df.date == str(day2)) | (df.date == str(day3))]
         # processed_data_files = os.listdir(processed_data_path)
         # screened_data_file = datetime_str + '_breakout.csv'
         # if screened_data_file in screened_data_files:
@@ -207,35 +189,40 @@ if __name__ == '__main__':
         cores = multiprocessing.cpu_count()
         ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
         pool=Pool(cores)
-        async_results_2_line = []
-        async_results_3_line = []
-        async_results_4_line = []
-        async_results_5_line = []
-        async_results_6_line = []
+        async_results_60_120 = []
+        async_results_120_250 = []
+        async_results_250 = []
         for ticker_chunk in ticker_chunk_list:
             ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-            async_result_2_line = pool.apply_async(run, args=(ticker_chunk_df,"2_line"))
-            async_results_2_line.append(async_result_2_line)
-            async_result_3_line = pool.apply_async(run, args=(ticker_chunk_df,"3_line"))
-            async_results_3_line.append(async_result_3_line)
-            async_result_4_line = pool.apply_async(run, args=(ticker_chunk_df,"4_line"))
-            async_results_4_line.append(async_result_4_line)
-            async_result_5_line = pool.apply_async(run, args=(ticker_chunk_df,"5_line"))
-            async_results_5_line.append(async_result_5_line)
-            async_result_6_line = pool.apply_async(run, args=(ticker_chunk_df,"6_line"))
-            async_results_6_line.append(async_result_6_line)
+            # async_result_2_line = pool.apply_async(run, args=(ticker_chunk_df,"2_line"))
+            # async_results_2_line.append(async_result_2_line)
+            # async_result_3_line = pool.apply_async(run, args=(ticker_chunk_df,"3_line"))
+            # async_results_3_line.append(async_result_3_line)
+            # async_result_4_line = pool.apply_async(run, args=(ticker_chunk_df,"4_line"))
+            # async_results_4_line.append(async_result_4_line)
+            # async_result_5_line = pool.apply_async(run, args=(ticker_chunk_df,"5_line"))
+            # async_results_5_line.append(async_result_5_line)
+            async_result_60_120 = pool.apply_async(run, args=(ticker_chunk_df,"60_120"))
+            async_results_60_120.append(async_result_60_120)
+            async_result_120_250 = pool.apply_async(run, args=(ticker_chunk_df,"120_250"))
+            async_results_120_250.append(async_result_120_250)
+            async_result_250 = pool.apply_async(run, args=(ticker_chunk_df,"250"))
+            async_results_250.append(async_result_250)
         pool.close()
         del(df)
         return_df = pd.DataFrame()
-        return_df = save(return_df,async_results_6_line,processed_data_files[-1]+"_6_line")
-        return_df = save(return_df,async_results_2_line,processed_data_files[-1]+"_2_line")
-        return_df = save(return_df,async_results_3_line,processed_data_files[-1]+"_3_line")
-        return_df = save(return_df,async_results_4_line,processed_data_files[-1]+"_4_line")
-        return_df = save(return_df,async_results_5_line,processed_data_files[-1]+"_5_line")
+
+        # return_df = save(return_df,async_results_2_line,processed_data_files[-1]+"_2_line")
+        # return_df = save(return_df,async_results_3_line,processed_data_files[-1]+"_3_line")
+        # return_df = save(return_df,async_results_4_line,processed_data_files[-1]+"_4_line")
+        # return_df = save(return_df,async_results_5_line,processed_data_files[-1]+"_5_line")
+        return_df = save(return_df,async_results_60_120,processed_data_files[-1]+"_60_120")
+        return_df = save(return_df,async_results_120_250,processed_data_files[-1]+"_120_250")
+        return_df = save(return_df,async_results_250,processed_data_files[-1]+"_250")
 
         if(not return_df.empty):
             try:
-                return_df.to_csv(screened_data_path + processed_data_files[-1] + '_all_breakout.txt',header=False, index=False)
+                return_df.to_csv(screened_data_path + processed_data_files[-1] + '_all.txt',header=False, index=False)
             except Exception as e:
                 logging.critical("return_df to_csv:"+str(e))
         else:
