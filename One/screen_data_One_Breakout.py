@@ -108,7 +108,7 @@ def save(return_df,async_results,processed_data_file):
         try:
             df.to_csv(screened_data_path + processed_data_file + '.csv')
             end = datetime.date.today()
-            df = df.loc[(df.date==str(end)) & (df.Wait_Cum>=15),'ticker']
+            df = df.loc[df.date==str(end),'ticker']
             df.to_csv(screened_data_path + processed_data_file + '.txt',header=False, index=False)
             return_df = pd.concat([return_df,df])
         except Exception as e:
