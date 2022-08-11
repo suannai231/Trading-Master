@@ -32,7 +32,7 @@ def get_stock_history(ticker):
         df = si.get_data(ticker,start,end,index_as_date=True)
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-            logging.critical("si.get_data "+ticker+" error: "+str(e)+". sys.exit...")
+            logging.critical("get_stock_history "+ticker+" error: "+str(e)+". sys.exit...")
             sys.exit(3)
     df.index.name = 'date'
     return df
@@ -50,7 +50,10 @@ def get_stock_realtime(ticker):
             d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
             df=pd.DataFrame(d,index=[str(end)])
     except Exception as e:
-        logging.critical(ticker+" "+str(e))
+        if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+            logging.critical("get_stock_realtime "+ticker+" error: "+str(e)+". sys.exit...")
+            sys.exit(3)
+        # logging.critical(ticker+" "+str(e))
         # open = close
         # low = close
         # high = close
@@ -143,6 +146,10 @@ logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 # logging.error('And non-ASCII stuff, too, like Øresund and Malmö')
 
 if __name__ == '__main__':
+    now = datetime.datetime.now()
+    start_time = now.strftime("%m%d%Y-%H%M%S")
+    logging.info("collect process start time:" + start_time)
+
     isPathExists = os.path.exists(path)
     if not isPathExists:
         os.makedirs(path)
@@ -162,13 +169,11 @@ if __name__ == '__main__':
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
     proc_num = len(ticker_chunk_list)
 
-    
-    now = datetime.datetime.now()
-    start_time = now.strftime("%m%d%Y-%H%M%S")
-    logging.info("start time:" + start_time)
-
     stock_history_concat_df = pd.DataFrame()
     while(stock_history_concat_df.empty):
+        now = datetime.datetime.now()
+        start_time = now.strftime("%m%d%Y-%H%M%S")
+        logging.info("start time:" + start_time)
         pool = Pool(proc_num)
         stock_async_results = []
 
@@ -188,6 +193,8 @@ if __name__ == '__main__':
                 break
             if not stock_chunk_df.empty:
                 stock_history_concat_df = pd.concat([stock_history_concat_df,stock_chunk_df])
+        stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+        logging.info("stop time:" + stop_time)
 
     today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
@@ -197,35 +204,40 @@ if __name__ == '__main__':
 
     stock_realtime_concat_df = pd.DataFrame()
     while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):         #get real time stock price
-            pool = Pool(proc_num)
-            stock_async_results = []
+        now = datetime.datetime.now()
+        start_time = now.strftime("%m%d%Y-%H%M%S")
+        logging.info("start time:" + start_time)
+        pool = Pool(proc_num)
+        stock_async_results = []
 
-            for ticker_chunk in ticker_chunk_list:
-                stock_async_result = pool.apply_async(get_stock_realtime_mt,args=(ticker_chunk,))
-                stock_async_results.append(stock_async_result)
+        for ticker_chunk in ticker_chunk_list:
+            stock_async_result = pool.apply_async(get_stock_realtime_mt,args=(ticker_chunk,))
+            stock_async_results.append(stock_async_result)
 
-            pool.close()
-            df = pd.DataFrame()
-            for stock_async_result in stock_async_results:
-                try:
-                    stock_chunk_df = stock_async_result.get(timeout=360)
-                except TimeoutError as e:
-                    logging.error(str(e) + " timeout 360 seconds, terminating process pool...")
-                    pool.terminate()
-                    pool.join()
-                    break
-                if not stock_chunk_df.empty:
-                    df = pd.concat([df,stock_chunk_df])
+        pool.close()
+        df = pd.DataFrame()
+        for stock_async_result in stock_async_results:
+            try:
+                stock_chunk_df = stock_async_result.get(timeout=360)
+            except TimeoutError as e:
+                logging.error(str(e) + " timeout 360 seconds, terminating process pool...")
+                pool.terminate()
+                pool.join()
+                break
+            if not stock_chunk_df.empty:
+                df = pd.concat([df,stock_chunk_df])
 
-            if not df.empty: 
-                stock_concat_df = pd.concat([stock_history_concat_df,df])
-                stock_concat_df.reset_index(inplace=True)
-                stock_realtime_concat_df = stock_concat_df
-                stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-                try:
-                    stock_concat_df.to_feather(path + stop_time + ".feather")
-                except Exception as e:
-                    logging.critical("to_feather:"+str(e))
+        if not df.empty: 
+            stock_concat_df = pd.concat([stock_history_concat_df,df])
+            stock_concat_df.reset_index(inplace=True)
+            stock_realtime_concat_df = stock_concat_df
+            stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+            try:
+                stock_concat_df.to_feather(path + stop_time + ".feather")
+            except Exception as e:
+                logging.critical("to_feather:"+str(e))
+        stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+        logging.info("stop time:" + stop_time)
 
     if (not stock_realtime_concat_df.empty):
         stock_concat_df = stock_realtime_concat_df
@@ -242,7 +254,7 @@ if __name__ == '__main__':
 
     # sys.exit(2)
     stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-    logging.info("stop time:" + stop_time)
+    logging.info("collect process exit time:" + stop_time)
     # thread_number = proc_num
 
     # with ThreadPoolExecutor(thread_number) as tp:
