@@ -145,6 +145,8 @@ def cal_basics(df):
     df['EMA120'] = ema120
     df['EMA250'] = ema250
 
+    df['AMP'] = (df['high']-df['low'])/df['low']
+
     return df
 
 def run(ticker_chunk_df):
@@ -156,9 +158,9 @@ def run(ticker_chunk_df):
 
         if df['close'][lastindex] > Price_Limit:
             continue
-        elif(len(df)<=base_days):
+        # elif(len(df)<=base_days):
             # print(ticker+" length is less than base_days business days.")
-            continue
+            # continue
 
         df = cal_basics(df)
         # df = cal_OBV(df)
