@@ -1,7 +1,7 @@
 from operator import index
 from urllib3 import Timeout
 from yahoo_fin import stock_info as si
-import yfinance as yf
+# import yfinance as yf
 import pandas as pd
 import datetime
 import os

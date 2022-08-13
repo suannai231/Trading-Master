@@ -7,13 +7,13 @@ from multiprocessing import Pool
 import time
 import logging
 import math
-
+import statistics
 # backward = 180
 # CAP_Limit = 10000000000
 Price_Limit = 9.5
-base_days = 59
+base_days = 13
 
-def cal_Max_Min(df):
+def cal_Stat(df):
 
     EMA5_Max = []
     EMA10_Max = []
@@ -32,8 +32,14 @@ def cal_Max_Min(df):
     EMA250_Min = []
     OBV_Min = []
     Close_Min = []
+
+    STD_Vol = []
+    STD_EMA5 = []
+
+    start = len(df)-base_days*2
+    stop = len(df)-base_days
     
-    for startindex in range(0,len(df)-base_days):
+    for startindex in range(start,stop):
         endindex = startindex + base_days
         EMA5_Max.append(max(df.loc[startindex:endindex,'EMA5']))
         EMA10_Max.append(max(df.loc[startindex:endindex,'EMA10']))
@@ -51,26 +57,31 @@ def cal_Max_Min(df):
         EMA250_Min.append(min(df.loc[startindex:endindex,'EMA250']))
         OBV_Min.append(min(df.loc[startindex:endindex,'OBV']))
         Close_Min.append(min(df.loc[startindex:endindex,'close']))
+        STD_Vol.append(statistics.stdev(df.loc[startindex:endindex,'volume']))
+        STD_EMA5.append(statistics.stdev(df.loc[startindex:endindex,'EMA5']))
 
-    df.loc[base_days:len(df)-1,'EMA5_Max'] = EMA5_Max
-    df.loc[base_days:len(df)-1,'EMA10_Max'] = EMA10_Max
-    df.loc[base_days:len(df)-1,'EMA20_Max'] = EMA20_Max
-    df.loc[base_days:len(df)-1,'EMA60_Max'] = EMA60_Max
-    df.loc[base_days:len(df)-1,'EMA120_Max'] = EMA120_Max
-    df.loc[base_days:len(df)-1,'EMA250_Max'] = EMA250_Max
-    df.loc[base_days:len(df)-1,'OBV_Max'] = OBV_Max
-    df.loc[base_days:len(df)-1,'Close_Max'] = Close_Max
+    df.loc[stop:len(df)-1,'EMA5_Max'] = EMA5_Max
+    df.loc[stop:len(df)-1,'EMA10_Max'] = EMA10_Max
+    df.loc[stop:len(df)-1,'EMA20_Max'] = EMA20_Max
+    df.loc[stop:len(df)-1,'EMA60_Max'] = EMA60_Max
+    df.loc[stop:len(df)-1,'EMA120_Max'] = EMA120_Max
+    df.loc[stop:len(df)-1,'EMA250_Max'] = EMA250_Max
+    df.loc[stop:len(df)-1,'OBV_Max'] = OBV_Max
+    df.loc[stop:len(df)-1,'Close_Max'] = Close_Max
 
-    df.loc[base_days:len(df)-1,'EMA5_Min'] = EMA5_Min
-    df.loc[base_days:len(df)-1,'EMA10_Min'] = EMA10_Min
-    df.loc[base_days:len(df)-1,'EMA20_Min'] = EMA20_Min
-    df.loc[base_days:len(df)-1,'EMA60_Min'] = EMA60_Min
-    df.loc[base_days:len(df)-1,'EMA120_Min'] = EMA120_Min
-    df.loc[base_days:len(df)-1,'EMA250_Min'] = EMA250_Min
-    df.loc[base_days:len(df)-1,'OBV_Min'] = OBV_Min
-    df.loc[base_days:len(df)-1,'Close_Min'] = Close_Min
+    df.loc[stop:len(df)-1,'EMA5_Min'] = EMA5_Min
+    df.loc[stop:len(df)-1,'EMA10_Min'] = EMA10_Min
+    df.loc[stop:len(df)-1,'EMA20_Min'] = EMA20_Min
+    df.loc[stop:len(df)-1,'EMA60_Min'] = EMA60_Min
+    df.loc[stop:len(df)-1,'EMA120_Min'] = EMA120_Min
+    df.loc[stop:len(df)-1,'EMA250_Min'] = EMA250_Min
+    df.loc[stop:len(df)-1,'OBV_Min'] = OBV_Min
+    df.loc[stop:len(df)-1,'Close_Min'] = Close_Min
 
-    return df.loc[base_days:]
+    df.loc[stop:len(df)-1,'STD_Vol'] = STD_Vol
+    df.loc[stop:len(df)-1,'STD_EMA5'] = STD_EMA5
+
+    return df.loc[stop:]
 
 def cal_OBV(df):
     startindex = 0
@@ -158,11 +169,13 @@ def run(ticker_chunk_df):
 
         if df['close'][lastindex] > Price_Limit:
             continue
-        # elif(len(df)<=base_days):
-            # print(ticker+" length is less than base_days business days.")
-            # continue
+        elif(len(df)<=base_days*2):
+            print(ticker+" length is less than" + str(base_days*2) +" business days.")
+            continue
 
         df = cal_basics(df)
+        df = cal_OBV(df)
+        df = cal_Stat(df)
         # df = cal_OBV(df)
         # df = cal_Max_Min(df)
 
@@ -192,8 +205,8 @@ if __name__ == '__main__':
     today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
-    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)): 
-    # while(True):
+    # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)): 
+    while(True):
         now = datetime.datetime.now()
         # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
         # if(now>today3pm):

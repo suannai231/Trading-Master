@@ -5,16 +5,18 @@ import os
 import sys
 from multiprocessing import Pool
 import numpy as np
-from datetime import timedelta
+# from datetime import timedelta
 import time
 import logging
 import math
+from yahoo_fin import stock_info as si
 
 processed_data_path="//jack-nas/Work/Python/ProcessedData/"
 screened_data_path="//jack-nas/Work/Python/ScreenedData/"
+base_days = 13
 
 def screen(df,lines):
-
+    ticker = df.iloc[-1]['ticker']
     close = df.iloc[-1]['close']
     ema5 = df.iloc[-1]['EMA5']
     ema10 = df.iloc[-1]['EMA10']
@@ -25,7 +27,10 @@ def screen(df,lines):
     # OBV = df.iloc[-1]['OBV']
     # OBV_Max = df.iloc[-1]['OBV_Max']
     turnover = df.iloc[-1]['volume']*close
-
+    STD_Vol = df.iloc[-1]['STD_Vol']
+    min_STD_Vol = min(df['STD_Vol'])
+    STD_EMA5 = df.iloc[-1]['STD_EMA5']
+    min_STD_EMA5 = min(df['STD_EMA5'])
     # ema5_max = df.iloc[-1]['EMA5_Max']
     # ema10_max = df.iloc[-1]['EMA10_Max']
     # ema20_max = df.iloc[-1]['EMA20_Max']
@@ -42,13 +47,34 @@ def screen(df,lines):
     # close_min = df.iloc[-1]['Close_Min']
 
     if lines=="Strong":
-        if close>=ema5>=ema10>=ema20:
+        try:
+            quote_table = si.get_quote_table(ticker)
+        except Exception as e:
+            if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+                logging.critical("get_stock_realtime "+ticker+" error: "+str(e)+". sys.exit...")
+                sys.exit(3)
+        if isinstance(quote_table["52 Week Range"], str):
+            FityTwo_Week_Low = float(quote_table["52 Week Range"].split(" - ")[0])
+        else:
+            logging.error(ticker + "52 week range is nan.")
+            return False
+        if FityTwo_Week_Low*3>=close>=FityTwo_Week_Low*1.4:
             return True
         else:
             return False
     elif lines=="AMP":
         AMP = df.iloc[-1]['AMP']
-        if (AMP >= 0.19) & (turnover >= 100000):
+        if (AMP >= 0.1) & (turnover >= 100000):
+            return True
+        else:
+            return False
+    elif lines=="STD_Vol":
+        if STD_Vol == min_STD_Vol:
+            return True
+        else:
+            return False
+    elif lines=="STD_EMA5":
+        if STD_EMA5 == min_STD_EMA5:
             return True
         else:
             return False
@@ -67,7 +93,7 @@ def run(ticker_chunk_df):
         # return_ticker_df = pd.DataFrame()
         # Breakout = 0
         # Wait_Cum = 0
-        df = ticker_df.iloc[len(ticker_df)-10:]
+        df = ticker_df.iloc[len(ticker_df)-base_days:]
         today_df = ticker_df.iloc[[-1]]
         for date in df.index:
             date_ticker_df = df[df.index==date]
@@ -79,7 +105,11 @@ def run(ticker_chunk_df):
             if AMP_result:
                 Strong_result = screen(today_df,"Strong")
                 if Strong_result:
-                    return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
+                    STD_Vol = screen(df,"STD_Vol")
+                    if STD_Vol:
+                        STD_EMA5 = screen(df,"STD_EMA5")
+                        if STD_EMA5:
+                            return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 break
 
         
@@ -124,8 +154,8 @@ if __name__ == '__main__':
     today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
-    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
-    # while(True):
+    # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+    while(True):
         now = datetime.datetime.now()
         # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
         # if(now>today3pm):
