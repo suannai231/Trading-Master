@@ -13,6 +13,7 @@ from yahoo_fin import stock_info as si
 
 processed_data_path="//jack-nas/Work/Python/ProcessedData/"
 screened_data_path="//jack-nas/Work/Python/ScreenedData/"
+raw_data_path = '//jack-nas/Work/Python/RawData/'
 base_days = 13
 
 def screen(df,lines):
@@ -31,6 +32,7 @@ def screen(df,lines):
     min_STD_Vol = min(df['STD_Vol'])
     STD_EMA5 = df.iloc[-1]['STD_EMA5']
     min_STD_EMA5 = min(df['STD_EMA5'])
+    Year_Low = df.iloc[-1]['Year_Low']
     # ema5_max = df.iloc[-1]['EMA5_Max']
     # ema10_max = df.iloc[-1]['EMA10_Max']
     # ema20_max = df.iloc[-1]['EMA20_Max']
@@ -47,27 +49,27 @@ def screen(df,lines):
     # close_min = df.iloc[-1]['Close_Min']
 
     if lines=="Strong":
-        try:
-            quote_table = si.get_quote_table(ticker)
-        except Exception as e:
-            if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-                logging.critical("get_stock_realtime "+ticker+" error: "+str(e)+". sys.exit...")
-                sys.exit(3)
-        if isinstance(quote_table["52 Week Range"], str):
-            FityTwo_Week_Low = float(quote_table["52 Week Range"].split(" - ")[0])
-        else:
-            logging.error(ticker + "52 week range is nan.")
-            return False
-        if FityTwo_Week_Low*3>=close>=FityTwo_Week_Low*1.4:
+        # try:
+        #     quote_table = si.get_quote_table(ticker)
+        # except Exception as e:
+        #     if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+        #         logging.critical("get_stock_realtime "+ticker+" error: "+str(e)+". sys.exit...")
+        #         sys.exit(3)
+        # if isinstance(quote_table["52 Week Range"], str):
+        #     FityTwo_Week_Low = float(quote_table["52 Week Range"].split(" - ")[0])
+        # else:
+        #     logging.error(ticker + "52 week range is nan.")
+        #     return False
+        if (Year_Low*3>=close>=Year_Low*1.4) & (turnover >= 100000):
             return True
         else:
             return False
-    elif lines=="AMP":
-        AMP = df.iloc[-1]['AMP']
-        if (AMP >= 0.1) & (turnover >= 100000):
-            return True
-        else:
-            return False
+    # elif lines=="AMP":
+    #     AMP = df.iloc[-1]['AMP']
+    #     if (AMP >= 0.1) & (turnover >= 100000):
+    #         return True
+    #     else:
+    #         return False
     elif lines=="STD_Vol":
         if STD_Vol == min_STD_Vol:
             return True
@@ -90,27 +92,32 @@ def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
+        # FityTwo_Week_Low_ticker_df = FityTwo_Week_Low_chunk_df.loc[FityTwo_Week_Low_chunk_df.ticker==ticker]
+        # if FityTwo_Week_Low_ticker_df.empty:
+        #     continue
+        # else:
+        #     FityTwo_Week_Low = FityTwo_Week_Low_ticker_df.iloc[-1]['FityTwo_Week_Low']
         # return_ticker_df = pd.DataFrame()
         # Breakout = 0
         # Wait_Cum = 0
         df = ticker_df.iloc[len(ticker_df)-base_days:]
         today_df = ticker_df.iloc[[-1]]
-        for date in df.index:
-            date_ticker_df = df[df.index==date]
-            if date_ticker_df.empty:
-                continue
+        # for date in df.index:
+        #     date_ticker_df = df[df.index==date]
+        #     if date_ticker_df.empty:
+        #         continue
 
-            AMP_result = screen(date_ticker_df,"AMP")
+        #     AMP_result = screen(date_ticker_df,"AMP")
             
-            if AMP_result:
-                Strong_result = screen(today_df,"Strong")
-                if Strong_result:
-                    STD_Vol = screen(df,"STD_Vol")
-                    if STD_Vol:
-                        STD_EMA5 = screen(df,"STD_EMA5")
-                        if STD_EMA5:
-                            return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
-                break
+        #     if AMP_result:
+        Strong_result = screen(today_df,"Strong")
+        if Strong_result:
+            STD_Vol = screen(df,"STD_Vol")
+            if STD_Vol:
+                STD_EMA5 = screen(df,"STD_EMA5")
+                if STD_EMA5:
+                    return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
+                # break
 
         
     return return_ticker_chunk_df
@@ -154,8 +161,31 @@ if __name__ == '__main__':
     today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
-    # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
-    while(True):
+    # FityTwo_Week_Low_df = pd.DataFrame()
+    # while(FityTwo_Week_Low_df.empty):
+    #     now = datetime.datetime.now()
+    #     # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
+    #     # if(now>today3pm):
+    #     #     logging.info("time passed 3:05pm.")
+    #     #     break
+    #     FityTwo_Week_Low_File_time = now.strftime("%m%d%Y")
+    #     start_time = now.strftime("%m%d%Y-%H%M%S")
+    #     logging.info("start time:" + start_time)
+    #     # FityTwo_Week_Low_File = os.listdir(raw_data_path+ start_time + "_FityTwo_Week_Low_df.feather")
+    #     # if len(FityTwo_Week_Low_File) == 0:
+    #     #     logging.warning("processed data not ready, sleep 10 seconds...")
+    #     #     time.sleep(10)
+    #     #     continue
+    #     try:
+    #         # time.sleep(1)
+    #         FityTwo_Week_Low_df = pd.read_feather(raw_data_path + FityTwo_Week_Low_File_time + "_FityTwo_Week_Low_df.feather")
+    #     except Exception as e:
+    #         logging.warning("processed data not ready, sleep 10 seconds...")
+    #         time.sleep(10)
+    #         continue
+    
+    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+    # while(True):
         now = datetime.datetime.now()
         # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
         # if(now>today3pm):
@@ -214,6 +244,7 @@ if __name__ == '__main__':
         async_results_AMP = []
         for ticker_chunk in ticker_chunk_list:
             ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
+            # FityTwo_Week_Low_chunk_df = FityTwo_Week_Low_df[FityTwo_Week_Low_df['ticker'].isin(ticker_chunk)]
             async_result_AMP = pool.apply_async(run, args=(ticker_chunk_df,))
             async_results_AMP.append(async_result_AMP)
         pool.close()

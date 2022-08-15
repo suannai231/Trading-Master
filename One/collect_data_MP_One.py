@@ -14,8 +14,9 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 import time
 import math
+import locale
 
-days=365*2
+days=365
 
 multipliers = {'K':1000, 'M':1000000, 'B':1000000000, 'T':1000000000000}
 
@@ -25,6 +26,29 @@ def string_to_int(string):
     mult = multipliers[string[-1]] # look up suffix to get multiplier
      # convert number to float, multiply by multiplier, then make int
     return int(float(string[:-1]) * mult)
+
+# def get_FityTwo_Week_Low(ticker):
+#     try:
+#         quote_table = si.get_quote_table(ticker)
+#     except Exception as e:
+#         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+#             logging.critical("get_stock_realtime "+ticker+" error: "+str(e)+". sys.exit...")
+#             sys.exit(3)
+#         else:
+#             logging.debug(ticker+str(e))
+#             return pd.DataFrame()
+#     FityTwo_Week_Low = float('nan')
+#     if isinstance(quote_table["52 Week Range"], str):
+#         locale.setlocale( locale.LC_ALL, 'en_US.UTF-8' )
+#         try:
+#             FityTwo_Week_Low = locale.atof(quote_table["52 Week Range"].split(" - ")[0])
+#         except Exception as e:
+#             logging.error(quote_table["52 Week Range"].split(" - ")[0] + " string to float exception:"+str(e))
+#     else:
+#         logging.error(ticker + "52 week range is nan.")
+#     d = {'FityTwo_Week_Low':FityTwo_Week_Low}
+#     df=pd.DataFrame(d,index=[ticker],)
+#     return df
 
 def get_stock_history(ticker):
     df = pd.DataFrame()
@@ -61,6 +85,19 @@ def get_stock_realtime(ticker):
         return pd.DataFrame()
     df.index.name = 'date'
     return df
+
+# def get_FityTwo_Week_Low_mt(ticker_chunk):
+
+#     thread_number = 20
+
+#     with ThreadPoolExecutor(thread_number) as tp:
+#         jobs = [tp.submit(get_FityTwo_Week_Low,ticker)  for ticker in ticker_chunk]
+#         ticker_chunk_df = pd.DataFrame()
+#         for job in cf.as_completed(jobs):
+#             df = job.result()
+#             if not df.empty:
+#                 ticker_chunk_df = pd.concat([ticker_chunk_df,df])
+#     return ticker_chunk_df
 
 def get_stock_history_mt(ticker_chunk):
 
@@ -169,6 +206,41 @@ if __name__ == '__main__':
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
     proc_num = len(ticker_chunk_list)
 
+    # FityTwo_Week_Low_df = pd.DataFrame()
+    # while(FityTwo_Week_Low_df.empty):
+    #     now = datetime.datetime.now()
+    #     start_time = now.strftime("%m%d%Y-%H%M%S")
+    #     logging.info("start time:" + start_time)
+    #     pool = Pool(proc_num)
+    #     stock_async_results = []
+
+    #     for ticker_chunk in ticker_chunk_list:
+    #         stock_async_result = pool.apply_async(get_FityTwo_Week_Low_mt,args=(ticker_chunk,))
+    #         stock_async_results.append(stock_async_result)
+
+    #     pool.close()
+        
+    #     for stock_async_result in stock_async_results:
+    #         try:
+    #             stock_chunk_df = stock_async_result.get(timeout=720)
+    #         except TimeoutError as e:
+    #             logging.error(str(e) + " timeout 720 seconds, terminating process pool...")
+    #             pool.terminate()
+    #             pool.join()
+    #             break
+    #         if not stock_chunk_df.empty:
+    #             FityTwo_Week_Low_df = pd.concat([FityTwo_Week_Low_df,stock_chunk_df])
+    #     if not FityTwo_Week_Low_df.empty: 
+    #         stop_time = datetime.datetime.now().strftime("%m%d%Y")
+    #         try:
+    #             FityTwo_Week_Low_df.reset_index(inplace=True)
+    #             FityTwo_Week_Low_df.rename(columns={"index":"ticker"},inplace=True)
+    #             FityTwo_Week_Low_df.to_feather(path + stop_time + "_FityTwo_Week_Low_df.feather")
+    #         except Exception as e:
+    #             logging.critical("to_feather:"+str(e))
+    #     stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+    #     logging.info("stop time:" + stop_time)
+
     stock_history_concat_df = pd.DataFrame()
     while(stock_history_concat_df.empty):
         now = datetime.datetime.now()
@@ -185,9 +257,9 @@ if __name__ == '__main__':
         
         for stock_async_result in stock_async_results:
             try:
-                stock_chunk_df = stock_async_result.get(timeout=360)
+                stock_chunk_df = stock_async_result.get(timeout=720)
             except TimeoutError as e:
-                logging.error(str(e) + " timeout 360 seconds, terminating process pool...")
+                logging.error(str(e) + " timeout 720 seconds, terminating process pool...")
                 pool.terminate()
                 pool.join()
                 break

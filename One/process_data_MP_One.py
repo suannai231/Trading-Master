@@ -13,6 +13,15 @@ import statistics
 Price_Limit = 9.5
 base_days = 13
 
+def cal_Year_Low(df):
+    Year_Low = []
+    start = 0
+    stop = len(df)
+    for end in range(start,stop):
+        Year_Low.append(min(df.loc[start:end,'close']))
+    df['Year_Low'] = Year_Low
+    return df
+
 def cal_Stat(df):
 
     EMA5_Max = []
@@ -170,11 +179,12 @@ def run(ticker_chunk_df):
         if df['close'][lastindex] > Price_Limit:
             continue
         elif(len(df)<=base_days*2):
-            print(ticker+" length is less than" + str(base_days*2) +" business days.")
+            print(ticker+" length is less than " + str(base_days*2) +" business days.")
             continue
 
         df = cal_basics(df)
         df = cal_OBV(df)
+        df = cal_Year_Low(df)
         df = cal_Stat(df)
         # df = cal_OBV(df)
         # df = cal_Max_Min(df)
@@ -205,8 +215,8 @@ if __name__ == '__main__':
     today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
-    # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)): 
-    while(True):
+    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)): 
+    # while(True):
         now = datetime.datetime.now()
         # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
         # if(now>today3pm):
