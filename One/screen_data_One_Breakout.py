@@ -30,23 +30,25 @@ def screen(df,lines):
     turnover = df.iloc[-1]['volume']*close
     STD_Vol = df.iloc[-1]['STD_Vol']
     min_STD_Vol = min(df['STD_Vol'])
-    STD_EMA5 = df.iloc[-1]['STD_EMA5']
-    min_STD_EMA5 = min(df['STD_EMA5'])
+    STD_Close = df.iloc[-1]['STD_Close']
+    min_STD_Close = min(df['STD_Close'])
     Year_Low = df.iloc[-1]['Year_Low']
+    Year_High = df.iloc[-1]['Year_High']
+    EMA20_High = df.iloc[-1]['EMA20_High']
     # ema5_max = df.iloc[-1]['EMA5_Max']
     # ema10_max = df.iloc[-1]['EMA10_Max']
-    # ema20_max = df.iloc[-1]['EMA20_Max']
+    ema20_max = df.iloc[-1]['EMA20_Max']
     # ema60_max = df.iloc[-1]['EMA60_Max']
     # ema120_max = df.iloc[-1]['EMA120_Max']
     # ema250_max = df.iloc[-1]['EMA250_Max']
-    # close_max = df.iloc[-1]['Close_Max']
+    close_max = df.iloc[-1]['Close_Max']
 
     # ema5_min = df.iloc[-1]['EMA5_Min']
     # ema10_min = df.iloc[-1]['EMA10_Min']
     # ema20_min = df.iloc[-1]['EMA20_Min']
     # ema60_min = df.iloc[-1]['EMA60_Min']
     # ema250_min = df.iloc[-1]['EMA250_Min']
-    # close_min = df.iloc[-1]['Close_Min']
+    close_min = df.iloc[-1]['Close_Min']
 
     if lines=="Strong":
         # try:
@@ -60,7 +62,8 @@ def screen(df,lines):
         # else:
         #     logging.error(ticker + "52 week range is nan.")
         #     return False
-        if (Year_Low*3>=close>=Year_Low*1.4) & (turnover >= 100000):
+        # if (Year_Low*2.5>=close>=Year_Low*1.2) & (close>=(Year_Low+Year_High)/2):
+        if(ema20==EMA20_High):
             return True
         else:
             return False
@@ -70,13 +73,23 @@ def screen(df,lines):
     #         return True
     #     else:
     #         return False
-    elif lines=="STD_Vol":
-        if STD_Vol == min_STD_Vol:
+    elif lines=="Close to EMA20":
+        if(ema60<=close<=ema20*1.2):
             return True
         else:
             return False
-    elif lines=="STD_EMA5":
-        if STD_EMA5 == min_STD_EMA5:
+    elif lines=="turnover":
+        if(turnover >= 50000):
+            return True
+        else:
+            return False
+    elif lines=="STD_Vol":
+        if (min_STD_Vol*1.4 >= STD_Vol > min_STD_Vol):
+            return True
+        else:
+            return False
+    elif lines=="STD_Close":
+        if STD_Close == min_STD_Close:
             return True
         else:
             return False
@@ -110,13 +123,12 @@ def run(ticker_chunk_df):
         #     AMP_result = screen(date_ticker_df,"AMP")
             
         #     if AMP_result:
-        Strong_result = screen(today_df,"Strong")
-        if Strong_result:
-            STD_Vol = screen(df,"STD_Vol")
-            if STD_Vol:
-                STD_EMA5 = screen(df,"STD_EMA5")
-                if STD_EMA5:
-                    return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
+        Turnover = screen(df,"turnover")
+        # STD_Close = screen(df,"STD_Close")
+        Strong = screen(df,"Strong")
+        Close_to_EMA20 = screen(df,"Close to EMA20")
+        if (Close_to_EMA20 & Turnover & Strong):
+            return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 # break
 
         

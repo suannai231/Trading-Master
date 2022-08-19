@@ -13,13 +13,19 @@ import statistics
 Price_Limit = 9.5
 base_days = 13
 
-def cal_Year_Low(df):
+def cal_Year_Low_High(df):
     Year_Low = []
+    Year_High = []
+    EMA20_High = []
     start = 0
     stop = len(df)
     for end in range(start,stop):
         Year_Low.append(min(df.loc[start:end,'close']))
+        Year_High.append(max(df.loc[start:end,'close']))
+        EMA20_High.append(max(df.loc[start:end,'EMA20']))
     df['Year_Low'] = Year_Low
+    df['Year_High'] = Year_High
+    df['EMA20_High'] = EMA20_High
     return df
 
 def cal_Stat(df):
@@ -43,7 +49,7 @@ def cal_Stat(df):
     Close_Min = []
 
     STD_Vol = []
-    STD_EMA5 = []
+    STD_Close = []
 
     start = len(df)-base_days*2
     stop = len(df)-base_days
@@ -67,7 +73,7 @@ def cal_Stat(df):
         OBV_Min.append(min(df.loc[startindex:endindex,'OBV']))
         Close_Min.append(min(df.loc[startindex:endindex,'close']))
         STD_Vol.append(statistics.stdev(df.loc[startindex:endindex,'volume']))
-        STD_EMA5.append(statistics.stdev(df.loc[startindex:endindex,'EMA5']))
+        STD_Close.append(statistics.stdev(df.loc[startindex:endindex,'close']))
 
     df.loc[stop:len(df)-1,'EMA5_Max'] = EMA5_Max
     df.loc[stop:len(df)-1,'EMA10_Max'] = EMA10_Max
@@ -88,7 +94,7 @@ def cal_Stat(df):
     df.loc[stop:len(df)-1,'Close_Min'] = Close_Min
 
     df.loc[stop:len(df)-1,'STD_Vol'] = STD_Vol
-    df.loc[stop:len(df)-1,'STD_EMA5'] = STD_EMA5
+    df.loc[stop:len(df)-1,'STD_Close'] = STD_Close
 
     return df.loc[stop:]
 
@@ -184,7 +190,7 @@ def run(ticker_chunk_df):
 
         df = cal_basics(df)
         df = cal_OBV(df)
-        df = cal_Year_Low(df)
+        df = cal_Year_Low_High(df)
         df = cal_Stat(df)
         # df = cal_OBV(df)
         # df = cal_Max_Min(df)
