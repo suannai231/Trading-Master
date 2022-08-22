@@ -13,16 +13,35 @@ import statistics
 Price_Limit = 9.5
 base_days = 13
 
+def cal_Vol_Low_High_Price(df):
+    Vol_High_Price = []
+    start = 0
+    stop = len(df)
+    for current in range(start,stop):
+        Vol_High = df.loc[current,'Vol_High']
+        s = df.loc[df.volume==Vol_High,'high']
+        if(not s.empty):
+            high = df.loc[df.volume==Vol_High,'high'].values[0]
+            Vol_High_Price.append(high)
+    df['Vol_High_Price']=Vol_High_Price
+    return df
+
 def cal_Year_Low_High(df):
     Year_Low = []
     Year_High = []
     EMA20_High = []
+    Vol_High = []
+    Vol_Low = []
     start = 0
     stop = len(df)
     for end in range(start,stop):
+        Vol_Low.append(min(df.loc[start:end,'volume']))
+        Vol_High.append(max(df.loc[start:end,'volume']))
         Year_Low.append(min(df.loc[start:end,'close']))
         Year_High.append(max(df.loc[start:end,'close']))
         EMA20_High.append(max(df.loc[start:end,'EMA20']))
+    df['Vol_Low'] = Vol_Low
+    df['Vol_High'] = Vol_High
     df['Year_Low'] = Year_Low
     df['Year_High'] = Year_High
     df['EMA20_High'] = EMA20_High
@@ -164,13 +183,15 @@ def cal_basics(df):
     ema60 = df['close'].ewm(span = 60, adjust = False).mean()
     ema120 = df['close'].ewm(span = 120, adjust = False).mean()
     ema250 = df['close'].ewm(span = 250, adjust = False).mean()
+    ema250 = df['close'].ewm(span = 250, adjust = False).mean()
+    ema999 = df['close'].ewm(span = 999, adjust = False).mean()
     df['EMA5'] = ema5
     df['EMA10'] = ema10
     df['EMA20'] = ema20
     df['EMA60'] = ema60
     df['EMA120'] = ema120
     df['EMA250'] = ema250
-
+    df['EMA999'] = ema999
     df['AMP'] = (df['high']-df['low'])/df['low']
 
     return df
@@ -189,9 +210,13 @@ def run(ticker_chunk_df):
             continue
 
         df = cal_basics(df)
+        if(len(df)>250):
+            df = df.iloc[len(df)-250:]
+            df.reset_index(drop=True,inplace=True)
         df = cal_OBV(df)
         df = cal_Year_Low_High(df)
-        df = cal_Stat(df)
+        df = cal_Vol_Low_High_Price(df)
+        # df = cal_Stat(df)
         # df = cal_OBV(df)
         # df = cal_Max_Min(df)
 
@@ -221,8 +246,8 @@ if __name__ == '__main__':
     today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
-    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)): 
-    # while(True):
+    # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)): 
+    while(True):
         now = datetime.datetime.now()
         # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
         # if(now>today3pm):

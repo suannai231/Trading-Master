@@ -19,36 +19,39 @@ base_days = 13
 def screen(df,lines):
     ticker = df.iloc[-1]['ticker']
     close = df.iloc[-1]['close']
+    change = df.iloc[-1]['change']
     ema5 = df.iloc[-1]['EMA5']
     ema10 = df.iloc[-1]['EMA10']
     ema20 = df.iloc[-1]['EMA20']
     ema60 = df.iloc[-1]['EMA60']
     ema120 = df.iloc[-1]['EMA120']
     ema250 = df.iloc[-1]['EMA250']
+    ema999 = df.iloc[-1]['EMA999']
     # OBV = df.iloc[-1]['OBV']
     # OBV_Max = df.iloc[-1]['OBV_Max']
     turnover = df.iloc[-1]['volume']*close
-    STD_Vol = df.iloc[-1]['STD_Vol']
-    min_STD_Vol = min(df['STD_Vol'])
-    STD_Close = df.iloc[-1]['STD_Close']
-    min_STD_Close = min(df['STD_Close'])
+    # STD_Vol = df.iloc[-1]['STD_Vol']
+    # min_STD_Vol = min(df['STD_Vol'])
+    # STD_Close = df.iloc[-1]['STD_Close']
+    # min_STD_Close = min(df['STD_Close'])
     Year_Low = df.iloc[-1]['Year_Low']
     Year_High = df.iloc[-1]['Year_High']
     EMA20_High = df.iloc[-1]['EMA20_High']
     # ema5_max = df.iloc[-1]['EMA5_Max']
     # ema10_max = df.iloc[-1]['EMA10_Max']
-    ema20_max = df.iloc[-1]['EMA20_Max']
+    # ema20_max = df.iloc[-1]['EMA20_Max']
     # ema60_max = df.iloc[-1]['EMA60_Max']
     # ema120_max = df.iloc[-1]['EMA120_Max']
     # ema250_max = df.iloc[-1]['EMA250_Max']
-    close_max = df.iloc[-1]['Close_Max']
+    # close_max = df.iloc[-1]['Close_Max']
 
     # ema5_min = df.iloc[-1]['EMA5_Min']
     # ema10_min = df.iloc[-1]['EMA10_Min']
     # ema20_min = df.iloc[-1]['EMA20_Min']
     # ema60_min = df.iloc[-1]['EMA60_Min']
     # ema250_min = df.iloc[-1]['EMA250_Min']
-    close_min = df.iloc[-1]['Close_Min']
+    # close_min = df.iloc[-1]['Close_Min']
+    Vol_High_Price = df.iloc[-1]['Vol_High_Price']
 
     if lines=="Strong":
         # try:
@@ -63,7 +66,8 @@ def screen(df,lines):
         #     logging.error(ticker + "52 week range is nan.")
         #     return False
         # if (Year_Low*2.5>=close>=Year_Low*1.2) & (close>=(Year_Low+Year_High)/2):
-        if(ema20==EMA20_High):
+        long_trend_days = len(df.loc[df.EMA20>=df.EMA60>=df.EMA120])
+        if(close >= Vol_High_Price*0.8) & (ema20>=EMA20_High*0.8) & (long_trend_days>=60):
             return True
         else:
             return False
@@ -74,7 +78,19 @@ def screen(df,lines):
     #     else:
     #         return False
     elif lines=="Close to EMA20":
-        if(ema60<=close<=ema20*1.2):
+        if(ema60<=close<=ema20*1.1):
+            return True
+        else:
+            return False
+    elif lines=="Up Trend":
+        if(len(df)<120):
+            return False
+        close5_low = min(df.iloc[len(df)-5:]['close'])
+        close10_low = min(df.iloc[len(df)-10:len(df)-5]['close'])
+        close20_low = min(df.iloc[len(df)-20:len(df)-10]['close'])
+        close60_low = min(df.iloc[len(df)-60:len(df)-20]['close'])
+        close120_low = min(df.iloc[len(df)-120:len(df)-60]['close'])
+        if(close5_low>close10_low>close20_low>close60_low>close120_low):
             return True
         else:
             return False
@@ -83,16 +99,17 @@ def screen(df,lines):
             return True
         else:
             return False
-    elif lines=="STD_Vol":
-        if (min_STD_Vol*1.4 >= STD_Vol > min_STD_Vol):
-            return True
-        else:
-            return False
-    elif lines=="STD_Close":
-        if STD_Close == min_STD_Close:
-            return True
-        else:
-            return False
+
+    # elif lines=="STD_Vol":
+    #     if (min_STD_Vol*1.4 >= STD_Vol > min_STD_Vol):
+    #         return True
+    #     else:
+    #         return False
+    # elif lines=="STD_Close":
+    #     if STD_Close == min_STD_Close:
+    #         return True
+    #     else:
+    #         return False
     return False
 
 def run(ticker_chunk_df):
@@ -104,7 +121,7 @@ def run(ticker_chunk_df):
     ticker_chunk_df.set_index('date',inplace=True)
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
-        ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
+        df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
         # FityTwo_Week_Low_ticker_df = FityTwo_Week_Low_chunk_df.loc[FityTwo_Week_Low_chunk_df.ticker==ticker]
         # if FityTwo_Week_Low_ticker_df.empty:
         #     continue
@@ -113,8 +130,8 @@ def run(ticker_chunk_df):
         # return_ticker_df = pd.DataFrame()
         # Breakout = 0
         # Wait_Cum = 0
-        df = ticker_df.iloc[len(ticker_df)-base_days:]
-        today_df = ticker_df.iloc[[-1]]
+        # df = ticker_df.iloc[len(ticker_df)-base_days:]
+        today_df = df.iloc[[-1]]
         # for date in df.index:
         #     date_ticker_df = df[df.index==date]
         #     if date_ticker_df.empty:
@@ -127,7 +144,8 @@ def run(ticker_chunk_df):
         # STD_Close = screen(df,"STD_Close")
         Strong = screen(df,"Strong")
         Close_to_EMA20 = screen(df,"Close to EMA20")
-        if (Close_to_EMA20 & Turnover & Strong):
+        # Price_Range = screen(df,"Up Trend")
+        if (Turnover & Strong & Close_to_EMA20):
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 # break
 
@@ -196,8 +214,8 @@ if __name__ == '__main__':
     #         time.sleep(10)
     #         continue
     
-    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
-    # while(True):
+    # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+    while(True):
         now = datetime.datetime.now()
         # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
         # if(now>today3pm):
@@ -229,7 +247,7 @@ if __name__ == '__main__':
         except Exception as e:
             logging.critical(e)
             continue
-        df = df.loc[df.date>"2022-01-01"]
+        # df = df.loc[df.date>"2022-01-01"]
         # today = datetime.date.today()
         # day1 = today - timedelta(days=1)
         # day2 = today - timedelta(days=2)

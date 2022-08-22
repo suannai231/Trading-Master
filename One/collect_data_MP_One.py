@@ -16,7 +16,7 @@ import time
 import math
 import locale
 
-days=365
+days=999
 
 multipliers = {'K':1000, 'M':1000000, 'B':1000000000, 'T':1000000000000}
 
