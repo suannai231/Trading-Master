@@ -66,7 +66,7 @@ def screen(df,lines):
         #     logging.error(ticker + "52 week range is nan.")
         #     return False
         # if (Year_Low*2.5>=close>=Year_Low*1.2) & (close>=(Year_Low+Year_High)/2):
-        long_trend_days = len(df.loc[df.EMA20>=df.EMA60>=df.EMA120])
+        long_trend_days = len(df.loc[(df.EMA20>=df.EMA60) & (df.EMA60>=df.EMA120)])
         if(close >= Vol_High_Price*0.8) & (ema20>=EMA20_High*0.8) & (long_trend_days>=60):
             return True
         else:
