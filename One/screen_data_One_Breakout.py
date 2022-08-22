@@ -70,7 +70,7 @@ def screen(df,lines):
             return False
         last_60days_df = df.iloc[len(df)-60:]
         long_trend_days = len(last_60days_df.loc[(last_60days_df.EMA20>=last_60days_df.EMA60) & (last_60days_df.EMA60>=last_60days_df.EMA120)])
-        if(close >= Vol_High_Price*0.8) & (ema20>=EMA20_High*0.8) & (long_trend_days>=30):
+        if(close >= Vol_High_Price*0.8) & (ema20>=EMA20_High*0.8) & (long_trend_days>=50):
             return True
         else:
             return False
