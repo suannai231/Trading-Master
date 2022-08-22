@@ -26,7 +26,7 @@ def screen(df,lines):
     ema60 = df.iloc[-1]['EMA60']
     ema120 = df.iloc[-1]['EMA120']
     ema250 = df.iloc[-1]['EMA250']
-    ema999 = df.iloc[-1]['EMA999']
+    # ema999 = df.iloc[-1]['EMA999']
     # OBV = df.iloc[-1]['OBV']
     # OBV_Max = df.iloc[-1]['OBV_Max']
     turnover = df.iloc[-1]['volume']*close
