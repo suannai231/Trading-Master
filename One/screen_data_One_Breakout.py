@@ -29,8 +29,8 @@ def screen(df,lines):
 
     if(len(df)<30):
         return False
-    Last_30days_df = df.iloc[len(df)-30:]
-    ema20_max = max(Last_30days_df.EMA20)
+    Last_10days_df = df.iloc[len(df)-10:]
+    ema20_10days_max = max(Last_10days_df.EMA20)
     # df = cal_Vol_Low_High_Price(Last_30days_df)
     # Vol_High_Price = df.iloc[-1]['Vol_High_Price']
     ticker = df.iloc[-1]['ticker']
@@ -38,12 +38,12 @@ def screen(df,lines):
         print("PETZ")
 
     if lines=="Strong":
-        if(close >= Vol_High_Price*0.8) & (ema20>=ema20_max):
+        if(close >= Vol_High_Price*0.7) & (ema20==ema20_10days_max):
             return True
         else:
             return False
     elif lines=="Close to EMA20":
-        if(close<=ema20*1.1):
+        if(close<=ema20*1.2):
             return True
         else:
             return False
@@ -60,7 +60,7 @@ def screen(df,lines):
         else:
             return False
     elif lines=="turnover":
-        if(turnover >= 100000):
+        if(turnover >= 500000):
             return True
         else:
             return False
