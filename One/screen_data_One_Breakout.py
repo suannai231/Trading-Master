@@ -16,72 +16,34 @@ screened_data_path="//jack-nas/Work/Python/ScreenedData/"
 raw_data_path = '//jack-nas/Work/Python/RawData/'
 base_days = 13
 
+
 def screen(df,lines):
-    ticker = df.iloc[-1]['ticker']
     close = df.iloc[-1]['close']
-    change = df.iloc[-1]['change']
-    ema5 = df.iloc[-1]['EMA5']
-    ema10 = df.iloc[-1]['EMA10']
     ema20 = df.iloc[-1]['EMA20']
     ema60 = df.iloc[-1]['EMA60']
-    ema120 = df.iloc[-1]['EMA120']
-    ema250 = df.iloc[-1]['EMA250']
-    # ema999 = df.iloc[-1]['EMA999']
-    # OBV = df.iloc[-1]['OBV']
-    # OBV_Max = df.iloc[-1]['OBV_Max']
     turnover = df.iloc[-1]['volume']*close
-    # STD_Vol = df.iloc[-1]['STD_Vol']
-    # min_STD_Vol = min(df['STD_Vol'])
-    # STD_Close = df.iloc[-1]['STD_Close']
-    # min_STD_Close = min(df['STD_Close'])
-    Year_Low = df.iloc[-1]['Year_Low']
-    Year_High = df.iloc[-1]['Year_High']
-    EMA20_High = df.iloc[-1]['EMA20_High']
-    # ema5_max = df.iloc[-1]['EMA5_Max']
-    # ema10_max = df.iloc[-1]['EMA10_Max']
-    # ema20_max = df.iloc[-1]['EMA20_Max']
-    # ema60_max = df.iloc[-1]['EMA60_Max']
-    # ema120_max = df.iloc[-1]['EMA120_Max']
-    # ema250_max = df.iloc[-1]['EMA250_Max']
-    # close_max = df.iloc[-1]['Close_Max']
-
-    # ema5_min = df.iloc[-1]['EMA5_Min']
-    # ema10_min = df.iloc[-1]['EMA10_Min']
-    # ema20_min = df.iloc[-1]['EMA20_Min']
-    # ema60_min = df.iloc[-1]['EMA60_Min']
-    # ema250_min = df.iloc[-1]['EMA250_Min']
-    # close_min = df.iloc[-1]['Close_Min']
+    # EMA20_High = df.iloc[-1]['EMA20_High']
     Vol_High_Price = df.iloc[-1]['Vol_High_Price']
+    change = df.iloc[-1]['change']
+    Year_Low = df.iloc[-1]['Year_Low']
+
+    if(len(df)<30):
+        return False
+    Last_30days_df = df.iloc[len(df)-30:]
+    ema20_max = max(Last_30days_df.EMA20)
+    # df = cal_Vol_Low_High_Price(Last_30days_df)
+    # Vol_High_Price = df.iloc[-1]['Vol_High_Price']
+    ticker = df.iloc[-1]['ticker']
+    if ticker=="PETZ":
+        print("PETZ")
 
     if lines=="Strong":
-        # try:
-        #     quote_table = si.get_quote_table(ticker)
-        # except Exception as e:
-        #     if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-        #         logging.critical("get_stock_realtime "+ticker+" error: "+str(e)+". sys.exit...")
-        #         sys.exit(3)
-        # if isinstance(quote_table["52 Week Range"], str):
-        #     FityTwo_Week_Low = float(quote_table["52 Week Range"].split(" - ")[0])
-        # else:
-        #     logging.error(ticker + "52 week range is nan.")
-        #     return False
-        # if (Year_Low*2.5>=close>=Year_Low*1.2) & (close>=(Year_Low+Year_High)/2):
-        if(len(df)<60):
-            return False
-        last_60days_df = df.iloc[len(df)-60:]
-        long_trend_days = len(last_60days_df.loc[(last_60days_df.EMA20>=last_60days_df.EMA60) & (last_60days_df.EMA60>=last_60days_df.EMA120)])
-        if(close >= Vol_High_Price*0.8) & (ema20>=EMA20_High*0.8) & (long_trend_days==60):
+        if(close >= Vol_High_Price*0.8) & (ema20>=ema20_max):
             return True
         else:
             return False
-    # elif lines=="AMP":
-    #     AMP = df.iloc[-1]['AMP']
-    #     if (AMP >= 0.1) & (turnover >= 100000):
-    #         return True
-    #     else:
-    #         return False
     elif lines=="Close to EMA20":
-        if(ema60<=close<=ema20*1.1):
+        if(close<=ema20*1.1):
             return True
         else:
             return False
@@ -98,7 +60,17 @@ def screen(df,lines):
         else:
             return False
     elif lines=="turnover":
-        if(turnover >= 50000):
+        if(turnover >= 100000):
+            return True
+        else:
+            return False
+    elif lines=="change":
+        if(change >= 0):
+            return True
+        else:
+            return False
+    elif lines=="Year_Low":
+        if(close<=Year_Low*1.5):
             return True
         else:
             return False
@@ -146,9 +118,11 @@ def run(ticker_chunk_df):
         Turnover = screen(df,"turnover")
         # STD_Close = screen(df,"STD_Close")
         Strong = screen(df,"Strong")
-        # Close_to_EMA20 = screen(df,"Close to EMA20")
+        Close_to_EMA20 = screen(df,"Close to EMA20")
+        change = screen(df,"change")
+        Year_Low = screen(df,'Year_Low')
         # Price_Range = screen(df,"Up Trend")
-        if (Turnover & Strong):
+        if (Turnover & Strong & Close_to_EMA20 & change & Year_Low):
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 # break
 
@@ -217,8 +191,8 @@ if __name__ == '__main__':
     #         time.sleep(10)
     #         continue
     
-    # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
-    while(True):
+    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+    # while(True):
         now = datetime.datetime.now()
         # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
         # if(now>today3pm):
