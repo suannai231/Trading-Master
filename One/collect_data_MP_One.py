@@ -82,7 +82,7 @@ def get_stock_realtime(ticker):
         # low = close
         # high = close
         # volume = df.iloc[-1].volume
-        return pd.DataFrame()
+        # return pd.DataFrame()
     df.index.name = 'date'
     return df
 
