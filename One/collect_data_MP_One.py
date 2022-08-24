@@ -74,7 +74,7 @@ def get_stock_realtime(ticker):
             d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
             df=pd.DataFrame(d,index=[str(end)])
     except Exception as e:
-        # if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+        if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
         #     logging.critical("get_stock_realtime "+ticker+" error: "+str(e)+". sys.exit...")
             return -1
         # logging.critical(ticker+" "+str(e))
