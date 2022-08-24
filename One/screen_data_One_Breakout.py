@@ -79,7 +79,7 @@ def screen(df,lines):
         else:
             return False
     elif lines=="AMP":
-        if(AMP<0.1):
+        if(AMP<=0.05):
             return True
         else:
             return False
