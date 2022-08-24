@@ -231,10 +231,11 @@ def chunks(lst, n):
 
 if __name__ == '__main__':
 
-    raw_data_path='//jack-nas.home/Work/Python/RawData/'
-    processed_data_path='//jack-nas.home/Work/Python/ProcessedData/'
-
-    logpath = '//jack-nas.home/Work/Python/'
+    # raw_data_path='//jack-nas.home/Work/Python/RawData/'
+    # processed_data_path='//jack-nas.home/Work/Python/ProcessedData/'
+    raw_data_path='C:/Python/RawData/'
+    processed_data_path='C:/Python/ProcessedData/'
+    logpath = 'C:/Python/'
     logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_process.log"
     logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
