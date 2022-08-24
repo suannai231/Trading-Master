@@ -256,7 +256,7 @@ if __name__ == '__main__':
     #     stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
     #     logging.info("stop time:" + stop_time)
 
-    thread_number = 30
+    thread_number = 20
     stock_history_concat_df = pd.DataFrame()
     while(stock_history_concat_df.empty):
         now = datetime.datetime.now()
@@ -298,7 +298,7 @@ if __name__ == '__main__':
     #     logging.info("time passed 3:05pm.")
     #     break
 
-    thread_number = 30
+    thread_number = 20
     stock_realtime_concat_df = pd.DataFrame()
     while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):         #get real time stock price
         now = datetime.datetime.now()
