@@ -184,6 +184,10 @@ else:
 # logpath = '//jack-nas.home/Work/Python/'
 path = 'C:/Python/RawData/'
 logpath = 'C:/Python/'
+isPathExists = os.path.exists(path)
+if not isPathExists:
+    os.makedirs(path)
+
 logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_collect.log"
 logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 # logging.debug('This message should go to the log file')
@@ -195,10 +199,6 @@ if __name__ == '__main__':
     now = datetime.datetime.now()
     start_time = now.strftime("%m%d%Y-%H%M%S")
     logging.info("collect process start time:" + start_time)
-
-    isPathExists = os.path.exists(path)
-    if not isPathExists:
-        os.makedirs(path)
 
     # files = os.listdir(path)
     # stock_file = start_time + '.feather'

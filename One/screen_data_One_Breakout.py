@@ -12,10 +12,10 @@ import math
 from yahoo_fin import stock_info as si
 
 # processed_data_path="//jack-nas.home/Work/Python/ProcessedData/"
-# screened_data_path="//jack-nas.home/Work/Python/ScreenedData/"
+screened_data_path="//jack-nas.home/Work/Python/ScreenedData/"
 # raw_data_path = '//jack-nas.home/Work/Python/RawData/'
 processed_data_path="C:/Python/ProcessedData/"
-screened_data_path="C:/Python/ScreenedData/"
+# screened_data_path="C:/Python/ScreenedData/"
 raw_data_path = 'C:/Python/RawData/'
 base_days = 13
 
