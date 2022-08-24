@@ -191,8 +191,8 @@ if __name__ == '__main__':
     #         time.sleep(10)
     #         continue
     
-    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
-    # while(True):
+    # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+    while(True):
         now = datetime.datetime.now()
         # today3pm = now.replace(hour=15,minute=5,second=0,microsecond=0)
         # if(now>today3pm):

@@ -16,7 +16,7 @@ import time
 import math
 import locale
 
-days=999
+days=365
 
 multipliers = {'K':1000, 'M':1000000, 'B':1000000000, 'T':1000000000000}
 
@@ -56,8 +56,8 @@ def get_stock_history(ticker):
         df = si.get_data(ticker,start,end,index_as_date=True)
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-            logging.critical("get_stock_history "+ticker+" error: "+str(e)+". sys.exit...")
-            sys.exit(3)
+            # logging.critical("get_stock_history "+ticker+" error: "+str(e)+". sys.exit...")
+            return -1
     df.index.name = 'date'
     return df
 
@@ -76,7 +76,7 @@ def get_stock_realtime(ticker):
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             logging.critical("get_stock_realtime "+ticker+" error: "+str(e)+". sys.exit...")
-            sys.exit(3)
+            return -1
         # logging.critical(ticker+" "+str(e))
         # open = close
         # low = close
@@ -99,28 +99,28 @@ def get_stock_realtime(ticker):
 #                 ticker_chunk_df = pd.concat([ticker_chunk_df,df])
 #     return ticker_chunk_df
 
-def get_stock_history_mt(ticker_chunk):
-
-    thread_number = 20
+def get_stock_history_mt(ticker_chunk,thread_number):
 
     with ThreadPoolExecutor(thread_number) as tp:
         jobs = [tp.submit(get_stock_history,ticker)  for ticker in ticker_chunk]
         ticker_chunk_df = pd.DataFrame()
         for job in cf.as_completed(jobs):
             df = job.result()
+            if isinstance(df,int):
+                return -1
             if not df.empty:
                 ticker_chunk_df = pd.concat([ticker_chunk_df,df])
     return ticker_chunk_df
 
-def get_stock_realtime_mt(ticker_chunk):
-
-    thread_number = 20
+def get_stock_realtime_mt(ticker_chunk,thread_number):
 
     with ThreadPoolExecutor(thread_number) as tp:
         jobs = [tp.submit(get_stock_realtime,ticker)  for ticker in ticker_chunk]
         ticker_chunk_df = pd.DataFrame()
         for job in cf.as_completed(jobs):
             df = job.result()
+            if isinstance(df,int):
+                return -1
             if not df.empty:
                 ticker_chunk_df = pd.concat([ticker_chunk_df,df])
     return ticker_chunk_df
@@ -170,7 +170,13 @@ def chunks(lst, n):
 
 date_time = datetime.datetime.now()
 start = date_time - datetime.timedelta(days)
-end = datetime.date.today()
+today830am = date_time.replace(hour=8,minute=30,second=0,microsecond=0)
+today3pm = date_time.replace(hour=15,minute=0,second=0,microsecond=0)
+
+if((date_time.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+    end = datetime.date.today()
+else:
+    end = datetime.date.today()+ datetime.timedelta(1)
 
 path = '//jack-nas/Work/Python/RawData/'
 
@@ -198,9 +204,18 @@ if __name__ == '__main__':
     #     print("error: " + stock_file + " existed.")
     #     sys.exit(1)
     
-    nasdaq = si.tickers_nasdaq()
-    other = si.tickers_other()
-    tickers = nasdaq + other
+    nasdaq = []
+    other = []
+    tickers = []
+
+    while((len(nasdaq)==0) or (len(other)==0)):
+        try:
+            nasdaq = si.tickers_nasdaq()
+            other = si.tickers_other()
+        except Exception as e:
+            logging.critical(str(e))
+            continue
+        tickers = nasdaq + other
 
     cores = multiprocessing.cpu_count()
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
@@ -241,6 +256,7 @@ if __name__ == '__main__':
     #     stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
     #     logging.info("stop time:" + stop_time)
 
+    thread_number = 20
     stock_history_concat_df = pd.DataFrame()
     while(stock_history_concat_df.empty):
         now = datetime.datetime.now()
@@ -250,7 +266,7 @@ if __name__ == '__main__':
         stock_async_results = []
 
         for ticker_chunk in ticker_chunk_list:
-            stock_async_result = pool.apply_async(get_stock_history_mt,args=(ticker_chunk,))
+            stock_async_result = pool.apply_async(get_stock_history_mt,args=(ticker_chunk,thread_number))
             stock_async_results.append(stock_async_result)
 
         pool.close()
@@ -263,6 +279,14 @@ if __name__ == '__main__':
                 pool.terminate()
                 pool.join()
                 break
+            if isinstance(stock_chunk_df,int):
+                if(thread_number!=1):
+                    thread_number -= 1
+                else:
+                    thread_number = 20
+                logging.critical("thread_number:"+str(thread_number))
+                stock_history_concat_df = pd.DataFrame()
+                break
             if not stock_chunk_df.empty:
                 stock_history_concat_df = pd.concat([stock_history_concat_df,stock_chunk_df])
         stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
@@ -274,6 +298,7 @@ if __name__ == '__main__':
     #     logging.info("time passed 3:05pm.")
     #     break
 
+    thread_number = 20
     stock_realtime_concat_df = pd.DataFrame()
     while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):         #get real time stock price
         now = datetime.datetime.now()
@@ -295,6 +320,13 @@ if __name__ == '__main__':
                 logging.error(str(e) + " timeout 360 seconds, terminating process pool...")
                 pool.terminate()
                 pool.join()
+                break
+            if isinstance(stock_chunk_df,int):
+                if(thread_number!=1):
+                    thread_number -= 1
+                else:
+                    thread_number = 20
+                logging.critical("thread_number:"+str(thread_number))
                 break
             if not stock_chunk_df.empty:
                 df = pd.concat([df,stock_chunk_df])
