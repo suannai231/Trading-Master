@@ -74,6 +74,7 @@ def get_stock_realtime(ticker):
             volume = int(quote_table['Volume'])
             d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
             df=pd.DataFrame(d,index=[str(end)])
+        df.index.name = 'date'
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
         #     logging.critical("get_stock_realtime "+ticker+" error: "+str(e)+". sys.exit...")
@@ -84,7 +85,6 @@ def get_stock_realtime(ticker):
         # high = close
         # volume = df.iloc[-1].volume
         # return pd.DataFrame()
-    df.index.name = 'date'
     return df
 
 # def get_FityTwo_Week_Low_mt(ticker_chunk):
