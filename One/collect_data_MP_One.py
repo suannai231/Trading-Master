@@ -62,6 +62,7 @@ def get_stock_history(ticker):
     return df
 
 def get_stock_realtime(ticker):
+    df = pd.DataFrame()
     try:
         df = si.get_data(ticker,end,end + datetime.timedelta(1),index_as_date=True)
         if(df.empty):
