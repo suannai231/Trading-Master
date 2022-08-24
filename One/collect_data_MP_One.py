@@ -178,9 +178,9 @@ if((date_time.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3
 else:
     end = datetime.date.today()+ datetime.timedelta(1)
 
-path = '//jack-nas/Work/Python/RawData/'
+path = '//jack-nas.home/Work/Python/RawData/'
 
-logpath = '//jack-nas/Work/Python/'
+logpath = '//jack-nas.home/Work/Python/'
 logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_collect.log"
 logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 # logging.debug('This message should go to the log file')

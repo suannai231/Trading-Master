@@ -11,9 +11,9 @@ import logging
 import math
 from yahoo_fin import stock_info as si
 
-processed_data_path="//jack-nas/Work/Python/ProcessedData/"
-screened_data_path="//jack-nas/Work/Python/ScreenedData/"
-raw_data_path = '//jack-nas/Work/Python/RawData/'
+processed_data_path="//jack-nas.home/Work/Python/ProcessedData/"
+screened_data_path="//jack-nas.home/Work/Python/ScreenedData/"
+raw_data_path = '//jack-nas.home/Work/Python/RawData/'
 base_days = 13
 
 
@@ -156,7 +156,7 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 if __name__ == '__main__':
-    logpath = '//jack-nas/Work/Python/'
+    logpath = '//jack-nas.home/Work/Python/'
     logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_screen.log"
     logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
