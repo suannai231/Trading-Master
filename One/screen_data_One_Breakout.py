@@ -51,20 +51,17 @@ def screen(df,lines):
             return True
         else:
             return False
-    elif lines=="Up Trend":
-        if(len(df)<120):
+    elif lines=="Up_Trend":
+        if(len(df)<60):
             return False
-        close5_low = min(df.iloc[len(df)-5:]['close'])
-        close10_low = min(df.iloc[len(df)-10:len(df)-5]['close'])
-        close20_low = min(df.iloc[len(df)-20:len(df)-10]['close'])
-        close60_low = min(df.iloc[len(df)-60:len(df)-20]['close'])
-        close120_low = min(df.iloc[len(df)-120:len(df)-60]['close'])
-        if(close5_low>close10_low>close20_low>close60_low>close120_low):
+        last_60days_df = df.iloc[len(df)-60:]
+        length = len(last_60days_df.loc[(last_60days_df.EMA20>=last_60days_df.EMA60) & (last_60days_df.EMA60>=last_60days_df.EMA120)])
+        if(length==60):
             return True
         else:
             return False
     elif lines=="turnover":
-        if(turnover >= 1000000):
+        if(turnover >= 100000):
             return True
         else:
             return False
@@ -129,10 +126,10 @@ def run(ticker_chunk_df):
         Strong = screen(df,"Strong")
         Close_to_EMA20 = screen(df,"Close to EMA20")
         change = screen(df,"change")
-        Year_Low = screen(df,'Year_Low')
+        # Year_Low = screen(df,'Year_Low')
         AMP = screen(df,'AMP')
-        # Price_Range = screen(df,"Up Trend")
-        if (Turnover & Strong & Close_to_EMA20 & change & Year_Low & AMP):
+        Up_Trend = screen(df,"Up_Trend")
+        if (Turnover & Strong & Close_to_EMA20 & change & AMP & Up_Trend):
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 # break
 
