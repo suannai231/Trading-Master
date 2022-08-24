@@ -286,6 +286,8 @@ if __name__ == '__main__':
                 else:
                     thread_number = 20
                 logging.critical("thread_number:"+str(thread_number))
+                pool.terminate()
+                pool.join()
                 stock_history_concat_df = pd.DataFrame()
                 break
             if not stock_chunk_df.empty:
@@ -327,6 +329,8 @@ if __name__ == '__main__':
                     thread_number -= 1
                 else:
                     thread_number = 20
+                pool.terminate()
+                pool.join()
                 logging.critical("thread_number:"+str(thread_number))
                 break
             if not stock_chunk_df.empty:
