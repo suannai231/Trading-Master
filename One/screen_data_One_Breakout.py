@@ -31,7 +31,7 @@ def screen(df,lines):
     Year_Low = df.iloc[-1]['Year_Low']
     AMP = df.iloc[-1]['AMP']
 
-    if(len(df)<30):
+    if(len(df)<10):
         return False
     Last_10days_df = df.iloc[len(df)-10:]
     ema20_10days_max = max(Last_10days_df.EMA20)
@@ -76,7 +76,7 @@ def screen(df,lines):
         else:
             return False
     elif lines=="AMP":
-        if(AMP<=0.05):
+        if(AMP<=0.08):
             return True
         else:
             return False
@@ -140,7 +140,7 @@ def run(ticker_chunk_df):
         Up_Trend = screen(df,"Up_Trend")
         OBV = screen(df,"OBV")
         # if (Turnover & Strong & Close_to_EMA20 & change & AMP & Up_Trend):
-        if(OBV):
+        if(OBV & Turnover & Strong & Close_to_EMA20 & change & AMP):
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 # break
 
