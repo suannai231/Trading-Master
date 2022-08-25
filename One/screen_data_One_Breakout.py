@@ -80,6 +80,15 @@ def screen(df,lines):
             return True
         else:
             return False
+    elif lines=="OBV":
+        obv_ema10 = df.iloc[-1]['obv_ema10']
+        obv_ema20 = df.iloc[-1]['obv_ema20']
+        obv_ema30 = df.iloc[-1]['obv_ema30']
+        OBV = df.iloc[-1]['OBV']
+        if(OBV>=obv_ema10>=obv_ema20>=obv_ema30):
+            return True
+        else:
+            return False
 
     # elif lines=="STD_Vol":
     #     if (min_STD_Vol*1.4 >= STD_Vol > min_STD_Vol):
@@ -129,7 +138,9 @@ def run(ticker_chunk_df):
         # Year_Low = screen(df,'Year_Low')
         AMP = screen(df,'AMP')
         Up_Trend = screen(df,"Up_Trend")
-        if (Turnover & Strong & Close_to_EMA20 & change & AMP & Up_Trend):
+        OBV = screen(df,"OBV")
+        # if (Turnover & Strong & Close_to_EMA20 & change & AMP & Up_Trend):
+        if(OBV):
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 # break
 

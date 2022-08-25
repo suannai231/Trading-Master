@@ -185,6 +185,12 @@ def cal_basics(df):
     ema250 = df['close'].ewm(span = 250, adjust = False).mean()
     ema250 = df['close'].ewm(span = 250, adjust = False).mean()
     ema999 = df['close'].ewm(span = 999, adjust = False).mean()
+    obv_ema10 = df['OBV'].ewm(span = 10, adjust = False).mean()
+    obv_ema20 = df['OBV'].ewm(span = 20, adjust = False).mean()
+    obv_ema30 = df['OBV'].ewm(span = 30, adjust = False).mean()
+    df['obv_ema10'] = obv_ema10
+    df['obv_ema20'] = obv_ema20
+    df['obv_ema30'] = obv_ema30
     df['EMA5'] = ema5
     df['EMA10'] = ema10
     df['EMA20'] = ema20
@@ -209,11 +215,11 @@ def run(ticker_chunk_df):
         #     print(ticker+" length is less than " + str(base_days*2) +" business days.")
         #     continue
 
+        df = cal_OBV(df)
         df = cal_basics(df)
         if(len(df)>250):
             df = df.iloc[len(df)-250:]
             df.reset_index(drop=True,inplace=True)
-        df = cal_OBV(df)
         df = cal_Year_Low_High(df)
         df = cal_Vol_Low_High_Price(df)
         # df = cal_Stat(df)
