@@ -71,7 +71,7 @@ def screen(df,lines):
         else:
             return False
     elif lines=="Year_Low":
-        if(close<=Year_Low*1.5):
+        if(close<=Year_Low*1.7):
             return True
         else:
             return False
@@ -135,12 +135,12 @@ def run(ticker_chunk_df):
         Strong = screen(df,"Strong")
         Close_to_EMA20 = screen(df,"Close to EMA20")
         change = screen(df,"change")
-        # Year_Low = screen(df,'Year_Low')
+        Year_Low = screen(df,'Year_Low')
         AMP = screen(df,'AMP')
         Up_Trend = screen(df,"Up_Trend")
         OBV = screen(df,"OBV")
         # if (Turnover & Strong & Close_to_EMA20 & change & AMP & Up_Trend):
-        if(OBV & Turnover & Strong & Close_to_EMA20 & change & AMP):
+        if(OBV & Turnover & Strong & Close_to_EMA20 & change & AMP & Year_Low):
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 # break
 
