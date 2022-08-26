@@ -264,7 +264,7 @@ if __name__ == '__main__':
         # qfq = qfq[qfq['date'] > '2017-01-01']
 
         tickers = df.ticker.unique()
-        cores = multiprocessing.cpu_count()
+        cores = multiprocessing.cpu_count()/2
         ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
         pool=Pool(cores)
         # async_results_60_120 = []
