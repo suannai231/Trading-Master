@@ -220,7 +220,7 @@ if __name__ == '__main__':
             continue
         tickers = nasdaq + other
 
-    cores = multiprocessing.cpu_count()
+    cores = int(multiprocessing.cpu_count()/2)
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
     proc_num = len(ticker_chunk_list)
 
