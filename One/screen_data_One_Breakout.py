@@ -81,7 +81,10 @@ def screen(df,lines):
         else:
             return False
     elif lines=="OBV":
-        obv_max = max(df.OBV)
+        if(len(df)<60):
+            return False
+        last_60days_df = df.iloc[len(df)-60:]
+        obv_max = max(last_60days_df.OBV)
         obv_ema10 = df.iloc[-1]['obv_ema10']
         obv_ema20 = df.iloc[-1]['obv_ema20']
         obv_ema30 = df.iloc[-1]['obv_ema30']
