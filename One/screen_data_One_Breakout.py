@@ -81,11 +81,12 @@ def screen(df,lines):
         else:
             return False
     elif lines=="OBV":
+        obv_max = max(df.OBV)
         obv_ema10 = df.iloc[-1]['obv_ema10']
         obv_ema20 = df.iloc[-1]['obv_ema20']
         obv_ema30 = df.iloc[-1]['obv_ema30']
         OBV = df.iloc[-1]['OBV']
-        if(OBV>=obv_ema10>=obv_ema20>=obv_ema30):
+        if((OBV>=obv_ema10>=obv_ema20>=obv_ema30) & (OBV>=obv_max*0.9)):
             return True
         else:
             return False
