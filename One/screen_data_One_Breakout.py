@@ -42,7 +42,7 @@ def screen(df,lines):
     #     print("PETZ")
 
     if lines=="Strong":
-        if(close >= Vol_High_Price*0.7) & (ema20==ema20_10days_max):
+        if(Vol_High_Price*1.2 >= close >= Vol_High_Price*0.7) & (ema20==ema20_10days_max):
             return True
         else:
             return False
