@@ -38,8 +38,8 @@ def screen(df,lines):
     # df = cal_Vol_Low_High_Price(Last_30days_df)
     # Vol_High_Price = df.iloc[-1]['Vol_High_Price']
     # ticker = df.iloc[-1]['ticker']
-    # if ticker=="PETZ":
-    #     print("PETZ")
+    # if ticker=="SCX":
+    #     print("SCX")
 
     if lines=="Strong":
         if(Vol_High_Price*1.1 >= close >= Vol_High_Price*0.90) & (ema20==ema20_10days_max):
@@ -141,7 +141,7 @@ def run(ticker_chunk_df):
         change = screen(df,"change")
         Year_Low = screen(df,'Year_Low')
         AMP = screen(df,'AMP')
-        Up_Trend = screen(df,"Up_Trend")
+        # Up_Trend = screen(df,"Up_Trend")
         OBV = screen(df,"OBV")
         # if (Turnover & Strong & Close_to_EMA20 & change & AMP & Up_Trend):
         if(OBV & Turnover & Strong & Close_to_EMA20 & change & AMP & Year_Low):
