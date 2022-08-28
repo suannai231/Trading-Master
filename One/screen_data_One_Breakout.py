@@ -26,7 +26,7 @@ def high_vol_in_last_20_days(df,sharesOutstanding):
     vol_max = max(Last_20days_df.volume)
     turnover_rate = vol_max/sharesOutstanding
     if turnover_rate>0.5:
-        low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low']
+        low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
         close = Last_20days_df.iloc[-1]['close']
         if(close>=low):
             return True
@@ -170,7 +170,7 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
         # Turnover = screen(df,"turnover")
         # STD_Close = screen(df,"STD_Close")
         # Strong = screen(df,"Strong")
-        # Close_to_EMA20 = screen(df,"Close to EMA20")
+        Close_to_EMA20 = screen(df,"Close to EMA20")
         # change = screen(df,"change")
         # Year_Low = screen(df,'Year_Low')
         # AMP = screen(df,'AMP')
@@ -178,7 +178,7 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
         # OBV = screen(df,"OBV")
         # if (Turnover & Strong & Close_to_EMA20 & change & AMP & Up_Trend):
         # if(OBV & Turnover & Strong & Close_to_EMA20 & change & AMP & Year_Low):
-        if(high_vol_in_last_20_days(df,sharesOutstanding)):
+        if(high_vol_in_last_20_days(df,sharesOutstanding) & Close_to_EMA20):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 # break
