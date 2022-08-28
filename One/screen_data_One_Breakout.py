@@ -19,6 +19,15 @@ processed_data_path="C:/Python/ProcessedData/"
 raw_data_path = 'C:/Python/RawData/'
 base_days = 13
 
+def high_vol_in_last_20_days(df,sharesOutstanding):
+    if(len(df)<20):
+        return False
+    Last_20days_df = df.iloc[len(df)-20:]
+    for vol in Last_20days_df.volume:
+        turnover_rate = vol/sharesOutstanding
+        if turnover_rate>0.5:
+            return True
+    return False
 
 def screen(df,lines):
     close = df.iloc[-1]['close']
@@ -106,7 +115,7 @@ def screen(df,lines):
     #         return False
     return False
 
-def run(ticker_chunk_df):
+def run(ticker_chunk_df,sharesOutstanding_chunk_df):
     if ticker_chunk_df.empty:
         return pd.DataFrame()
     tickers = ticker_chunk_df.ticker.unique()
@@ -116,6 +125,13 @@ def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
+        if ticker not in sharesOutstanding_chunk_df.ticker.values:
+            continue
+        sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
+        sharesOutstanding = sharesOutstanding_df.iloc[-1]['sharesOutstanding']
+        if(ticker=="DRUG"):
+            logging.info("DRUG")
+
         # FityTwo_Week_Low_ticker_df = FityTwo_Week_Low_chunk_df.loc[FityTwo_Week_Low_chunk_df.ticker==ticker]
         # if FityTwo_Week_Low_ticker_df.empty:
         #     continue
@@ -125,7 +141,7 @@ def run(ticker_chunk_df):
         # Breakout = 0
         # Wait_Cum = 0
         # df = ticker_df.iloc[len(ticker_df)-base_days:]
-        today_df = df.iloc[[-1]]
+        
         # for date in df.index:
         #     date_ticker_df = df[df.index==date]
         #     if date_ticker_df.empty:
@@ -134,17 +150,19 @@ def run(ticker_chunk_df):
         #     AMP_result = screen(date_ticker_df,"AMP")
             
         #     if AMP_result:
-        Turnover = screen(df,"turnover")
+        # Turnover = screen(df,"turnover")
         # STD_Close = screen(df,"STD_Close")
-        Strong = screen(df,"Strong")
-        Close_to_EMA20 = screen(df,"Close to EMA20")
-        change = screen(df,"change")
-        Year_Low = screen(df,'Year_Low')
-        AMP = screen(df,'AMP')
+        # Strong = screen(df,"Strong")
+        # Close_to_EMA20 = screen(df,"Close to EMA20")
+        # change = screen(df,"change")
+        # Year_Low = screen(df,'Year_Low')
+        # AMP = screen(df,'AMP')
         # Up_Trend = screen(df,"Up_Trend")
-        OBV = screen(df,"OBV")
+        # OBV = screen(df,"OBV")
         # if (Turnover & Strong & Close_to_EMA20 & change & AMP & Up_Trend):
-        if(OBV & Turnover & Strong & Close_to_EMA20 & change & AMP & Year_Low):
+        # if(OBV & Turnover & Strong & Close_to_EMA20 & change & AMP & Year_Low):
+        if(high_vol_in_last_20_days(df,sharesOutstanding)):
+            today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 # break
 
@@ -182,11 +200,14 @@ if __name__ == '__main__':
     logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_screen.log"
     logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
+    now = datetime.datetime.now()
+    start_time = now.strftime("%m%d%Y-%H%M%S")
+    logging.info("screen_data process start time:" + start_time)
+
     isPathExists = os.path.exists(screened_data_path)
     if not isPathExists:
         os.makedirs(screened_data_path)
 
-    now = datetime.datetime.now()
     today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
@@ -212,7 +233,23 @@ if __name__ == '__main__':
     #         logging.warning("processed data not ready, sleep 10 seconds...")
     #         time.sleep(10)
     #         continue
-    
+    sharesOutstanding_df = pd.DataFrame()
+    while(sharesOutstanding_df.empty):
+        path = 'C:/Python/RawData/'
+        today_date = datetime.datetime.now().strftime("%m%d%Y")
+        file_name = today_date + "_sharesOutstanding.feather"
+        full_path_name = path + today_date + "_sharesOutstanding.feather"
+        files = os.listdir(path)
+        if file_name not in files:
+            logging.warning("sharesOutstanding_file is not ready, sleep 10 seconds...")
+            time.sleep(10)
+            continue
+        try:
+            sharesOutstanding_df = pd.read_feather(full_path_name)
+            logging.info('sharesOutstanding_df is ready')
+        except Exception as e:
+            logging.critical('sharesOutstanding_df read_feather:'+str(e))
+            continue
     # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
     while(True):
         now = datetime.datetime.now()
@@ -244,7 +281,7 @@ if __name__ == '__main__':
             time.sleep(1)
             df = pd.read_feather(processed_data_path + processed_data_files[-1])
         except Exception as e:
-            logging.critical(e)
+            logging.critical(str(e))
             continue
         # df = df.loc[df.date>"2022-01-01"]
         # today = datetime.date.today()
@@ -273,8 +310,9 @@ if __name__ == '__main__':
         async_results_AMP = []
         for ticker_chunk in ticker_chunk_list:
             ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
+            sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
             # FityTwo_Week_Low_chunk_df = FityTwo_Week_Low_df[FityTwo_Week_Low_df['ticker'].isin(ticker_chunk)]
-            async_result_AMP = pool.apply_async(run, args=(ticker_chunk_df,))
+            async_result_AMP = pool.apply_async(run, args=(ticker_chunk_df,sharesOutstanding_chunk_df))
             async_results_AMP.append(async_result_AMP)
         pool.close()
         del(df)
