@@ -228,7 +228,7 @@ logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 # logging.warning('And this, too')
 # logging.error('And non-ASCII stuff, too, like Øresund and Malmö')
 
-def collect_data(func):
+def collect_data(func,proc_num):
     thread_number = 20
     stock_history_concat_df = pd.DataFrame()
     while(stock_history_concat_df.empty):
@@ -332,7 +332,7 @@ if __name__ == '__main__':
     #     stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
     #     logging.info("stop time:" + stop_time)
 
-    sharesOutstanding_df=collect_data(get_quote_data)
+    sharesOutstanding_df=collect_data(get_quote_data,proc_num)
     logging.info("sharesOutstanding_df is ready.")
     if not sharesOutstanding_df.empty: 
         sharesOutstanding_df.reset_index(inplace=True)
@@ -344,7 +344,7 @@ if __name__ == '__main__':
         except Exception as e:
             logging.critical("to_feather:"+str(e))
 
-    stock_history_concat_df=collect_data(get_stock_history)
+    stock_history_concat_df=collect_data(get_stock_history,proc_num)
     logging.info("stock_history_concat_df is ready.")
 
     today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
@@ -399,7 +399,7 @@ if __name__ == '__main__':
         #     if not stock_chunk_df.empty:
         #         df = pd.concat([df,stock_chunk_df])
 
-        realtime_df=collect_data(get_stock_realtime)
+        realtime_df=collect_data(get_stock_realtime,proc_num)
         logging.info('realtime_df is ready')
         if not realtime_df.empty: 
             stock_concat_df = pd.concat([stock_history_concat_df,realtime_df])
