@@ -24,12 +24,15 @@ def high_vol_in_last_20_days(df,sharesOutstanding):
         return False
     Last_20days_df = df.iloc[len(df)-20:]
     vol_max = max(Last_20days_df.volume)
-    turnover_rate = vol_max/sharesOutstanding
-    if turnover_rate>0.5:
+    vol_max_turnover_rate = vol_max/sharesOutstanding
+    if vol_max_turnover_rate>0.5:
         low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
         close = Last_20days_df.iloc[-1]['close']
         if(close>=low):
-            return True
+            vol = df.iloc[-1]['volume']
+            turnover_rate = vol/sharesOutstanding
+            if turnover_rate<0.1:
+                return True
     # start = 0
     # stop = len(df)
     # for current in Last_20days_df.index:
