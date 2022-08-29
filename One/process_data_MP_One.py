@@ -127,12 +127,13 @@ def cal_OBV(df):
     # OBV_MAX.append(0)
 
     for i in range(startindex+1, endindex):
-        high = df.high[i-1]
-        low = df.low[i-1]
-        mid = (high+low)/2
-        if df.close[i] > mid:
+        # high = df.high[i-1]
+        # low = df.low[i-1]
+        # mid = (high+low)/2
+        previous_close = df.close[i-1]
+        if df.close[i] > previous_close:
             OBV.append(OBV[-1] + df.volume[i])
-        elif df.close[i] < mid:
+        elif df.close[i] < previous_close:
             OBV.append( OBV[-1] - df.volume[i])
         else:
             OBV.append(OBV[-1])

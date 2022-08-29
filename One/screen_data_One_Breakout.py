@@ -25,7 +25,7 @@ def high_vol_in_last_20_days(df,sharesOutstanding):
     Last_20days_df = df.iloc[len(df)-20:]
     vol_max = max(Last_20days_df.volume)
     vol_max_turnover_rate = vol_max/sharesOutstanding
-    if vol_max_turnover_rate>0.5:
+    if vol_max_turnover_rate>0.2:
         low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
         close = Last_20days_df.iloc[-1]['close']
         if(close>=low):
@@ -114,11 +114,12 @@ def screen(df,lines):
             return False
         last_60days_df = df.iloc[len(df)-60:]
         obv_max = max(last_60days_df.OBV)
-        obv_ema10 = df.iloc[-1]['obv_ema10']
-        obv_ema20 = df.iloc[-1]['obv_ema20']
-        obv_ema30 = df.iloc[-1]['obv_ema30']
+        # obv_ema10 = df.iloc[-1]['obv_ema10']
+        # obv_ema20 = df.iloc[-1]['obv_ema20']
+        # obv_ema30 = df.iloc[-1]['obv_ema30']
         OBV = df.iloc[-1]['OBV']
-        if((OBV>=obv_ema10>=obv_ema20>=obv_ema30) & (OBV>=obv_max*0.9)):
+        # if((OBV>=obv_ema10>=obv_ema20>=obv_ema30) & (OBV>=obv_max*0.9)):
+        if OBV == obv_max:
             return True
         else:
             return False
@@ -178,10 +179,10 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
         # Year_Low = screen(df,'Year_Low')
         # AMP = screen(df,'AMP')
         # Up_Trend = screen(df,"Up_Trend")
-        # OBV = screen(df,"OBV")
+        OBV = screen(df,"OBV")
         # if (Turnover & Strong & Close_to_EMA20 & change & AMP & Up_Trend):
         # if(OBV & Turnover & Strong & Close_to_EMA20 & change & AMP & Year_Low):
-        if(high_vol_in_last_20_days(df,sharesOutstanding) & Close_to_EMA20):
+        if(high_vol_in_last_20_days(df,sharesOutstanding) & Close_to_EMA20 & OBV):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 # break
