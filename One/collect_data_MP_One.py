@@ -246,9 +246,9 @@ def collect_data(func,proc_num):
         
         for stock_async_result in stock_async_results:
             try:
-                stock_chunk_df = stock_async_result.get(timeout=360)
+                stock_chunk_df = stock_async_result.get(timeout=180)
             except TimeoutError as e:
-                logging.error(str(e) + " timeout 6 minutes, terminating process pool...")
+                logging.error(str(e) + " timeout 3 minutes, terminating process pool...")
                 pool.terminate()
                 pool.join()
                 break
