@@ -183,9 +183,9 @@ def cal_basics(df):
     ema20 = df['close'].ewm(span = 20, adjust = False).mean()
     ema60 = df['close'].ewm(span = 60, adjust = False).mean()
     ema120 = df['close'].ewm(span = 120, adjust = False).mean()
-    ema250 = df['close'].ewm(span = 250, adjust = False).mean()
-    ema250 = df['close'].ewm(span = 250, adjust = False).mean()
-    ema999 = df['close'].ewm(span = 999, adjust = False).mean()
+    # ema250 = df['close'].ewm(span = 250, adjust = False).mean()
+    # ema250 = df['close'].ewm(span = 250, adjust = False).mean()
+    # ema999 = df['close'].ewm(span = 999, adjust = False).mean()
     obv_ema10 = df['OBV'].ewm(span = 10, adjust = False).mean()
     obv_ema20 = df['OBV'].ewm(span = 20, adjust = False).mean()
     obv_ema30 = df['OBV'].ewm(span = 30, adjust = False).mean()
@@ -197,8 +197,8 @@ def cal_basics(df):
     df['EMA20'] = ema20
     df['EMA60'] = ema60
     df['EMA120'] = ema120
-    df['EMA250'] = ema250
-    df['EMA999'] = ema999
+    # df['EMA250'] = ema250
+    # df['EMA999'] = ema999
     df['AMP'] = (df['high']-df['low'])/df['low']
 
     return df
@@ -215,12 +215,13 @@ def run(ticker_chunk_df):
         # elif(len(df)<=base_days*2):
         #     print(ticker+" length is less than " + str(base_days*2) +" business days.")
         #     continue
-
-        df = cal_OBV(df)
-        df = cal_basics(df)
         if(len(df)>250):
             df = df.iloc[len(df)-250:]
             df.reset_index(drop=True,inplace=True)
+            
+        df = cal_OBV(df)
+        df = cal_basics(df)
+
         df = cal_Year_Low_High(df)
         df = cal_Vol_Low_High_Price(df)
         # df = cal_Stat(df)
@@ -288,7 +289,7 @@ if __name__ == '__main__':
 
         tickers = df.ticker.unique()
 
-        cores = int(multiprocessing.cpu_count()/2)
+        cores = int(multiprocessing.cpu_count())
         ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
         pool = Pool(cores)
         async_results = []
