@@ -338,7 +338,8 @@ if __name__ == '__main__':
         sharesOutstanding_df.reset_index(inplace=True)
         stop_time = datetime.datetime.now().strftime("%m%d%Y")
         try:
-            sharesOutstanding_df.to_feather(path + stop_time + "_sharesOutstanding.feather")
+            sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
+            sharesOutstanding_df.to_feather(sharesOutstanding_path + stop_time + "_sharesOutstanding.feather")
             logging.info("sharesOutstanding_df to_feather saved.")
         except Exception as e:
             logging.critical("to_feather:"+str(e))
