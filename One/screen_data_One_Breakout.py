@@ -256,11 +256,11 @@ if __name__ == '__main__':
     #         continue
     sharesOutstanding_df = pd.DataFrame()
     while(sharesOutstanding_df.empty):
-        path = 'C:/Python/RawData/'
+        sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
         today_date = datetime.datetime.now().strftime("%m%d%Y")
         file_name = today_date + "_sharesOutstanding.feather"
-        full_path_name = path + today_date + "_sharesOutstanding.feather"
-        files = os.listdir(path)
+        full_path_name = sharesOutstanding_path + today_date + "_sharesOutstanding.feather"
+        files = os.listdir(sharesOutstanding_path)
         if file_name not in files:
             logging.warning("sharesOutstanding_file is not ready, sleep 10 seconds...")
             time.sleep(10)
