@@ -16,12 +16,12 @@ processed_data_path="C:/Python/ProcessedData/"
 raw_data_path = 'C:/Python/RawData/'
 base_days = 13
 
-def high_vol_in_last_20_days(df,Float):
+def high_vol_in_last_20_days(df,sharesOutstanding):
     if(len(df)<20):
         return False
     Last_20days_df = df.iloc[len(df)-20:]
     vol_max = max(Last_20days_df.volume)
-    vol_max_turnover_rate = vol_max/Float
+    vol_max_turnover_rate = vol_max/sharesOutstanding
     if vol_max_turnover_rate>0.05:
         low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
         close = Last_20days_df.iloc[-1]['close']
@@ -50,7 +50,7 @@ def screen(df,lines):
             return False
     return False
 
-def run(ticker_chunk_df,Float_chunk_df):
+def run(ticker_chunk_df,sharesOutstanding_chunk_df):
     if ticker_chunk_df.empty:
         return pd.DataFrame()
     tickers = ticker_chunk_df.ticker.unique()
@@ -60,17 +60,17 @@ def run(ticker_chunk_df,Float_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-        if ticker not in Float_chunk_df.ticker.values:
+        if ticker not in sharesOutstanding_chunk_df.ticker.values:
             continue
-        Float_df = Float_chunk_df[Float_chunk_df.ticker==ticker]
-        Float = Float_df.iloc[-1]['Float']
-        if(ticker=="VLCN"):
-            logging.info("VLCN")
+        sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
+        sharesOutstanding = sharesOutstanding_df.iloc[-1]['sharesOutstanding']
+        if(ticker=="TMC"):
+            logging.info("TMC")
 
         Close_to_EMA20 = screen(df,"Close to EMA20")
         OBV = screen(df,"OBV")
 
-        if(high_vol_in_last_20_days(df,Float) & Close_to_EMA20 & OBV):
+        if(high_vol_in_last_20_days(df,sharesOutstanding) & Close_to_EMA20 & OBV):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
         
@@ -118,42 +118,23 @@ if __name__ == '__main__':
     today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
-    Float_df = pd.DataFrame()
-    while(Float_df.empty):
-        Float_path = 'C:/Python/Float/'
+    sharesOutstanding_df = pd.DataFrame()
+    while(sharesOutstanding_df.empty):
+        sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
         today_date = datetime.datetime.now().strftime("%m%d%Y")
-        file_name = today_date + "_Float.feather"
-        full_path_name = Float_path + today_date + "_Float.feather"
-        files = os.listdir(Float_path)
+        file_name = today_date + "_sharesOutstanding.feather"
+        full_path_name = sharesOutstanding_path + today_date + "_sharesOutstanding.feather"
+        files = os.listdir(sharesOutstanding_path)
         if file_name not in files:
-            logging.warning("Float_file is not ready, sleep 10 seconds...")
+            logging.warning("sharesOutstanding_file is not ready, sleep 10 seconds...")
             time.sleep(10)
             continue
         try:
-            Float_df = pd.read_feather(full_path_name)
-            logging.info('Float_df is ready')
+            sharesOutstanding_df = pd.read_feather(full_path_name)
+            logging.info('sharesOutstanding_df is ready')
         except Exception as e:
-            logging.critical('Float_df read_feather:'+str(e))
+            logging.critical('sharesOutstanding_df read_feather:'+str(e))
             continue
-
-    # sharesOutstanding_df = pd.DataFrame()
-    # while(sharesOutstanding_df.empty):
-    #     sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
-    #     today_date = datetime.datetime.now().strftime("%m%d%Y")
-    #     file_name = today_date + "_sharesOutstanding.feather"
-    #     full_path_name = sharesOutstanding_path + today_date + "_sharesOutstanding.feather"
-    #     files = os.listdir(sharesOutstanding_path)
-    #     if file_name not in files:
-    #         logging.warning("sharesOutstanding_file is not ready, sleep 10 seconds...")
-    #         time.sleep(10)
-    #         continue
-    #     try:
-    #         sharesOutstanding_df = pd.read_feather(full_path_name)
-    #         logging.info('sharesOutstanding_df is ready')
-    #     except Exception as e:
-    #         logging.critical('sharesOutstanding_df read_feather:'+str(e))
-    #         continue
-
     while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
     # while(True):
         now = datetime.datetime.now()
@@ -191,9 +172,8 @@ if __name__ == '__main__':
         async_results_AMP = []
         for ticker_chunk in ticker_chunk_list:
             ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-            # sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
-            Float_chunk_df = Float_df[Float_df['ticker'].isin(ticker_chunk)]
-            async_result_AMP = pool.apply_async(run, args=(ticker_chunk_df,Float_chunk_df))
+            sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
+            async_result_AMP = pool.apply_async(run, args=(ticker_chunk_df,sharesOutstanding_chunk_df))
             async_results_AMP.append(async_result_AMP)
         pool.close()
         del(df)
