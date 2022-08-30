@@ -12,6 +12,49 @@ import math
 
 days=365
 
+multipliers = {'K':1000, 'M':1000000, 'B':1000000000, 'T':1000000000000}
+
+def string_to_int(string):
+    if string[-1].isdigit(): # check if no suffix
+        return int(string)
+    mult = multipliers[string[-1]] # look up suffix to get multiplier
+     # convert number to float, multiply by multiplier, then make int
+    return int(float(string[:-1]) * mult)
+
+
+        # if('Market Cap' in dic.keys()):
+        #     if isinstance(dic['Market Cap'],str):
+        #         marketcap = string_to_int(dic['Market Cap'])
+        #     else:
+        #         print(ticker+" marketcap is not available")
+        #         continue
+        # else:
+        #     print(ticker+" marketcap is not available")
+        #     continue
+
+def get_stats(ticker):
+    df = pd.DataFrame()
+    try:
+        stats_df = si.get_stats(ticker)
+        # dict['ticker'] = ticker
+        Float_df = stats_df.loc[stats_df.Attribute=='Float 8']
+        if not Float_df.empty:
+            if isinstance(Float_df.iloc[-1].Value,str):
+                Float = string_to_int(Float_df.iloc[-1].Value)
+            else:
+                return pd.DataFrame()
+        else:
+            return pd.DataFrame()
+    except Exception as e:
+        if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+            return -1
+        else:
+            return pd.DataFrame()
+    d={'ticker':[ticker],'Float':[Float]}
+    df = pd.DataFrame(d)
+    df = df.set_index('ticker')
+    return df
+
 def get_quote_data(ticker):
     df = pd.DataFrame()
     try:
@@ -157,6 +200,18 @@ if __name__ == '__main__':
 
     cores = int(multiprocessing.cpu_count()/2)
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
+
+    Float_df=collect_data(get_stats,cores)
+    logging.info("Float_df is ready.")
+    if not Float_df.empty: 
+        Float_df.reset_index(inplace=True)
+        stop_time = datetime.datetime.now().strftime("%m%d%Y")
+        try:
+            Float_path = 'C:/Python/Float/'
+            Float_df.to_feather(Float_df + stop_time + "_Float.feather")
+            logging.info("Float_df to_feather saved.")
+        except Exception as e:
+            logging.critical("to_feather:"+str(e))
 
     sharesOutstanding_df=collect_data(get_quote_data,cores)
     logging.info("sharesOutstanding_df is ready.")
