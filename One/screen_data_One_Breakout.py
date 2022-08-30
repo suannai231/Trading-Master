@@ -44,7 +44,7 @@ def screen(df,lines):
         last_60days_df = df.iloc[len(df)-60:]
         obv_max = max(last_60days_df.OBV)
         OBV = df.iloc[-1]['OBV']
-        if OBV == obv_max:
+        if OBV >= obv_max*0.99:
             return True
         else:
             return False
@@ -64,8 +64,8 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
             continue
         sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
         sharesOutstanding = sharesOutstanding_df.iloc[-1]['sharesOutstanding']
-        # if(ticker=="NCPL"):
-        #     logging.info("NCPL")
+        if(ticker=="CEI"):
+            logging.info("CEI")
 
         Close_to_EMA20 = screen(df,"Close to EMA20")
         OBV = screen(df,"OBV")
