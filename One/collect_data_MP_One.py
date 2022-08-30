@@ -46,7 +46,7 @@ def get_stats(ticker):
         else:
             return pd.DataFrame()
     except Exception as e:
-        if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+        if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'") | str(e).startswith('list'):
             return -1
         else:
             return pd.DataFrame()
@@ -143,10 +143,11 @@ logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 def collect_data(func,cores):
     thread_number = 20
     stock_history_concat_df = pd.DataFrame()
+    now = datetime.datetime.now()
+    start_time = now.strftime("%m%d%Y-%H%M%S")
+    logging.info("collect_data" + str(func) + "start time:" + start_time)
     while(stock_history_concat_df.empty):
-        now = datetime.datetime.now()
-        start_time = now.strftime("%m%d%Y-%H%M%S")
-        logging.info("collect_data" + str(func) + "start time:" + start_time)
+
         pool = Pool(cores)
         stock_async_results = []
 
@@ -176,9 +177,9 @@ def collect_data(func,cores):
                 break
             if not stock_chunk_df.empty:
                 stock_history_concat_df = pd.concat([stock_history_concat_df,stock_chunk_df])
-        stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-        logging.info("collect_data" + str(func) + "stop time:" + stop_time)
-        return stock_history_concat_df
+    stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+    logging.info("collect_data" + str(func) + "stop time:" + stop_time)
+    return stock_history_concat_df
 
 if __name__ == '__main__':
     now = datetime.datetime.now()
@@ -213,17 +214,17 @@ if __name__ == '__main__':
         except Exception as e:
             logging.critical("to_feather:"+str(e))
 
-    sharesOutstanding_df=collect_data(get_quote_data,cores)
-    logging.info("sharesOutstanding_df is ready.")
-    if not sharesOutstanding_df.empty: 
-        sharesOutstanding_df.reset_index(inplace=True)
-        stop_time = datetime.datetime.now().strftime("%m%d%Y")
-        try:
-            sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
-            sharesOutstanding_df.to_feather(sharesOutstanding_path + stop_time + "_sharesOutstanding.feather")
-            logging.info("sharesOutstanding_df to_feather saved.")
-        except Exception as e:
-            logging.critical("to_feather:"+str(e))
+    # sharesOutstanding_df=collect_data(get_quote_data,cores)
+    # logging.info("sharesOutstanding_df is ready.")
+    # if not sharesOutstanding_df.empty: 
+    #     sharesOutstanding_df.reset_index(inplace=True)
+    #     stop_time = datetime.datetime.now().strftime("%m%d%Y")
+    #     try:
+    #         sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
+    #         sharesOutstanding_df.to_feather(sharesOutstanding_path + stop_time + "_sharesOutstanding.feather")
+    #         logging.info("sharesOutstanding_df to_feather saved.")
+    #     except Exception as e:
+    #         logging.critical("to_feather:"+str(e))
 
     stock_history_concat_df=collect_data(get_stock_history,cores)
     logging.info("stock_history_concat_df is ready.")
