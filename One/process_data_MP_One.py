@@ -26,96 +26,96 @@ def cal_Vol_Low_High_Price(df):
     df['Vol_High_Price']=Vol_High_Price
     return df
 
-def cal_Year_Low_High(df):
-    Year_Low = []
-    Year_High = []
-    EMA20_High = []
-    Vol_High = []
-    Vol_Low = []
-    start = 0
-    stop = len(df)
-    for end in range(start,stop):
-        Vol_Low.append(min(df.loc[start:end,'volume']))
-        Vol_High.append(max(df.loc[start:end,'volume']))
-        Year_Low.append(min(df.loc[start:end,'close']))
-        Year_High.append(max(df.loc[start:end,'close']))
-        EMA20_High.append(max(df.loc[start:end,'EMA20']))
-    df['Vol_Low'] = Vol_Low
-    df['Vol_High'] = Vol_High
-    df['Year_Low'] = Year_Low
-    df['Year_High'] = Year_High
-    df['EMA20_High'] = EMA20_High
-    return df
+# def cal_Year_Low_High(df):
+#     Year_Low = []
+#     Year_High = []
+#     EMA20_High = []
+#     Vol_High = []
+#     Vol_Low = []
+#     start = 0
+#     stop = len(df)
+#     for end in range(start,stop):
+#         Vol_Low.append(min(df.loc[start:end,'volume']))
+#         Vol_High.append(max(df.loc[start:end,'volume']))
+#         Year_Low.append(min(df.loc[start:end,'close']))
+#         Year_High.append(max(df.loc[start:end,'close']))
+#         EMA20_High.append(max(df.loc[start:end,'EMA20']))
+#     df['Vol_Low'] = Vol_Low
+#     df['Vol_High'] = Vol_High
+#     df['Year_Low'] = Year_Low
+#     df['Year_High'] = Year_High
+#     df['EMA20_High'] = EMA20_High
+#     return df
 
-def cal_Stat(df):
+# def cal_Stat(df):
 
-    EMA5_Max = []
-    EMA10_Max = []
-    EMA20_Max = []
-    EMA60_Max = []
-    EMA120_Max = []
-    EMA250_Max = []
-    OBV_Max = []
-    Close_Max = []
+#     EMA5_Max = []
+#     EMA10_Max = []
+#     EMA20_Max = []
+#     EMA60_Max = []
+#     EMA120_Max = []
+#     EMA250_Max = []
+#     OBV_Max = []
+#     Close_Max = []
 
-    EMA5_Min = []
-    EMA10_Min = []
-    EMA20_Min = []
-    EMA60_Min = []
-    EMA120_Min = []
-    EMA250_Min = []
-    OBV_Min = []
-    Close_Min = []
+#     EMA5_Min = []
+#     EMA10_Min = []
+#     EMA20_Min = []
+#     EMA60_Min = []
+#     EMA120_Min = []
+#     EMA250_Min = []
+#     OBV_Min = []
+#     Close_Min = []
 
-    STD_Vol = []
-    STD_Close = []
+#     STD_Vol = []
+#     STD_Close = []
 
-    start = len(df)-base_days*2
-    stop = len(df)-base_days
+#     start = len(df)-base_days*2
+#     stop = len(df)-base_days
     
-    for startindex in range(start,stop):
-        endindex = startindex + base_days
-        EMA5_Max.append(max(df.loc[startindex:endindex,'EMA5']))
-        EMA10_Max.append(max(df.loc[startindex:endindex,'EMA10']))
-        EMA20_Max.append(max(df.loc[startindex:endindex,'EMA20']))
-        EMA60_Max.append(max(df.loc[startindex:endindex,'EMA60']))
-        EMA120_Max.append(max(df.loc[startindex:endindex,'EMA120']))
-        EMA250_Max.append(max(df.loc[startindex:endindex,'EMA250']))
-        OBV_Max.append(max(df.loc[startindex:endindex,'OBV']))
-        Close_Max.append(max(df.loc[startindex:endindex,'close']))
-        EMA5_Min.append(min(df.loc[startindex:endindex,'EMA5']))
-        EMA10_Min.append(min(df.loc[startindex:endindex,'EMA10']))
-        EMA20_Min.append(min(df.loc[startindex:endindex,'EMA20']))
-        EMA60_Min.append(min(df.loc[startindex:endindex,'EMA60']))
-        EMA120_Min.append(min(df.loc[startindex:endindex,'EMA120']))
-        EMA250_Min.append(min(df.loc[startindex:endindex,'EMA250']))
-        OBV_Min.append(min(df.loc[startindex:endindex,'OBV']))
-        Close_Min.append(min(df.loc[startindex:endindex,'close']))
-        STD_Vol.append(statistics.stdev(df.loc[startindex:endindex,'volume']))
-        STD_Close.append(statistics.stdev(df.loc[startindex:endindex,'close']))
+#     for startindex in range(start,stop):
+#         endindex = startindex + base_days
+#         EMA5_Max.append(max(df.loc[startindex:endindex,'EMA5']))
+#         EMA10_Max.append(max(df.loc[startindex:endindex,'EMA10']))
+#         EMA20_Max.append(max(df.loc[startindex:endindex,'EMA20']))
+#         EMA60_Max.append(max(df.loc[startindex:endindex,'EMA60']))
+#         EMA120_Max.append(max(df.loc[startindex:endindex,'EMA120']))
+#         EMA250_Max.append(max(df.loc[startindex:endindex,'EMA250']))
+#         OBV_Max.append(max(df.loc[startindex:endindex,'OBV']))
+#         Close_Max.append(max(df.loc[startindex:endindex,'close']))
+#         EMA5_Min.append(min(df.loc[startindex:endindex,'EMA5']))
+#         EMA10_Min.append(min(df.loc[startindex:endindex,'EMA10']))
+#         EMA20_Min.append(min(df.loc[startindex:endindex,'EMA20']))
+#         EMA60_Min.append(min(df.loc[startindex:endindex,'EMA60']))
+#         EMA120_Min.append(min(df.loc[startindex:endindex,'EMA120']))
+#         EMA250_Min.append(min(df.loc[startindex:endindex,'EMA250']))
+#         OBV_Min.append(min(df.loc[startindex:endindex,'OBV']))
+#         Close_Min.append(min(df.loc[startindex:endindex,'close']))
+#         STD_Vol.append(statistics.stdev(df.loc[startindex:endindex,'volume']))
+#         STD_Close.append(statistics.stdev(df.loc[startindex:endindex,'close']))
 
-    df.loc[stop:len(df)-1,'EMA5_Max'] = EMA5_Max
-    df.loc[stop:len(df)-1,'EMA10_Max'] = EMA10_Max
-    df.loc[stop:len(df)-1,'EMA20_Max'] = EMA20_Max
-    df.loc[stop:len(df)-1,'EMA60_Max'] = EMA60_Max
-    df.loc[stop:len(df)-1,'EMA120_Max'] = EMA120_Max
-    df.loc[stop:len(df)-1,'EMA250_Max'] = EMA250_Max
-    df.loc[stop:len(df)-1,'OBV_Max'] = OBV_Max
-    df.loc[stop:len(df)-1,'Close_Max'] = Close_Max
+#     df.loc[stop:len(df)-1,'EMA5_Max'] = EMA5_Max
+#     df.loc[stop:len(df)-1,'EMA10_Max'] = EMA10_Max
+#     df.loc[stop:len(df)-1,'EMA20_Max'] = EMA20_Max
+#     df.loc[stop:len(df)-1,'EMA60_Max'] = EMA60_Max
+#     df.loc[stop:len(df)-1,'EMA120_Max'] = EMA120_Max
+#     df.loc[stop:len(df)-1,'EMA250_Max'] = EMA250_Max
+#     df.loc[stop:len(df)-1,'OBV_Max'] = OBV_Max
+#     df.loc[stop:len(df)-1,'Close_Max'] = Close_Max
 
-    df.loc[stop:len(df)-1,'EMA5_Min'] = EMA5_Min
-    df.loc[stop:len(df)-1,'EMA10_Min'] = EMA10_Min
-    df.loc[stop:len(df)-1,'EMA20_Min'] = EMA20_Min
-    df.loc[stop:len(df)-1,'EMA60_Min'] = EMA60_Min
-    df.loc[stop:len(df)-1,'EMA120_Min'] = EMA120_Min
-    df.loc[stop:len(df)-1,'EMA250_Min'] = EMA250_Min
-    df.loc[stop:len(df)-1,'OBV_Min'] = OBV_Min
-    df.loc[stop:len(df)-1,'Close_Min'] = Close_Min
+#     df.loc[stop:len(df)-1,'EMA5_Min'] = EMA5_Min
+#     df.loc[stop:len(df)-1,'EMA10_Min'] = EMA10_Min
+#     df.loc[stop:len(df)-1,'EMA20_Min'] = EMA20_Min
+#     df.loc[stop:len(df)-1,'EMA60_Min'] = EMA60_Min
+#     df.loc[stop:len(df)-1,'EMA120_Min'] = EMA120_Min
+#     df.loc[stop:len(df)-1,'EMA250_Min'] = EMA250_Min
+#     df.loc[stop:len(df)-1,'OBV_Min'] = OBV_Min
+#     df.loc[stop:len(df)-1,'Close_Min'] = Close_Min
 
-    df.loc[stop:len(df)-1,'STD_Vol'] = STD_Vol
-    df.loc[stop:len(df)-1,'STD_Close'] = STD_Close
+#     df.loc[stop:len(df)-1,'STD_Vol'] = STD_Vol
+#     df.loc[stop:len(df)-1,'STD_Close'] = STD_Close
 
-    return df.loc[stop:]
+#     return df.loc[stop:]
 
 def cal_OBV(df):
     startindex = 0
@@ -222,8 +222,8 @@ def run(ticker_chunk_df):
         df = cal_OBV(df)
         df = cal_basics(df)
 
-        df = cal_Year_Low_High(df)
-        df = cal_Vol_Low_High_Price(df)
+        # df = cal_Year_Low_High(df)
+        # df = cal_Vol_Low_High_Price(df)
         # df = cal_Stat(df)
         # df = cal_OBV(df)
         # df = cal_Max_Min(df)
@@ -289,7 +289,7 @@ if __name__ == '__main__':
 
         tickers = df.ticker.unique()
 
-        cores = int(multiprocessing.cpu_count())
+        cores = int(multiprocessing.cpu_count()/2)
         ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
         pool = Pool(cores)
         async_results = []
