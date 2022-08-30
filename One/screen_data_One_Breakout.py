@@ -44,7 +44,7 @@ def screen(df,lines):
         last_60days_df = df.iloc[len(df)-60:]
         obv_max = max(last_60days_df.OBV)
         OBV = df.iloc[-1]['OBV']
-        if OBV >= obv_max*0.99:
+        if OBV >= obv_max:
             return True
         else:
             return False
