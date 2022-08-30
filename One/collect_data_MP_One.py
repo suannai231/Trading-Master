@@ -98,12 +98,14 @@ logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_collect.log"
 logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
 def collect_data(func,cores):
+    now = datetime.datetime.now()
+    start_time = now.strftime("%m%d%Y-%H%M%S")
+    logging.info("collect_data" + str(func) + "start time:" + start_time)
+
     thread_number = 20
     stock_history_concat_df = pd.DataFrame()
     while(stock_history_concat_df.empty):
-        now = datetime.datetime.now()
-        start_time = now.strftime("%m%d%Y-%H%M%S")
-        logging.info("collect_data" + str(func) + "start time:" + start_time)
+
         pool = Pool(cores)
         stock_async_results = []
 
@@ -133,9 +135,9 @@ def collect_data(func,cores):
                 break
             if not stock_chunk_df.empty:
                 stock_history_concat_df = pd.concat([stock_history_concat_df,stock_chunk_df])
-        stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-        logging.info("collect_data" + str(func) + "stop time:" + stop_time)
-        return stock_history_concat_df
+    stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+    logging.info("collect_data" + str(func) + "stop time:" + stop_time)
+    return stock_history_concat_df
 
 if __name__ == '__main__':
     now = datetime.datetime.now()
