@@ -22,7 +22,7 @@ def high_vol_in_last_20_days(df,sharesOutstanding):
     Last_20days_df = df.iloc[len(df)-20:]
     vol_max = max(Last_20days_df.volume)
     vol_max_turnover_rate = vol_max/sharesOutstanding
-    if vol_max_turnover_rate>0.1:
+    if vol_max_turnover_rate>0.05:
         low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
         close = Last_20days_df.iloc[-1]['close']
         if(close>=low):
@@ -64,8 +64,8 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
             continue
         sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
         sharesOutstanding = sharesOutstanding_df.iloc[-1]['sharesOutstanding']
-        if(ticker=="CEI"):
-            logging.info("CEI")
+        if(ticker=="TMC"):
+            logging.info("TMC")
 
         Close_to_EMA20 = screen(df,"Close to EMA20")
         OBV = screen(df,"OBV")
