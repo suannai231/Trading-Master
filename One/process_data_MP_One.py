@@ -256,6 +256,7 @@ def process_data():
     try:
         time.sleep(1)
         df = pd.read_feather(raw_data_path + raw_data_files[-1])
+        logging.info(raw_data_path + raw_data_files[-1]+" loaded.")
     except Exception as e:
         logging.critical(e)
         return
@@ -271,6 +272,7 @@ def process_data():
         async_result = pool.apply_async(run, args=(ticker_chunk_df,))
         async_results.append(async_result)
     pool.close()
+    logging.info("process pool started.")
 
     df = pd.DataFrame()
     for async_result in async_results:
@@ -279,9 +281,11 @@ def process_data():
             df = pd.concat([df,async_result.get()])
     
     if(not df.empty):
+        logging.info("result is ready.")
         df.reset_index(drop=True,inplace=True)
         try:
             df.to_feather(processed_data_path + raw_data_files[-1])
+            logging.info(processed_data_path + raw_data_files[-1]+" is saved.")
         except Exception as e:
             logging.critical("to_feather:"+str(e))
         # df.to_csv(processed_data_path + raw_data_files[-1] + '.csv')
@@ -297,16 +301,16 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 if __name__ == '__main__':
-    now = datetime.datetime.now()
-    start_time = now.strftime("%m%d%Y-%H%M%S")
-    logging.info("process_data process start time:" + start_time)
-
     raw_data_path='C:/Python/RawData/'
     processed_data_path='C:/Python/ProcessedData/'
     logpath = 'C:/Python/'
 
     logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_process.log"
     logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
+
+    now = datetime.datetime.now()
+    start_time = now.strftime("%m%d%Y-%H%M%S")
+    logging.info("process_data process start time:" + start_time)
 
     isPathExists = os.path.exists(processed_data_path)
     if not isPathExists:
