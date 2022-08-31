@@ -135,8 +135,8 @@ if __name__ == '__main__':
         except Exception as e:
             logging.critical('sharesOutstanding_df read_feather:'+str(e))
             continue
-    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
-    # while(True):
+    # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+    while(True):
         now = datetime.datetime.now()
 
         start_time = now.strftime("%m%d%Y-%H%M%S")
