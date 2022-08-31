@@ -169,7 +169,7 @@ if __name__ == '__main__':
     processed_data_path="C:/Python/ProcessedData/"
     raw_data_path = 'C:/Python/RawData/'
 
-    logpath = '//jack-nas.home/Work/Python/'
+    logpath = 'C:/Python/'
     logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_screen.log"
     logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
