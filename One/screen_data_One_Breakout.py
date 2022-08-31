@@ -28,6 +28,7 @@ def screen(df,lines):
     close = df.iloc[-1]['close']
     ema20 = df.iloc[-1]['EMA20']
     change = df.iloc[-1]['change']
+    turnover = df.iloc[-1]['volume']*close
 
     if lines=="Close to EMA20":
         if(close<=ema20*1.2):
@@ -46,6 +47,11 @@ def screen(df,lines):
         obv_max = max(last_60days_df.OBV)
         OBV = df.iloc[-1]['OBV']
         if OBV == obv_max:
+            return True
+        else:
+            return False
+    elif lines=="turnover":
+        if(turnover >= 1000000):
             return True
         else:
             return False
@@ -71,8 +77,9 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
         # Close_to_EMA20 = screen(df,"Close to EMA20")
         change  = screen(df,"change")
         OBV = screen(df,"OBV")
+        turnover = screen(df,'turnover')
 
-        if(high_vol_in_last_20_days(df,sharesOutstanding) & OBV & change):
+        if(high_vol_in_last_20_days(df,sharesOutstanding) & OBV & change & turnover):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
         
