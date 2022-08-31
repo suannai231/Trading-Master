@@ -9,12 +9,7 @@ import numpy as np
 import time
 import logging
 import math
-from yahoo_fin import stock_info as si
-
-screened_data_path="//jack-nas.home/Work/Python/ScreenedData/"
-processed_data_path="C:/Python/ProcessedData/"
-raw_data_path = 'C:/Python/RawData/'
-base_days = 13
+# from yahoo_fin import stock_info as si
 
 def high_vol_in_last_20_days(df,sharesOutstanding):
     if(len(df)<20):
@@ -44,7 +39,7 @@ def screen(df,lines):
         last_60days_df = df.iloc[len(df)-60:]
         obv_max = max(last_60days_df.OBV)
         OBV = df.iloc[-1]['OBV']
-        if OBV >= obv_max:
+        if OBV == obv_max:
             return True
         else:
             return False
@@ -64,8 +59,8 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
             continue
         sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
         sharesOutstanding = sharesOutstanding_df.iloc[-1]['sharesOutstanding']
-        if(ticker=="TMC"):
-            logging.info("TMC")
+        # if(ticker=="TMC"):
+        #     logging.info("TMC")
 
         Close_to_EMA20 = screen(df,"Close to EMA20")
         OBV = screen(df,"OBV")
@@ -76,7 +71,70 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
         
     return return_ticker_chunk_df
 
-def save(return_df,async_results,processed_data_file):
+# def save(return_df,async_results,processed_data_file):
+#     df = pd.DataFrame()
+#     for async_result in async_results:
+#         result = async_result.get()
+#         if not result.empty:
+#             df = pd.concat([df,result])
+    
+#     if(not df.empty):
+#         df.reset_index(drop=False,inplace=True)
+#         try:
+#             df.to_csv(screened_data_path + processed_data_file + '.csv')
+#             end = datetime.date.today()
+#             df = df.loc[df.date==str(end),'ticker']
+#             df.to_csv(screened_data_path + processed_data_file + '.txt',header=False, index=False)
+#             return_df = pd.concat([return_df,df])
+#         except Exception as e:
+#             logging.critical("return_df to_csv:"+str(e))
+#     else:
+#         logging.error("return_df empty")
+#     return return_df
+
+def screen_data():
+    now = datetime.datetime.now()
+    start_time = now.strftime("%m%d%Y-%H%M%S")
+    logging.info("screen_data start time:" + start_time)
+
+    processed_data_files = os.listdir(processed_data_path)
+    if len(processed_data_files) == 0:
+        logging.warning("processed data not ready, sleep 10 seconds...")
+        time.sleep(10)
+        return
+
+    screened_data_files = os.listdir(screened_data_path)
+    processed_data_files_str = processed_data_files[-1] + '_AMP.txt'
+    if processed_data_files_str in screened_data_files:
+        logging.warning("error: " + processed_data_files_str + " existed, sleep 10 seconds...")
+        time.sleep(10)
+        return
+
+    logging.info("processing "+processed_data_files[-1])
+
+    try:
+        time.sleep(1)
+        df = pd.read_feather(processed_data_path + processed_data_files[-1])
+    except Exception as e:
+        logging.critical(str(e))
+        return
+
+    tickers = df.ticker.unique()
+    cores = int(multiprocessing.cpu_count()/4)
+    ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
+    pool=Pool(cores)
+
+    async_results = []
+    for ticker_chunk in ticker_chunk_list:
+        ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
+        sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
+        async_result = pool.apply_async(run, args=(ticker_chunk_df,sharesOutstanding_chunk_df))
+        async_results.append(async_result)
+    pool.close()
+
+    # return_df = pd.DataFrame()
+
+    # return_df = save(return_df,async_results_AMP,processed_data_files[-1]+"_AMP")
     df = pd.DataFrame()
     for async_result in async_results:
         result = async_result.get()
@@ -86,16 +144,19 @@ def save(return_df,async_results,processed_data_file):
     if(not df.empty):
         df.reset_index(drop=False,inplace=True)
         try:
-            df.to_csv(screened_data_path + processed_data_file + '.csv')
-            end = datetime.date.today()
-            df = df.loc[df.date==str(end),'ticker']
-            df.to_csv(screened_data_path + processed_data_file + '.txt',header=False, index=False)
-            return_df = pd.concat([return_df,df])
+            df.to_csv(screened_data_path + processed_data_files[-1] + '.csv')
+            # end = datetime.date.today()
+            # df = df.loc[df.date==str(end),'ticker']
+            df.ticker.to_csv(screened_data_path + processed_data_files[-1] + '.txt',header=False, index=False)
+            # return_df = pd.concat([return_df,df])
         except Exception as e:
             logging.critical("return_df to_csv:"+str(e))
     else:
         logging.error("return_df empty")
-    return return_df
+    # return return_df
+
+    stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+    logging.info("screen_data stop time:" +stop_time)
 
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
@@ -103,6 +164,11 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 if __name__ == '__main__':
+
+    screened_data_path="//jack-nas.home/Work/Python/ScreenedData/"
+    processed_data_path="C:/Python/ProcessedData/"
+    raw_data_path = 'C:/Python/RawData/'
+
     logpath = '//jack-nas.home/Work/Python/'
     logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_screen.log"
     logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
@@ -115,12 +181,9 @@ if __name__ == '__main__':
     if not isPathExists:
         os.makedirs(screened_data_path)
 
-    today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
-    today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
-
+    sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
     sharesOutstanding_df = pd.DataFrame()
     while(sharesOutstanding_df.empty):
-        sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
         today_date = datetime.datetime.now().strftime("%m%d%Y")
         file_name = today_date + "_sharesOutstanding.feather"
         full_path_name = sharesOutstanding_path + today_date + "_sharesOutstanding.feather"
@@ -135,51 +198,16 @@ if __name__ == '__main__':
         except Exception as e:
             logging.critical('sharesOutstanding_df read_feather:'+str(e))
             continue
-    # while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
-    while(True):
-        now = datetime.datetime.now()
 
-        start_time = now.strftime("%m%d%Y-%H%M%S")
-        logging.info("start time:" + start_time)
+    screen_data()
 
-        processed_data_files = os.listdir(processed_data_path)
-        if len(processed_data_files) == 0:
-            logging.warning("processed data not ready, sleep 10 seconds...")
-            time.sleep(10)
-            continue
+    now = datetime.datetime.now()
+    today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
+    today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
-        screened_data_files = os.listdir(screened_data_path)
-        processed_data_files_str = processed_data_files[-1] + '_AMP.txt'
-        if processed_data_files_str in screened_data_files:
-            logging.warning("error: " + processed_data_files_str + " existed, sleep 10 seconds...")
-            time.sleep(10)
-            continue
+    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+        screen_data()
 
-        logging.info("processing "+processed_data_files[-1])
-
-        try:
-            time.sleep(1)
-            df = pd.read_feather(processed_data_path + processed_data_files[-1])
-        except Exception as e:
-            logging.critical(str(e))
-            continue
-
-        tickers = df.ticker.unique()
-        cores = int(multiprocessing.cpu_count()/2)
-        ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
-        pool=Pool(cores)
-
-        async_results_AMP = []
-        for ticker_chunk in ticker_chunk_list:
-            ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-            sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
-            async_result_AMP = pool.apply_async(run, args=(ticker_chunk_df,sharesOutstanding_chunk_df))
-            async_results_AMP.append(async_result_AMP)
-        pool.close()
-        del(df)
-        return_df = pd.DataFrame()
-
-        return_df = save(return_df,async_results_AMP,processed_data_files[-1]+"_AMP")
-
-        stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-        logging.info("stop time:" +stop_time)
+    now = datetime.datetime.now()
+    stop_time = now.strftime("%m%d%Y-%H%M%S")
+    logging.info("screen_data process stop time:" + start_time)

@@ -175,18 +175,19 @@ if __name__ == '__main__':
     stock_history_concat_df=collect_data(get_stock_history,cores)
     logging.info("stock_history_concat_df is ready.")
 
+    # if(not (now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+    if (not stock_history_concat_df.empty):
+        stock_history_concat_df.reset_index(inplace=True)
+        stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+        try:
+            stock_history_concat_df.to_feather(path + stop_time + ".feather")
+            logging.info("stock_history_concat_df to_feather saved.")
+        except Exception as e:
+            logging.critical("to_feather:"+str(e))
+
+    now = datetime.datetime.now()
     today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
-
-    if(not (now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
-        if (not stock_history_concat_df.empty):
-            stock_history_concat_df.reset_index(inplace=True)
-            stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-            try:
-                stock_history_concat_df.to_feather(path + stop_time + ".feather")
-                logging.info("stock_history_concat_df to_feather saved.")
-            except Exception as e:
-                logging.critical("to_feather:"+str(e))
 
     while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):         #get real time stock price
 
