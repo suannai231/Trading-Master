@@ -197,7 +197,7 @@ if __name__ == '__main__':
         if not realtime_df.empty:
             realtime_df.reset_index(inplace=True)
             stock_concat_df = pd.concat([stock_history_concat_df,realtime_df])
-            # stock_concat_df.reset_index(inplace=True)
+            stock_concat_df.reset_index(inplace=True,drop=True)
             # stock_realtime_concat_df = stock_concat_df
             stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
             try:

@@ -27,9 +27,15 @@ def high_vol_in_last_20_days(df,sharesOutstanding):
 def screen(df,lines):
     close = df.iloc[-1]['close']
     ema20 = df.iloc[-1]['EMA20']
+    change = df.iloc[-1]['change']
 
     if lines=="Close to EMA20":
         if(close<=ema20*1.2):
+            return True
+        else:
+            return False
+    elif lines=="change":
+        if change >=0:
             return True
         else:
             return False
@@ -62,10 +68,11 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
         # if(ticker=="TMC"):
         #     logging.info("TMC")
 
-        Close_to_EMA20 = screen(df,"Close to EMA20")
+        # Close_to_EMA20 = screen(df,"Close to EMA20")
+        change  = screen(df,"change")
         OBV = screen(df,"OBV")
 
-        if(high_vol_in_last_20_days(df,sharesOutstanding) & Close_to_EMA20 & OBV):
+        if(high_vol_in_last_20_days(df,sharesOutstanding) & OBV & change):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
         
