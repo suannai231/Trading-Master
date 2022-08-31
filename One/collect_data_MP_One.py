@@ -117,15 +117,19 @@ def collect_data(func,cores):
         
         for stock_async_result in stock_async_results:
             try:
-                stock_chunk_df = stock_async_result.get(timeout=60)
+                stock_chunk_df = stock_async_result.get(timeout=120)
             except TimeoutError as e:
-                logging.error(str(e) + " timeout 1 minute, terminating process pool...")
+                logging.error(str(e) + " timeout 2 minutes, terminating process pool...")
                 pool.terminate()
                 pool.join()
-                thread_number += 1
+                if(thread_number<40):
+                    thread_number += 1
+                else:
+                    thread_number = 20
+                logging.critical("thread_number:"+str(thread_number))
                 break
             if isinstance(stock_chunk_df,int):
-                if(thread_number!=1):
+                if(thread_number>1):
                     thread_number -= 1
                 else:
                     thread_number = 20
