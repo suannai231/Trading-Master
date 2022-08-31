@@ -117,11 +117,12 @@ def collect_data(func,cores):
         
         for stock_async_result in stock_async_results:
             try:
-                stock_chunk_df = stock_async_result.get(timeout=180)
+                stock_chunk_df = stock_async_result.get(timeout=60)
             except TimeoutError as e:
-                logging.error(str(e) + " timeout 3 minutes, terminating process pool...")
+                logging.error(str(e) + " timeout 1 minute, terminating process pool...")
                 pool.terminate()
                 pool.join()
+                thread_number += 1
                 break
             if isinstance(stock_chunk_df,int):
                 if(thread_number!=1):
@@ -193,9 +194,10 @@ if __name__ == '__main__':
 
         realtime_df=collect_data(get_stock_realtime,cores)
         logging.info('realtime_df is ready')
-        if not realtime_df.empty: 
+        if not realtime_df.empty:
+            realtime_df.reset_index(inplace=True)
             stock_concat_df = pd.concat([stock_history_concat_df,realtime_df])
-            stock_concat_df.reset_index(inplace=True)
+            # stock_concat_df.reset_index(inplace=True)
             # stock_realtime_concat_df = stock_concat_df
             stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
             try:
