@@ -170,9 +170,7 @@ if __name__ == '__main__':
     logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_screen.log"
     logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
-    now = datetime.datetime.now()
-    start_time = now.strftime("%m%d%Y-%H%M%S")
-    log('info',"screen_data process start time:" + start_time)
+    log('info',"screen_data process start.")
 
     isPathExists = os.path.exists(screened_data_path)
     if not isPathExists:
@@ -207,4 +205,4 @@ if __name__ == '__main__':
 
     now = datetime.datetime.now()
     stop_time = now.strftime("%m%d%Y-%H%M%S")
-    log('info',"screen_data process stop time:" + start_time)
+    log('info',"screen_data process exit.")
