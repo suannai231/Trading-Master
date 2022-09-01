@@ -11,6 +11,24 @@ import logging
 import math
 
 days=365
+date_time = datetime.datetime.now()
+start = date_time - datetime.timedelta(days)
+today8am = date_time.replace(hour=8,minute=0,second=0,microsecond=0)
+today3pm = date_time.replace(hour=15,minute=0,second=0,microsecond=0)
+
+if((date_time.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):
+    end = datetime.date.today()
+else:
+    end = datetime.date.today()+ datetime.timedelta(1)
+
+path = 'C:/Python/RawData/'
+logpath = 'C:/Python/'
+isPathExists = os.path.exists(path)
+if not isPathExists:
+    os.makedirs(path)
+
+logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_collect.log"
+logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
 def get_quote_data(ticker):
     df = pd.DataFrame()
@@ -77,25 +95,6 @@ def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
-
-date_time = datetime.datetime.now()
-start = date_time - datetime.timedelta(days)
-today8am = date_time.replace(hour=8,minute=0,second=0,microsecond=0)
-today3pm = date_time.replace(hour=15,minute=0,second=0,microsecond=0)
-
-if((date_time.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):
-    end = datetime.date.today()
-else:
-    end = datetime.date.today()+ datetime.timedelta(1)
-
-path = 'C:/Python/RawData/'
-logpath = 'C:/Python/'
-isPathExists = os.path.exists(path)
-if not isPathExists:
-    os.makedirs(path)
-
-logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_collect.log"
-logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
 def collect_data(func,cores):
     now = datetime.datetime.now()
