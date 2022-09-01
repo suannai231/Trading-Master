@@ -79,7 +79,7 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
         OBV = screen(df,"OBV")
         turnover = screen(df,'turnover')
 
-        if(high_vol_in_last_20_days(df,sharesOutstanding) & OBV & change & turnover):
+        if(high_vol_in_last_60_days(df,sharesOutstanding) & OBV & change & turnover):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
         
