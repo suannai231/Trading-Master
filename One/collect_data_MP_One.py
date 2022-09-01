@@ -21,15 +21,6 @@ if((date_time.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm
 else:
     end = datetime.date.today()+ datetime.timedelta(1)
 
-path = 'C:/Python/RawData/'
-logpath = 'C:/Python/'
-isPathExists = os.path.exists(path)
-if not isPathExists:
-    os.makedirs(path)
-
-logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_collect.log"
-logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
-
 def get_quote_data(ticker):
     df = pd.DataFrame()
     try:
@@ -97,57 +88,70 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 def collect_data(func,cores):
-    now = datetime.datetime.now()
-    start_time = now.strftime("%m%d%Y-%H%M%S")
-    logging.info("collect_data" + str(func) + "start time:" + start_time)
+    log('info',"collect_data" + str(func) + " start.")
 
     thread_number = 20
-    stock_history_concat_df = pd.DataFrame()
-    while(stock_history_concat_df.empty):
-
+    df = pd.DataFrame()
+    while(df.empty):
         pool = Pool(cores)
         stock_async_results = []
-
         for ticker_chunk in ticker_chunk_list:
             stock_async_result = pool.apply_async(get_stock_data_mt,args=(func,ticker_chunk,thread_number))
             stock_async_results.append(stock_async_result)
-
         pool.close()
-        
+        log('info',"process pool start.")
+
         for stock_async_result in stock_async_results:
             try:
                 stock_chunk_df = stock_async_result.get(timeout=120)
             except TimeoutError as e:
-                logging.error(str(e) + " timeout 2 minutes, terminating process pool...")
+                log('critical',"timeout 2 minutes, terminating process pool...")
                 pool.terminate()
                 pool.join()
                 if(thread_number<40):
                     thread_number += 1
                 else:
                     thread_number = 20
-                logging.critical("thread_number:"+str(thread_number))
+                log('critical',"thread_number:"+str(thread_number))
                 break
             if isinstance(stock_chunk_df,int):
+                log('critical',"network connection error, terminating process pool...")
+                pool.terminate()
+                pool.join()
                 if(thread_number>1):
                     thread_number -= 1
                 else:
                     thread_number = 20
-                logging.critical("thread_number:"+str(thread_number))
-                pool.terminate()
-                pool.join()
-                stock_history_concat_df = pd.DataFrame()
+                log('critical',"thread_number:"+str(thread_number))
+                df = pd.DataFrame()
                 break
             if not stock_chunk_df.empty:
-                stock_history_concat_df = pd.concat([stock_history_concat_df,stock_chunk_df])
-    stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-    logging.info("collect_data" + str(func) + "stop time:" + stop_time)
-    return stock_history_concat_df
+                df = pd.concat([df,stock_chunk_df])
+    log('info',"collect_data" + str(func) + " stop.")
+    return df
+
+def log(type,string):
+    now = datetime.datetime.now()
+    log_time = now.strftime("%m%d%Y-%H%M%S")
+    if type=='info':
+        logging.info(log_time+":"+string)
+    elif type=='error':
+        logging.error(log_time+":"+string)
+    elif type=='critical':
+        logging.critical(log_time+":"+string)
 
 if __name__ == '__main__':
-    now = datetime.datetime.now()
-    start_time = now.strftime("%m%d%Y-%H%M%S")
-    logging.info("collect process start time:" + start_time)
-    
+    path = 'C:/Python/RawData/'
+    isPathExists = os.path.exists(path)
+    if not isPathExists:
+        os.makedirs(path)
+
+    logpath = 'C:/Python/'
+    logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_collect.log"
+    logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
+
+    log('info','collect process started.')
+
     nasdaq = []
     other = []
     tickers = []
@@ -157,7 +161,7 @@ if __name__ == '__main__':
             nasdaq = si.tickers_nasdaq()
             other = si.tickers_other()
         except Exception as e:
-            logging.critical(str(e))
+            log('critical','get tickers exception:'+str(e))
             continue
         tickers = nasdaq + other
 
@@ -165,34 +169,34 @@ if __name__ == '__main__':
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
 
     sharesOutstanding_df=collect_data(get_quote_data,cores)
-    logging.info("sharesOutstanding_df is ready.")
+    log('info','sharesOutstanding_df is ready.')
     if not sharesOutstanding_df.empty: 
         sharesOutstanding_df.reset_index(inplace=True)
         stop_time = datetime.datetime.now().strftime("%m%d%Y")
         try:
             sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
             sharesOutstanding_df.to_feather(sharesOutstanding_path + stop_time + "_sharesOutstanding.feather")
-            logging.info("sharesOutstanding_df to_feather saved.")
+            log('info','sharesOutstanding_df to_feather saved.')
         except Exception as e:
-            logging.critical("to_feather:"+str(e))
+            log('critical',"to_feather:"+str(e))
 
     stock_history_concat_df=collect_data(get_stock_history,cores)
-    logging.info("stock_history_concat_df is ready.")
+    log('info','stock_history_concat_df is ready.')
     if (not stock_history_concat_df.empty):
         stock_history_concat_df.reset_index(inplace=True)
         stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
         try:
             stock_history_concat_df.to_feather(path + stop_time + ".feather")
-            logging.info("stock_history_concat_df to_feather saved.")
+            log('info','stock_history_concat_df to_feather saved.')
         except Exception as e:
-            logging.critical("to_feather:"+str(e))
+            log('critical',"to_feather:"+str(e))
 
     now = datetime.datetime.now()
     today8am = now.replace(hour=8,minute=0,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
     while((now.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):         #get real time stock price
         realtime_df=collect_data(get_stock_realtime,cores)
-        logging.info('realtime_df is ready')
+        log('info','realtime_df is ready')
         if not realtime_df.empty:
             realtime_df.reset_index(inplace=True)
             stock_concat_df = pd.concat([stock_history_concat_df,realtime_df])
@@ -201,9 +205,8 @@ if __name__ == '__main__':
             stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
             try:
                 stock_concat_df.to_feather(path + stop_time + ".feather")
-                logging.info(path + stop_time + ".feather" + "saved")
+                log('info',path + stop_time + ".feather" + "saved")
             except Exception as e:
-                logging.critical("to_feather:"+str(e))
+                log('critical',"to_feather:"+str(e))
 
-    stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-    logging.info("collect process exit time:" + stop_time)
+    log('info','collect process exit.')
