@@ -319,10 +319,10 @@ if __name__ == '__main__':
     process_data()
 
     now = datetime.datetime.now()
-    today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
+    today8am = now.replace(hour=8,minute=0,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
-    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)): 
+    while((now.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)): 
         process_data()
     
     stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
