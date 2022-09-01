@@ -74,7 +74,7 @@ def process_data():
     log('info',"process_data start.")
     raw_data_files = os.listdir(raw_data_path)
     if len(raw_data_files) == 0:
-        logging.warning("raw data not ready, sleep 10 seconds...")
+        log('warning',"raw data not ready, sleep 10 seconds...")
         time.sleep(10)
         return
     # date_time = datetime.datetime.now() 
@@ -83,7 +83,7 @@ def process_data():
 
     processed_data_files = os.listdir(processed_data_path)
     if raw_data_files[-1] in processed_data_files:
-        logging.warning("error: " + raw_data_files[-1] + " existed, sleep 10 seconds...")
+        log('warning',"error: " + raw_data_files[-1] + " existed, sleep 10 seconds...")
         time.sleep(10)
         return
     
@@ -97,7 +97,6 @@ def process_data():
         return
 
     tickers = df.ticker.unique()
-
     cores = int(multiprocessing.cpu_count()/2)
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
     pool = Pool(cores)
@@ -133,6 +132,8 @@ def log(type,string):
     log_time = now.strftime("%m%d%Y-%H%M%S")
     if type=='info':
         logging.info(log_time+":"+string)
+    elif type=='warning':
+        logging.warning(log_time+":"+string)
     elif type=='error':
         logging.error(log_time+":"+string)
     elif type=='critical':

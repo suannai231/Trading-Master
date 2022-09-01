@@ -135,6 +135,8 @@ def log(type,string):
     log_time = now.strftime("%m%d%Y-%H%M%S")
     if type=='info':
         logging.info(log_time+":"+string)
+    elif type=='warning':
+        logging.warning(log_time+":"+string)
     elif type=='error':
         logging.error(log_time+":"+string)
     elif type=='critical':

@@ -72,7 +72,7 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
         sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
         sharesOutstanding = sharesOutstanding_df.iloc[-1]['sharesOutstanding']
         # if(ticker=="TMC"):
-        #     logging.info("TMC")
+        #     log('info',"TMC")
 
         # Close_to_EMA20 = screen(df,"Close to EMA20")
         change  = screen(df,"change")
@@ -85,52 +85,29 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
         
     return return_ticker_chunk_df
 
-# def save(return_df,async_results,processed_data_file):
-#     df = pd.DataFrame()
-#     for async_result in async_results:
-#         result = async_result.get()
-#         if not result.empty:
-#             df = pd.concat([df,result])
-    
-#     if(not df.empty):
-#         df.reset_index(drop=False,inplace=True)
-#         try:
-#             df.to_csv(screened_data_path + processed_data_file + '.csv')
-#             end = datetime.date.today()
-#             df = df.loc[df.date==str(end),'ticker']
-#             df.to_csv(screened_data_path + processed_data_file + '.txt',header=False, index=False)
-#             return_df = pd.concat([return_df,df])
-#         except Exception as e:
-#             logging.critical("return_df to_csv:"+str(e))
-#     else:
-#         logging.error("return_df empty")
-#     return return_df
-
 def screen_data():
-    now = datetime.datetime.now()
-    start_time = now.strftime("%m%d%Y-%H%M%S")
-    logging.info("screen_data start time:" + start_time)
+    log('info',"screen_data start.")
 
     processed_data_files = os.listdir(processed_data_path)
     if len(processed_data_files) == 0:
-        logging.warning("processed data not ready, sleep 10 seconds...")
+        log('warning',"processed data not ready, sleep 10 seconds...")
         time.sleep(10)
         return
 
     screened_data_files = os.listdir(screened_data_path)
     processed_data_files_str = processed_data_files[-1] + '.txt'
     if processed_data_files_str in screened_data_files:
-        logging.warning("error: " + processed_data_files_str + " existed, sleep 10 seconds...")
+        log('warning',"error: " + processed_data_files_str + " existed, sleep 10 seconds...")
         time.sleep(10)
         return
 
-    logging.info("processing "+processed_data_files[-1])
-
+    log('info',"processing "+processed_data_files[-1])
     try:
         time.sleep(1)
         df = pd.read_feather(processed_data_path + processed_data_files[-1])
+        log('info',processed_data_path + processed_data_files[-1] + " loaded.")
     except Exception as e:
-        logging.critical(str(e))
+        log('critical',str(e))
         return
 
     tickers = df.ticker.unique()
@@ -145,10 +122,8 @@ def screen_data():
         async_result = pool.apply_async(run, args=(ticker_chunk_df,sharesOutstanding_chunk_df))
         async_results.append(async_result)
     pool.close()
+    log('info',"process pool start.")
 
-    # return_df = pd.DataFrame()
-
-    # return_df = save(return_df,async_results_AMP,processed_data_files[-1]+"_AMP")
     df = pd.DataFrame()
     for async_result in async_results:
         result = async_result.get()
@@ -159,23 +134,31 @@ def screen_data():
         df.reset_index(drop=False,inplace=True)
         try:
             df.to_csv(screened_data_path + processed_data_files[-1] + '.csv')
-            # end = datetime.date.today()
-            # df = df.loc[df.date==str(end),'ticker']
             df.ticker.to_csv(screened_data_path + processed_data_files[-1] + '.txt',header=False, index=False)
-            # return_df = pd.concat([return_df,df])
+            log('info',screened_data_path + processed_data_files[-1] +" is saved.")
         except Exception as e:
-            logging.critical("return_df to_csv:"+str(e))
+            log('critical',"df to_csv:"+str(e))
     else:
-        logging.error("return_df empty")
-    # return return_df
+        log('error',"df empty")
 
-    stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-    logging.info("screen_data stop time:" +stop_time)
+    log('info',"screen_data stop.")
 
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
+
+def log(type,string):
+    now = datetime.datetime.now()
+    log_time = now.strftime("%m%d%Y-%H%M%S")
+    if type=='info':
+        logging.info(log_time+":"+string)
+    elif type=='warning':
+        logging.warning(log_time+":"+string)
+    elif type=='error':
+        logging.error(log_time+":"+string)
+    elif type=='critical':
+        logging.critical(log_time+":"+string)
 
 if __name__ == '__main__':
 
@@ -189,7 +172,7 @@ if __name__ == '__main__':
 
     now = datetime.datetime.now()
     start_time = now.strftime("%m%d%Y-%H%M%S")
-    logging.info("screen_data process start time:" + start_time)
+    log('info',"screen_data process start time:" + start_time)
 
     isPathExists = os.path.exists(screened_data_path)
     if not isPathExists:
@@ -203,14 +186,14 @@ if __name__ == '__main__':
         full_path_name = sharesOutstanding_path + today_date + "_sharesOutstanding.feather"
         files = os.listdir(sharesOutstanding_path)
         if file_name not in files:
-            logging.warning("sharesOutstanding_file is not ready, sleep 10 seconds...")
+            log('warning',"sharesOutstanding_file is not ready, sleep 10 seconds...")
             time.sleep(10)
             continue
         try:
             sharesOutstanding_df = pd.read_feather(full_path_name)
-            logging.info('sharesOutstanding_df is ready')
+            log('info','sharesOutstanding_df is ready')
         except Exception as e:
-            logging.critical('sharesOutstanding_df read_feather:'+str(e))
+            log('critical','sharesOutstanding_df read_feather:'+str(e))
             continue
 
     screen_data()
@@ -224,4 +207,4 @@ if __name__ == '__main__':
 
     now = datetime.datetime.now()
     stop_time = now.strftime("%m%d%Y-%H%M%S")
-    logging.info("screen_data process stop time:" + start_time)
+    log('info',"screen_data process stop time:" + start_time)
