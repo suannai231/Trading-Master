@@ -191,10 +191,10 @@ if __name__ == '__main__':
             logging.critical("to_feather:"+str(e))
 
     now = datetime.datetime.now()
-    today830am = now.replace(hour=8,minute=30,second=0,microsecond=0)
+    today8am = now.replace(hour=8,minute=0,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
-    while((now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):         #get real time stock price
+    while((now.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):         #get real time stock price
 
         realtime_df=collect_data(get_stock_realtime,cores)
         logging.info('realtime_df is ready')
