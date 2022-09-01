@@ -80,10 +80,10 @@ def chunks(lst, n):
 
 date_time = datetime.datetime.now()
 start = date_time - datetime.timedelta(days)
-today830am = date_time.replace(hour=8,minute=30,second=0,microsecond=0)
+today8am = date_time.replace(hour=8,minute=0,second=0,microsecond=0)
 today3pm = date_time.replace(hour=15,minute=0,second=0,microsecond=0)
 
-if((date_time.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
+if((date_time.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):
     end = datetime.date.today()
 else:
     end = datetime.date.today()+ datetime.timedelta(1)
