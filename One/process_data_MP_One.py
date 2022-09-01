@@ -147,12 +147,12 @@ def cal_OBV(df):
 
 def cal_basics(df):
 
-    lastindex = len(df)-1
+    # lastindex = len(df)-1
 
-    df['Breakout'] = 0
-    df['Breakout_Cum'] = 0
-    df['Wait'] = 0
-    df['Wait_Cum'] = 0
+    # df['Breakout'] = 0
+    # df['Breakout_Cum'] = 0
+    # df['Wait'] = 0
+    # df['Wait_Cum'] = 0
 
     df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
     # df['change_1days'] = (df.close.shift(-1)- df.close)/df.close
@@ -187,12 +187,12 @@ def cal_basics(df):
     # ema250 = df['close'].ewm(span = 250, adjust = False).mean()
     # ema250 = df['close'].ewm(span = 250, adjust = False).mean()
     # ema999 = df['close'].ewm(span = 999, adjust = False).mean()
-    obv_ema10 = df['OBV'].ewm(span = 10, adjust = False).mean()
-    obv_ema20 = df['OBV'].ewm(span = 20, adjust = False).mean()
-    obv_ema30 = df['OBV'].ewm(span = 30, adjust = False).mean()
-    df['obv_ema10'] = obv_ema10
-    df['obv_ema20'] = obv_ema20
-    df['obv_ema30'] = obv_ema30
+    # obv_ema10 = df['OBV'].ewm(span = 10, adjust = False).mean()
+    # obv_ema20 = df['OBV'].ewm(span = 20, adjust = False).mean()
+    # obv_ema30 = df['OBV'].ewm(span = 30, adjust = False).mean()
+    # df['obv_ema10'] = obv_ema10
+    # df['obv_ema20'] = obv_ema20
+    # df['obv_ema30'] = obv_ema30
     df['EMA5'] = ema5
     df['EMA10'] = ema10
     df['EMA20'] = ema20
