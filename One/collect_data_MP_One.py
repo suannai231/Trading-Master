@@ -179,8 +179,6 @@ if __name__ == '__main__':
 
     stock_history_concat_df=collect_data(get_stock_history,cores)
     logging.info("stock_history_concat_df is ready.")
-
-    # if(not (now.weekday() <= 4) & (today830am <= datetime.datetime.now() <= today3pm)):
     if (not stock_history_concat_df.empty):
         stock_history_concat_df.reset_index(inplace=True)
         stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
