@@ -11,17 +11,17 @@ import logging
 import math
 # from yahoo_fin import stock_info as si
 
-def high_vol_in_last_20_days(df,sharesOutstanding):
-    if(len(df)<20):
+def high_vol_in_last_60_days(df,sharesOutstanding):
+    if(len(df)<60):
         return False
-    Last_20days_df = df.iloc[len(df)-20:]
-    vol_max = max(Last_20days_df.volume)
-    vol_max_turnover_rate = vol_max/sharesOutstanding
-    if vol_max_turnover_rate>0.05:
-        low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
-        close = Last_20days_df.iloc[-1]['close']
-        if(close>=low):
-            return True
+    Last_60days_df = df.iloc[len(df)-60:]
+    vol_max = max(Last_60days_df.volume)
+    # vol_max_turnover_rate = vol_max/sharesOutstanding
+    # if vol_max_turnover_rate>0.05:
+    low = Last_60days_df.loc[Last_60days_df.volume==vol_max,'low'][0]
+    close = Last_60days_df.iloc[-1]['close']
+    if(close>=low):
+        return True
     return False
 
 def screen(df,lines):
