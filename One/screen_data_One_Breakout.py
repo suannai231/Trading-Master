@@ -51,7 +51,7 @@ def screen(df,lines):
         else:
             return False
     elif lines=="turnover":
-        if(turnover >= 1000000):
+        if(turnover >= 500000):
             return True
         else:
             return False
@@ -71,8 +71,8 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
             continue
         sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
         sharesOutstanding = sharesOutstanding_df.iloc[-1]['sharesOutstanding']
-        # if(ticker=="TMC"):
-        #     log('info',"TMC")
+        if(ticker=="WNW"):
+            log('info',"WNW")
 
         # Close_to_EMA20 = screen(df,"Close to EMA20")
         change  = screen(df,"change")
