@@ -19,9 +19,9 @@ def high_vol_in_last_60_days(df,sharesOutstanding):
     vol = Last_60days_df.iloc[-1]['volume']
     turnover_rate = vol/sharesOutstanding
     if turnover_rate>0.05:
-        high = Last_60days_df.loc[Last_60days_df.volume==vol_max,'high'][0]
+        low = Last_60days_df.loc[Last_60days_df.volume==vol_max,'low'][0]
         close = Last_60days_df.iloc[-1]['close']
-        if(close>=high):
+        if(close>=low):
             return True
     return False
 
