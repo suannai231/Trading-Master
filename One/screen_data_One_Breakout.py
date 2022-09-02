@@ -11,16 +11,17 @@ import logging
 import math
 # from yahoo_fin import stock_info as si
 
-def high_vol_in_last_60_days(df,sharesOutstanding):
-    if(len(df)<60):
+def high_vol_in_last_20_days(df,sharesOutstanding):
+    if((len(df)<20) or (sharesOutstanding==0)):
         return False
-    Last_60days_df = df.iloc[len(df)-60:]
-    vol_max = max(Last_60days_df.volume)
-    vol = Last_60days_df.iloc[-1]['volume']
-    turnover_rate = vol/sharesOutstanding
-    if turnover_rate>0.05:
-        low = Last_60days_df.loc[Last_60days_df.volume==vol_max,'low'][0]
-        close = Last_60days_df.iloc[-1]['close']
+    Last_20days_df = df.iloc[len(df)-20:]
+    vol_max = max(Last_20days_df.volume)
+    # vol = Last_20days_df.iloc[-1]['volume']
+    max_turnover_rate = vol_max/sharesOutstanding
+    # turnover_rate = vol/sharesOutstanding
+    if max_turnover_rate>=0.07:
+        low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
+        close = Last_20days_df.iloc[-1]['close']
         if(close>=low):
             return True
     return False
@@ -80,7 +81,7 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
         OBV = screen(df,"OBV")
         turnover = screen(df,'turnover')
 
-        if(high_vol_in_last_60_days(df,sharesOutstanding) & OBV & change & turnover):
+        if(high_vol_in_last_20_days(df,sharesOutstanding) & OBV & change & turnover):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
         
