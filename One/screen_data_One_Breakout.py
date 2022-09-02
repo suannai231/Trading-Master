@@ -29,7 +29,7 @@ def screen(df,lines):
     turnover = df.iloc[-1]['volume']*close
 
     if lines=="Close to EMA20":
-        if(close<=ema20*1.1):
+        if(ema20 <= close <= ema20*1.1):
             return True
         else:
             return False
