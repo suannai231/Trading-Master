@@ -72,13 +72,13 @@ def run(ticker_chunk_df):
         if(ticker=="FRGE"):
             log('info',"FRGE")
 
-        # Close_to_EMA20 = screen(df,"Close to EMA20")
+        Close_to_EMA20 = screen(df,"Close to EMA20")
         ready = above_high_vol_low_20_days(df)
         change  = screen(df,"change")
         OBV = screen(df,"OBV")
         turnover = screen(df,'turnover')
 
-        if(ready & OBV & change & turnover):
+        if(ready & OBV & change & turnover & Close_to_EMA20):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
         
