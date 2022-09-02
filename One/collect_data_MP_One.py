@@ -21,24 +21,24 @@ if((date_time.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm
 else:
     end = datetime.date.today()+ datetime.timedelta(1)
 
-def get_quote_data(ticker):
-    df = pd.DataFrame()
-    try:
-        dict = si.get_quote_data(ticker)
-        # dict['ticker'] = ticker
-        if 'sharesOutstanding' in dict.keys():
-            sharesOutstanding = dict['sharesOutstanding']
-        else:
-            return pd.DataFrame()
-    except Exception as e:
-        if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-            return -1
-        else:
-            return pd.DataFrame()
-    d={'ticker':[ticker],'sharesOutstanding':[sharesOutstanding]}
-    df = pd.DataFrame(d)
-    df = df.set_index('ticker')
-    return df
+# def get_quote_data(ticker):
+#     df = pd.DataFrame()
+#     try:
+#         dict = si.get_quote_data(ticker)
+#         # dict['ticker'] = ticker
+#         if 'sharesOutstanding' in dict.keys():
+#             sharesOutstanding = dict['sharesOutstanding']
+#         else:
+#             return pd.DataFrame()
+#     except Exception as e:
+#         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+#             return -1
+#         else:
+#             return pd.DataFrame()
+#     d={'ticker':[ticker],'sharesOutstanding':[sharesOutstanding]}
+#     df = pd.DataFrame(d)
+#     df = df.set_index('ticker')
+#     return df
 
 def get_stock_history(ticker):
     df = pd.DataFrame()
@@ -170,17 +170,17 @@ if __name__ == '__main__':
     cores = int(multiprocessing.cpu_count()/2)
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
 
-    sharesOutstanding_df=collect_data(get_quote_data,cores)
-    log('info','sharesOutstanding_df is ready.')
-    if not sharesOutstanding_df.empty: 
-        sharesOutstanding_df.reset_index(inplace=True)
-        stop_time = datetime.datetime.now().strftime("%m%d%Y")
-        try:
-            sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
-            sharesOutstanding_df.to_feather(sharesOutstanding_path + stop_time + "_sharesOutstanding.feather")
-            log('info','sharesOutstanding_df to_feather saved.')
-        except Exception as e:
-            log('critical',"to_feather:"+str(e))
+    # sharesOutstanding_df=collect_data(get_quote_data,cores)
+    # log('info','sharesOutstanding_df is ready.')
+    # if not sharesOutstanding_df.empty: 
+    #     sharesOutstanding_df.reset_index(inplace=True)
+    #     stop_time = datetime.datetime.now().strftime("%m%d%Y")
+    #     try:
+    #         sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
+    #         sharesOutstanding_df.to_feather(sharesOutstanding_path + stop_time + "_sharesOutstanding.feather")
+    #         log('info','sharesOutstanding_df to_feather saved.')
+    #     except Exception as e:
+    #         log('critical',"to_feather:"+str(e))
 
     stock_history_concat_df=collect_data(get_stock_history,cores)
     log('info','stock_history_concat_df is ready.')
