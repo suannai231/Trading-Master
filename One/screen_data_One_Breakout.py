@@ -74,6 +74,8 @@ def screen(df,lines):
         vol_max = max(Last_20days_df.volume)
         ticker = df.iloc[-1]['ticker']
         float = get_float(ticker)
+        if float==0:
+            return False
         max_turnover = vol_max/float
         vol = df.iloc[-1]['volume']
         turnover = vol/float
