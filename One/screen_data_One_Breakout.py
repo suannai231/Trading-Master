@@ -11,19 +11,15 @@ import logging
 import math
 # from yahoo_fin import stock_info as si
 
-def high_vol_in_last_20_days(df,sharesOutstanding):
-    if((len(df)<20) or (sharesOutstanding==0)):
+def above_high_vol_low_20_days(df):
+    if(len(df)<20):
         return False
     Last_20days_df = df.iloc[len(df)-20:]
     vol_max = max(Last_20days_df.volume)
-    # vol = Last_20days_df.iloc[-1]['volume']
-    max_turnover_rate = vol_max/sharesOutstanding
-    # turnover_rate = vol/sharesOutstanding
-    if max_turnover_rate>=0.07:
-        low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
-        close = Last_20days_df.iloc[-1]['close']
-        if(close>=low):
-            return True
+    low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
+    close = Last_20days_df.iloc[-1]['close']
+    if(close>=low):
+        return True
     return False
 
 def screen(df,lines):
@@ -77,7 +73,7 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
             log('info',"FRGE")
 
         # Close_to_EMA20 = screen(df,"Close to EMA20")
-        ready = high_vol_in_last_20_days(df,sharesOutstanding)
+        ready = above_high_vol_low_20_days(df)
         change  = screen(df,"change")
         OBV = screen(df,"OBV")
         turnover = screen(df,'turnover')
