@@ -97,8 +97,8 @@ def run(ticker_chunk_df):
         #     continue
         # sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
         # sharesOutstanding = sharesOutstanding_df.iloc[-1]['sharesOutstanding']
-        if(ticker=="FRGE"):
-            log('info',"FRGE")
+        # if(ticker=="FRGE"):
+        #     log('info',"FRGE")
 
         Close_to_EMA20 = screen(df,"Close to EMA20")
         above_high_vol_low_20_days = screen(df,"above_high_vol_low_20_days")
