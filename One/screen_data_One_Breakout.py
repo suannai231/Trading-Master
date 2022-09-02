@@ -34,7 +34,7 @@ def screen(df,lines):
         else:
             return False
     elif lines=="change":
-        if change >=5:
+        if change >=1:
             return True
         else:
             return False
