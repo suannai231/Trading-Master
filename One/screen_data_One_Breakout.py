@@ -9,24 +9,31 @@ import numpy as np
 import time
 import logging
 import math
-# from yahoo_fin import stock_info as si
+from yahoo_fin import stock_info as si
 
-def above_high_vol_low_20_days(df):
-    if(len(df)<20):
-        return False
-    Last_20days_df = df.iloc[len(df)-20:]
-    vol_max = max(Last_20days_df.volume)
-    low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
-    close = Last_20days_df.iloc[-1]['close']
-    if(close>=low):
-        return True
-    return False
+multipliers = {'K':1000, 'M':1000000, 'B':1000000000, 'T':1000000000000}
+
+def string_to_int(string):
+    if string[-1].isdigit(): # check if no suffix
+        return int(string)
+    mult = multipliers[string[-1]] # look up suffix to get multiplier
+     # convert number to float, multiply by multiplier, then make int
+    return int(float(string[:-1]) * mult)
+
+def get_float(ticker):
+    float = 0
+    try:
+        df = si.get_stats(ticker)
+        float = string_to_int(df[df.Attribute=="Float 8"].iloc[-1].Value)
+    except Exception as e:
+        log("critical",ticker + " get_stats exception:" + str(e))
+    return float
 
 def screen(df,lines):
     close = df.iloc[-1]['close']
     ema20 = df.iloc[-1]['EMA20']
     change = df.iloc[-1]['change']
-    turnover = df.iloc[-1]['volume']*close
+    # turnover = df.iloc[-1]['volume']*close
 
     if lines=="Close to EMA20":
         if(ema20 <= close <= ema20*1.1):
@@ -48,11 +55,30 @@ def screen(df,lines):
             return True
         else:
             return False
-    elif lines=="turnover":
-        if(turnover >= 500000):
-            return True
-        else:
+    # elif lines=="turnover":
+    #     if(turnover >= 500000):
+    #         return True
+    #     else:
+    #         return False
+    elif lines=="above_high_vol_low_20_days":
+        if(len(df)<20):
             return False
+        Last_20days_df = df.iloc[len(df)-20:]
+        vol_max = max(Last_20days_df.volume)
+        low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
+        close = Last_20days_df.iloc[-1]['close']
+        if close >= low:
+            return True
+    elif lines=="turnover":
+        Last_20days_df = df.iloc[len(df)-20:]
+        vol_max = max(Last_20days_df.volume)
+        ticker = df.iloc[-1]['ticker']
+        float = get_float(ticker)
+        max_turnover = vol_max/float
+        vol = df.iloc[-1]['volume']
+        turnover = vol/float
+        if ((max_turnover >= 0.07) and (turnover >= 0.05)):
+            return True
     return False
 
 def run(ticker_chunk_df):
@@ -73,14 +99,15 @@ def run(ticker_chunk_df):
             log('info',"FRGE")
 
         Close_to_EMA20 = screen(df,"Close to EMA20")
-        ready = above_high_vol_low_20_days(df)
+        ready = screen(df,"above_high_vol_low_20_days")
         change  = screen(df,"change")
         OBV = screen(df,"OBV")
-        turnover = screen(df,'turnover')
-
-        if(ready & OBV & change & turnover & Close_to_EMA20):
-            today_df = df.iloc[[-1]]
-            return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
+        
+        if(ready & OBV & change & Close_to_EMA20):
+            turnover = screen(df,'turnover')
+            if turnover:
+                today_df = df.iloc[[-1]]
+                return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
         
     return return_ticker_chunk_df
 
@@ -148,6 +175,10 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 def log(type,string):
+    logpath = 'C:/Python/'
+    logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_screen.log"
+    logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
+
     now = datetime.datetime.now()
     log_time = now.strftime("%m%d%Y-%H%M%S")
     if type=='info':
@@ -164,10 +195,6 @@ if __name__ == '__main__':
     screened_data_path="//jack-nas.home/Work/Python/ScreenedData/"
     processed_data_path="C:/Python/ProcessedData/"
     raw_data_path = 'C:/Python/RawData/'
-
-    logpath = 'C:/Python/'
-    logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_screen.log"
-    logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
     log('info',"screen_data process start.")
 
