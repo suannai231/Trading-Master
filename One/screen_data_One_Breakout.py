@@ -102,7 +102,7 @@ def run(ticker_chunk_df):
         above_high_vol_low_20_days = screen(df,"above_high_vol_low_20_days")
         change  = screen(df,"change")
         OBV = screen(df,"OBV")
-        turnover = screen(df,"screen")
+        turnover = screen(df,"turnover")
         
         if(above_high_vol_low_20_days & OBV & change & Close_to_EMA20 & turnover):
             turnover = screen(df,'active')
