@@ -55,7 +55,7 @@ def screen(df,lines):
             return False
     return False
 
-def run(ticker_chunk_df,sharesOutstanding_chunk_df):
+def run(ticker_chunk_df):
     if ticker_chunk_df.empty:
         return pd.DataFrame()
     tickers = ticker_chunk_df.ticker.unique()
@@ -65,10 +65,10 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-        if ticker not in sharesOutstanding_chunk_df.ticker.values:
-            continue
-        sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
-        sharesOutstanding = sharesOutstanding_df.iloc[-1]['sharesOutstanding']
+        # if ticker not in sharesOutstanding_chunk_df.ticker.values:
+        #     continue
+        # sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
+        # sharesOutstanding = sharesOutstanding_df.iloc[-1]['sharesOutstanding']
         if(ticker=="FRGE"):
             log('info',"FRGE")
 
@@ -117,8 +117,8 @@ def screen_data():
     async_results = []
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-        sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run, args=(ticker_chunk_df,sharesOutstanding_chunk_df))
+        # sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
+        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
         async_results.append(async_result)
     pool.close()
     log('info',"process pool start.")
@@ -175,23 +175,23 @@ if __name__ == '__main__':
     if not isPathExists:
         os.makedirs(screened_data_path)
 
-    sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
-    sharesOutstanding_df = pd.DataFrame()
-    while(sharesOutstanding_df.empty):
-        today_date = datetime.datetime.now().strftime("%m%d%Y")
-        file_name = today_date + "_sharesOutstanding.feather"
-        full_path_name = sharesOutstanding_path + today_date + "_sharesOutstanding.feather"
-        files = os.listdir(sharesOutstanding_path)
-        if file_name not in files:
-            log('warning',"sharesOutstanding_file is not ready, sleep 10 seconds...")
-            time.sleep(10)
-            continue
-        try:
-            sharesOutstanding_df = pd.read_feather(full_path_name)
-            log('info','sharesOutstanding_df is ready')
-        except Exception as e:
-            log('critical','sharesOutstanding_df read_feather:'+str(e))
-            continue
+    # sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
+    # sharesOutstanding_df = pd.DataFrame()
+    # while(sharesOutstanding_df.empty):
+    #     today_date = datetime.datetime.now().strftime("%m%d%Y")
+    #     file_name = today_date + "_sharesOutstanding.feather"
+    #     full_path_name = sharesOutstanding_path + today_date + "_sharesOutstanding.feather"
+    #     files = os.listdir(sharesOutstanding_path)
+    #     if file_name not in files:
+    #         log('warning',"sharesOutstanding_file is not ready, sleep 10 seconds...")
+    #         time.sleep(10)
+    #         continue
+    #     try:
+    #         sharesOutstanding_df = pd.read_feather(full_path_name)
+    #         log('info','sharesOutstanding_df is ready')
+    #     except Exception as e:
+    #         log('critical','sharesOutstanding_df read_feather:'+str(e))
+    #         continue
 
     screen_data()
 
