@@ -33,7 +33,6 @@ def screen(df,lines):
     close = df.iloc[-1]['close']
     ema20 = df.iloc[-1]['EMA20']
     change = df.iloc[-1]['change']
-    # turnover = df.iloc[-1]['volume']*close
 
     if lines=="Close to EMA20":
         if(ema20 <= close <= ema20*1.1):
@@ -56,6 +55,7 @@ def screen(df,lines):
         else:
             return False
     elif lines=="turnover":
+        turnover = df.iloc[-1]['volume']*close
         if(turnover >= 500000):
             return True
         else:
