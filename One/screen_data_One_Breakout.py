@@ -73,15 +73,16 @@ def run(ticker_chunk_df,sharesOutstanding_chunk_df):
             continue
         sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
         sharesOutstanding = sharesOutstanding_df.iloc[-1]['sharesOutstanding']
-        if(ticker=="WNW"):
-            log('info',"WNW")
+        if(ticker=="FRGE"):
+            log('info',"FRGE")
 
         # Close_to_EMA20 = screen(df,"Close to EMA20")
+        ready = high_vol_in_last_20_days(df,sharesOutstanding)
         change  = screen(df,"change")
         OBV = screen(df,"OBV")
         turnover = screen(df,'turnover')
 
-        if(high_vol_in_last_20_days(df,sharesOutstanding) & OBV & change & turnover):
+        if(ready & OBV & change & turnover):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
         
