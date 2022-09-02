@@ -128,6 +128,10 @@ def process_data():
     log('info',"process_data stop.")
 
 def log(type,string):
+    logpath = 'C:/Python/'
+    logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_process.log"
+    logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
+
     now = datetime.datetime.now()
     log_time = now.strftime("%m%d%Y-%H%M%S")
     if type=='info':
@@ -142,10 +146,7 @@ def log(type,string):
 if __name__ == '__main__':
     raw_data_path='C:/Python/RawData/'
     processed_data_path='C:/Python/ProcessedData/'
-    logpath = 'C:/Python/'
 
-    logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_process.log"
-    logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
     log('info','process_data process start.')
 

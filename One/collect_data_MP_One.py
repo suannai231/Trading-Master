@@ -131,6 +131,10 @@ def collect_data(func,cores):
     return df
 
 def log(type,string):
+    logpath = 'C:/Python/'
+    logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_collect.log"
+    logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
+    
     now = datetime.datetime.now()
     log_time = now.strftime("%m%d%Y-%H%M%S")
     if type=='info':
@@ -147,10 +151,6 @@ if __name__ == '__main__':
     isPathExists = os.path.exists(path)
     if not isPathExists:
         os.makedirs(path)
-
-    logpath = 'C:/Python/'
-    logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_collect.log"
-    logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
     log('info','collect process started.')
 
