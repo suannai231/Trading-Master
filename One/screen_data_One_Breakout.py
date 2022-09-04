@@ -11,7 +11,7 @@ import logging
 import math
 from yahoo_fin import stock_info as si
 
-multipliers = {'K':1000, 'M':1000000, 'B':1000000000, 'T':1000000000000}
+multipliers = {'K':1000, 'M':1000000, 'B':1000000000, 'T':1000000000000, 'k':1000, 'm':1000000, 'b':1000000000, 't':1000000000000}
 
 def string_to_int(string):
     if string[-1].isdigit(): # check if no suffix
@@ -22,11 +22,17 @@ def string_to_int(string):
 
 def get_float(ticker):
     float = 0
-    try:
-        df = si.get_stats(ticker)
-        float = string_to_int(df[df.Attribute=="Float 8"].iloc[-1].Value)
-    except Exception as e:
-        log("critical",ticker + " get_stats exception:" + str(e))
+    while(float == 0):
+        try:
+            df = si.get_stats(ticker)
+            float = string_to_int(df[df.Attribute=="Float 8"].iloc[-1].Value)
+        except Exception as e:
+            log("critical",ticker + " get_stats exception:" + str(e))
+            if str(e).startswith('list index out of range'):
+                log("critical","sleep 60 seconds.")
+                time.sleep(60)
+            else:
+                return -1
     return float
 
 def screen(df,lines):
@@ -74,14 +80,47 @@ def screen(df,lines):
         vol_max = max(Last_20days_df.volume)
         ticker = df.iloc[-1]['ticker']
         float = get_float(ticker)
-        if float==0:
-            return False
+        if float==-1:
+            return -1
         max_turnover = vol_max/float
         vol = df.iloc[-1]['volume']
         turnover = vol/float
         if ((max_turnover >= 0.07) and (turnover >= 0.05)):
             return True
     return False
+
+def test(ticker_chunk_df):
+    if ticker_chunk_df.empty:
+        return pd.DataFrame()
+    tickers = ticker_chunk_df.ticker.unique()
+    if len(tickers) == 0:
+        return pd.DataFrame()
+    ticker_chunk_df.set_index('date',inplace=True)
+    return_ticker_chunk_df = pd.DataFrame()
+    for ticker in tickers:
+        ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
+        df_len = len(ticker_df)
+        if df_len < 60:
+            continue
+        for i in range(59, df_len):
+            # if(i==df_len-1):
+            #     log("info",ticker)
+            slice_df = ticker_df.iloc[0:i]
+            Close_to_EMA20 = screen(slice_df,"Close to EMA20")
+            above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
+            change  = screen(slice_df,"change")
+            OBV = screen(slice_df,"OBV")
+            turnover = screen(slice_df,"turnover")
+            
+            if(above_high_vol_low_20_days & OBV & change & Close_to_EMA20 & turnover):
+                turnover = screen(slice_df,'active')
+                if turnover == -1:
+                    break
+                elif turnover:
+                    today_df = slice_df.iloc[[-1]]
+                    return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
+        
+    return return_ticker_chunk_df
 
 def run(ticker_chunk_df):
     if ticker_chunk_df.empty:
@@ -140,7 +179,7 @@ def screen_data():
         return
 
     tickers = df.ticker.unique()
-    cores = int(multiprocessing.cpu_count()/4)
+    cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
     pool=Pool(cores)
 
@@ -148,7 +187,7 @@ def screen_data():
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
         # sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
+        async_result = pool.apply_async(test, args=(ticker_chunk_df,))
         async_results.append(async_result)
     pool.close()
     log('info',"process pool start.")
