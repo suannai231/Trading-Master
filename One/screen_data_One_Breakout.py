@@ -121,7 +121,7 @@ def run_last_20_days(ticker_chunk_df):
             OBV = screen(slice_df,"OBV")
             turnover = screen(slice_df,"turnover")
             
-            if(above_high_vol_low_20_days & OBV & change & Close_to_EMA20 & turnover):
+            if(above_high_vol_low_20_days & OBV & change & turnover):
                 candidate = True
 
             if((i==df_len) and (candidate==True)):
