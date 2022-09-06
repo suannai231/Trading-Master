@@ -41,7 +41,7 @@ def screen(df,lines):
     change = df.iloc[-1]['change']
 
     if lines=="Close to EMA20":
-        if(ema20 <= close <= ema20*1.4):
+        if(ema20 <= close <= ema20*1.2):
             return True
         else:
             return False
@@ -115,22 +115,19 @@ def run_last_20_days(ticker_chunk_df):
         candidate = False
         for i in range(df_len-20, df_len+1):
             slice_df = ticker_df.iloc[0:i]
-            Close_to_EMA20 = screen(slice_df,"Close to EMA20")
+            
             above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
             change  = screen(slice_df,"change")
             OBV = screen(slice_df,"OBV")
             turnover = screen(slice_df,"turnover")
             
             if(above_high_vol_low_20_days & OBV & change & Close_to_EMA20 & turnover):
-                # active = screen(slice_df,'active')
-                # if active == -1:
-                #     break
-                # elif active:
                 candidate = True
 
             if((i==df_len) and (candidate==True)):
                 buy = screen(slice_df,"buy")
-                # above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
+                Close_to_EMA20 = screen(slice_df,"Close to EMA20")
+
                 if(buy and above_high_vol_low_20_days and Close_to_EMA20):
                     today_df = slice_df.iloc[[-1]]
                     return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
