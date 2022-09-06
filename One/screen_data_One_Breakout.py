@@ -20,20 +20,20 @@ def string_to_int(string):
      # convert number to float, multiply by multiplier, then make int
     return int(float(string[:-1]) * mult)
 
-def get_float(ticker):
-    float = 0
-    while(float == 0):
-        try:
-            df = si.get_stats(ticker)
-            float = string_to_int(df[df.Attribute=="Float 8"].iloc[-1].Value)
-        except Exception as e:
-            log("critical",ticker + " get_stats exception:" + str(e))
-            if str(e).startswith('list index out of range'):
-                log("critical","sleep 60 seconds.")
-                time.sleep(60)
-            else:
-                return -1
-    return float
+# def get_float(ticker):
+#     float = 0
+#     while(float == 0):
+#         try:
+#             df = si.get_stats(ticker)
+#             float = string_to_int(df[df.Attribute=="Float 8"].iloc[-1].Value)
+#         except Exception as e:
+#             log("critical",ticker + " get_stats exception:" + str(e))
+#             if str(e).startswith('list index out of range'):
+#                 log("critical","sleep 60 seconds.")
+#                 time.sleep(60)
+#             else:
+#                 return -1
+#     return float
 
 def screen(df,lines):
     close = df.iloc[-1]['close']
@@ -41,7 +41,7 @@ def screen(df,lines):
     change = df.iloc[-1]['change']
 
     if lines=="Close to EMA20":
-        if(ema20 <= close <= ema20*1.3):
+        if(ema20 <= close <= ema20*1.4):
             return True
         else:
             return False
@@ -70,26 +70,36 @@ def screen(df,lines):
         if(len(df)<20):
             return False
         Last_20days_df = df.iloc[len(df)-20:]
-        vol_max = max(Last_20days_df.volume)
+        vol_max = max(Last_20days_df.volume.dropna(axis=0))
         low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
         close = Last_20days_df.iloc[-1]['close']
         if close >= low:
             return True
-    elif lines=="active":
-        Last_20days_df = df.iloc[len(df)-20:]
-        vol_max = max(Last_20days_df.volume)
-        ticker = df.iloc[-1]['ticker']
-        float = get_float(ticker)
-        if float==-1:
-            return -1
-        max_turnover = vol_max/float
-        vol = df.iloc[-1]['volume']
-        turnover = vol/float
-        if ((max_turnover >= 0.07) and (turnover >= 0.05)):
+        else:
+            return False
+    elif lines=="buy":
+        open = df.iloc[-1]['open']
+        close = df.iloc[-1]['close']
+        change = abs((close - open)/open)
+        if change <=0.05:
             return True
+        else:
+            return False
+    # elif lines=="active":
+    #     Last_20days_df = df.iloc[len(df)-20:]
+    #     vol_max = max(Last_20days_df.volume)
+    #     ticker = df.iloc[-1]['ticker']
+    #     float = get_float(ticker)
+    #     if float==-1:
+    #         return -1
+    #     max_turnover = vol_max/float
+    #     vol = df.iloc[-1]['volume']
+    #     turnover = vol/float
+    #     if ((max_turnover >= 0.07) and (turnover >= 0.05)):
+    #         return True
     return False
 
-def test(ticker_chunk_df):
+def run_last_20_days(ticker_chunk_df):
     if ticker_chunk_df.empty:
         return pd.DataFrame()
     tickers = ticker_chunk_df.ticker.unique()
@@ -100,11 +110,10 @@ def test(ticker_chunk_df):
     for ticker in tickers:
         ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
         df_len = len(ticker_df)
-        if df_len < 60:
+        if df_len < 20:
             continue
-        for i in range(59, df_len):
-            # if(i==df_len-1):
-            #     log("info",ticker)
+        candidate = False
+        for i in range(df_len-20, df_len+1):
             slice_df = ticker_df.iloc[0:i]
             Close_to_EMA20 = screen(slice_df,"Close to EMA20")
             above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
@@ -113,12 +122,19 @@ def test(ticker_chunk_df):
             turnover = screen(slice_df,"turnover")
             
             if(above_high_vol_low_20_days & OBV & change & Close_to_EMA20 & turnover):
-                turnover = screen(slice_df,'active')
-                if turnover == -1:
-                    break
-                elif turnover:
+                # active = screen(slice_df,'active')
+                # if active == -1:
+                #     break
+                # elif active:
+                candidate = True
+
+            if((i==df_len) and (candidate==True)):
+                buy = screen(slice_df,"buy")
+                # above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
+                if(buy and above_high_vol_low_20_days and Close_to_EMA20):
                     today_df = slice_df.iloc[[-1]]
                     return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
+                    log("info",ticker)
         
     return return_ticker_chunk_df
 
@@ -187,7 +203,7 @@ def screen_data():
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
         # sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(test, args=(ticker_chunk_df,))
+        async_result = pool.apply_async(run_last_20_days, args=(ticker_chunk_df,))
         async_results.append(async_result)
     pool.close()
     log('info',"process pool start.")
