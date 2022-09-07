@@ -19,11 +19,10 @@ def cal_OBV(df):
         previous_close = df.close[i-1]
         if df.close[i] >= previous_close:
             OBV.append(OBV[-1] + df.volume[i])
-        # elif df.close[i] < previous_close:
+        elif df.close[i] < previous_close:
+            OBV.append(OBV[-1] - df.volume[i])
         else:
-            OBV.append( OBV[-1] - df.volume[i])
-        # else:
-        #     OBV.append(OBV[-1])
+            OBV.append(OBV[-1])
         # OBV_MAX.append(max(OBV))
     df['OBV'] = OBV
     return df
