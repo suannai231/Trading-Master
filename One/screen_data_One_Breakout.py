@@ -10,6 +10,7 @@ import time
 import logging
 import math
 from yahoo_fin import stock_info as si
+import statistics
 
 multipliers = {'K':1000, 'M':1000000, 'B':1000000000, 'T':1000000000000, 'k':1000, 'm':1000000, 'b':1000000000, 't':1000000000000}
 
@@ -56,7 +57,13 @@ def screen(df,lines):
         last_60days_df = df.iloc[len(df)-60:]
         obv_max = max(last_60days_df.OBV)
         OBV = df.iloc[-1]['OBV']
-        if OBV == obv_max:
+        OBV_EMA20 = df.iloc[-1]['OBV_EMA20']
+        OBV_EMA60 = df.iloc[-1]['OBV_EMA60']
+        DIS=statistics.pstdev(last_60days_df.OBV)
+        UPPER=OBV_EMA60+(2*DIS)
+        LOWER=OBV_EMA60-(2*DIS)
+
+        if OBV >= UPPER:
             return True
         else:
             return False
@@ -145,6 +152,10 @@ def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
+        OBV = screen(df,"OBV")
+        if OBV:
+            today_df = df.iloc[[-1]]
+            return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
         # if ticker not in sharesOutstanding_chunk_df.ticker.values:
         #     continue
         # sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
@@ -152,17 +163,17 @@ def run(ticker_chunk_df):
         # if(ticker=="FRGE"):
         #     log('info',"FRGE")
 
-        Close_to_EMA20 = screen(df,"Close to EMA20")
-        above_high_vol_low_20_days = screen(df,"above_high_vol_low_20_days")
-        change  = screen(df,"change")
-        OBV = screen(df,"OBV")
-        turnover = screen(df,"turnover")
+        # Close_to_EMA20 = screen(df,"Close to EMA20")
+        # above_high_vol_low_20_days = screen(df,"above_high_vol_low_20_days")
+        # change  = screen(df,"change")
+        # OBV = screen(df,"OBV")
+        # turnover = screen(df,"turnover")
         
-        if(above_high_vol_low_20_days & OBV & change & Close_to_EMA20 & turnover):
-            turnover = screen(df,'active')
-            if turnover:
-                today_df = df.iloc[[-1]]
-                return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
+        # if(above_high_vol_low_20_days & OBV & change & Close_to_EMA20 & turnover):
+        #     turnover = screen(df,'active')
+        #     if turnover:
+        #         today_df = df.iloc[[-1]]
+        #         return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
         
     return return_ticker_chunk_df
 
@@ -200,7 +211,7 @@ def screen_data():
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
         # sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run_last_20_days, args=(ticker_chunk_df,))
+        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
         async_results.append(async_result)
     pool.close()
     log('info',"process pool start.")

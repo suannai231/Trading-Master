@@ -41,6 +41,11 @@ def cal_basics(df):
     df['EMA20'] = ema20
     df['EMA60'] = ema60
     df['EMA120'] = ema120
+
+    OBV_EMA20 = df['OBV'].ewm(span = 20, adjust = False).mean()
+    df['OBV_EMA20'] = OBV_EMA20
+    OBV_EMA60 = df['OBV'].ewm(span = 60, adjust = False).mean()
+    df['OBV_EMA60'] = OBV_EMA60
     return df
 
 def run(ticker_chunk_df):
