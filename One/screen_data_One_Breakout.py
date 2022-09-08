@@ -157,7 +157,8 @@ def run(ticker_chunk_df):
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
         OBV = screen(df,"OBV")
-        if OBV:
+        above_high_vol_low_20_days = screen(df,"above_high_vol_low_20_days")
+        if OBV and above_high_vol_low_20_days:
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
         # if ticker not in sharesOutstanding_chunk_df.ticker.values:
