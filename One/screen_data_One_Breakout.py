@@ -52,20 +52,21 @@ def screen(df,lines):
         else:
             return False
     elif lines=="OBV":
-        if(len(df)<60):
+        if(len(df)<20):
             return False
         last_60days_df = df.iloc[len(df)-60:]
-        obv_max = max(last_60days_df.OBV)
+        # obv_max = max(last_60days_df.OBV)
         OBV = df.iloc[-1]['OBV']
         OBV_SMA20 = df.iloc[-1]['OBV_SMA20']
-        OBV_SMA60 = df.iloc[-1]['OBV_SMA60']
-        DIS=statistics.pstdev(last_60days_df.OBV)
-        UPPER=OBV_SMA60+(2*DIS)
-        LOWER=OBV_SMA60-(2*DIS)
+        # OBV_SMA60 = df.iloc[-1]['OBV_SMA60']
+        last_20days_df = df.iloc[len(df)-20:]
+        DIS=statistics.pstdev(last_20days_df.OBV)
+        UPPER=OBV_SMA20+(2*DIS)
+        # LOWER=OBV_SMA20-(2*DIS)
 
-        ticker = df.iloc[-1]['ticker']
-        if ticker=="PHIO":
-            log("info",ticker)
+        # ticker = df.iloc[-1]['ticker']
+        # if ticker=="PHIO":
+        #     log("info",ticker)
 
         if OBV >= UPPER:
             return True
