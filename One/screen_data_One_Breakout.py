@@ -125,9 +125,10 @@ def run_last_20_days(ticker_chunk_df):
         if df_len < 20:
             continue
         candidate = False
-        for i in range(df_len-20, df_len+1):
+        for i in range(df_len-19, df_len+1):
             slice_df = ticker_df.iloc[0:i]
-            
+            if slice_df.empty:
+                log("info","error")
             above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
             change  = screen(slice_df,"change")
             OBV = screen(slice_df,"OBV")
