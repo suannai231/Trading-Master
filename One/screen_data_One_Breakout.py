@@ -150,7 +150,7 @@ def run_last_20_days(ticker_chunk_df):
             else:
                 Pre_Above_EMA20 = False
 
-            if((i==df_len) and (Fall==True) and (ticker_df.iloc[i-1].close>=close)):
+            if((i==df_len) and (Fall==True) and (ticker_df.iloc[i-1].close > close)):
                 # buy = screen(slice_df,"buy")
                 # Close_to_EMA20 = screen(slice_df,"Close to EMA20")
 
