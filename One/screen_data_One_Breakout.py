@@ -152,11 +152,11 @@ def run_last_20_days(ticker_chunk_df):
 
             if((i==df_len) and (Fall==True) and (ticker_df.iloc[i-1].close > close)):
                 # buy = screen(slice_df,"buy")
-                # Close_to_EMA20 = screen(slice_df,"Close to EMA20")
+                Close_to_EMA20 = screen(slice_df,"Close to EMA20")
 
                 # if(buy and above_high_vol_low_20_days and Close_to_EMA20):
                 turnover = screen(slice_df,"turnover")
-                if turnover:
+                if turnover and Close_to_EMA20:
                     today_df = slice_df.iloc[[-1]]
                     return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                     log("info",ticker)
