@@ -46,29 +46,34 @@ def screen(df,lines):
             return True
         else:
             return False
+    elif lines == "Above EMA20":
+        if(close < ema20):
+            return False
+        else:
+            return True
     elif lines=="change":
         if change >= 0.05:
             return True
         else:
             return False
     elif lines=="OBV":
-        if(len(df)<20):
+        if(len(df)<60):
             return False
         last_60days_df = df.iloc[len(df)-60:]
-        # obv_max = max(last_60days_df.OBV)
+        obv_max = max(last_60days_df.OBV)
         OBV = df.iloc[-1]['OBV']
-        OBV_SMA20 = df.iloc[-1]['OBV_SMA20']
+        # OBV_SMA20 = df.iloc[-1]['OBV_SMA20']
         # OBV_SMA60 = df.iloc[-1]['OBV_SMA60']
-        last_20days_df = df.iloc[len(df)-20:]
-        DIS=statistics.pstdev(last_20days_df.OBV)
-        UPPER=OBV_SMA20+(2*DIS)
+        # last_20days_df = df.iloc[len(df)-20:]
+        # DIS=statistics.pstdev(last_20days_df.OBV)
+        # UPPER=OBV_SMA20+(2*DIS)
         # LOWER=OBV_SMA20-(2*DIS)
 
         # ticker = df.iloc[-1]['ticker']
         # if ticker=="PHIO":
         #     log("info",ticker)
 
-        if OBV >= UPPER:
+        if OBV == obv_max:
             return True
         else:
             return False
@@ -124,27 +129,35 @@ def run_last_20_days(ticker_chunk_df):
         df_len = len(ticker_df)
         if df_len < 20:
             continue
-        candidate = False
+        Pre_Above_EMA20 = False
+        Fall = False
         for i in range(df_len-19, df_len+1):
             slice_df = ticker_df.iloc[0:i]
             if slice_df.empty:
-                log("info","error")
-            above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
-            change  = screen(slice_df,"change")
-            OBV = screen(slice_df,"OBV")
-            turnover = screen(slice_df,"turnover")
-            
-            if(above_high_vol_low_20_days & OBV & change & turnover):
-                candidate = True
+                log("error","slice_df is empty")
+            # above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
+            # change  = screen(slice_df,"change")
+            # OBV = screen(slice_df,"OBV")
+            # turnover = screen(slice_df,"turnover")
+            Above_EMA20 = screen(slice_df,"Above EMA20")
 
-            if((i==df_len) and (candidate==True)):
-                buy = screen(slice_df,"buy")
-                Close_to_EMA20 = screen(slice_df,"Close to EMA20")
+            if ((Pre_Above_EMA20 == True) and (Above_EMA20 == False)):
+                close = ticker_df.iloc[i-1].close
+                Fall = True
 
-                if(buy and above_high_vol_low_20_days and Close_to_EMA20):
-                    today_df = slice_df.iloc[[-1]]
-                    return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
-                    log("info",ticker)
+            if(Above_EMA20):
+                Pre_Above_EMA20 = True
+            else:
+                Pre_Above_EMA20 = False
+
+            if((i==df_len) and (Fall==True) and (ticker_df.iloc[i-1].close>=close)):
+                # buy = screen(slice_df,"buy")
+                # Close_to_EMA20 = screen(slice_df,"Close to EMA20")
+
+                # if(buy and above_high_vol_low_20_days and Close_to_EMA20):
+                today_df = slice_df.iloc[[-1]]
+                return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
+                log("info",ticker)
         
     return return_ticker_chunk_df
 
