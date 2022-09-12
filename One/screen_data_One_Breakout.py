@@ -79,7 +79,7 @@ def screen(df,lines):
             return False
     elif lines=="turnover":
         turnover = df.iloc[-1]['volume']*close
-        if(turnover >= 500000):
+        if(turnover >= 100000):
             return True
         else:
             return False
@@ -138,7 +138,7 @@ def run_last_20_days(ticker_chunk_df):
             # above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
             # change  = screen(slice_df,"change")
             # OBV = screen(slice_df,"OBV")
-            # turnover = screen(slice_df,"turnover")
+            
             Above_EMA20 = screen(slice_df,"Above EMA20")
 
             if ((Pre_Above_EMA20 == True) and (Above_EMA20 == False)):
@@ -155,9 +155,11 @@ def run_last_20_days(ticker_chunk_df):
                 # Close_to_EMA20 = screen(slice_df,"Close to EMA20")
 
                 # if(buy and above_high_vol_low_20_days and Close_to_EMA20):
-                today_df = slice_df.iloc[[-1]]
-                return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
-                log("info",ticker)
+                turnover = screen(slice_df,"turnover")
+                if turnover:
+                    today_df = slice_df.iloc[[-1]]
+                    return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
+                    log("info",ticker)
         
     return return_ticker_chunk_df
 
