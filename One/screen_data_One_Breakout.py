@@ -42,7 +42,7 @@ def screen(df,lines):
     change = df.iloc[-1]['change']
 
     if lines=="Close to EMA20":
-        if(close <= ema20*1.05):
+        if(close <= ema20*1.1):
             return True
         else:
             return False
@@ -141,7 +141,8 @@ def run_last_20_days(ticker_chunk_df):
         if df_len < 20:
             continue
         podifan = False
-        Above_EMA20 = 0
+        Above_EMA20 = False
+        Above_EMA20_Nums = 0
         for i in range(df_len-19, df_len+1):
             slice_df = ticker_df.iloc[0:i]
             if slice_df.empty:
@@ -153,10 +154,11 @@ def run_last_20_days(ticker_chunk_df):
             if screen(slice_df,'podifan'):
                 podifan = True
 
-            if screen(slice_df,'Above EMA20'):
-                Above_EMA20 += 1
+            Above_EMA20 = screen(slice_df,'Above EMA20')
+            if Above_EMA20:
+                Above_EMA20_Nums += 1
 
-            if((i==df_len) and (podifan==True) and (Above_EMA20>1)):
+            if((i==df_len) and (podifan==True) and (Above_EMA20>1) and Above_EMA20):
                 # buy = screen(slice_df,"buy")
                 Close_to_EMA20 = screen(slice_df,"Close to EMA20")
                 change  = screen(slice_df,"change")
