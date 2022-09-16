@@ -105,10 +105,11 @@ def screen(df,lines):
     elif lines=="podifan":
         if(len(df)<20):
             return False
-        min_close = min(df.close)
-        pre_close = df.iloc[-2]['close']
+        min_low = min(df.low)
+        pre_low = df.iloc[-2]['low']
+        pre_high = df.iloc[-2]['high']
         close = df.iloc[-1]['close']
-        if (pre_close == min_close) and (close > pre_close):
+        if (pre_low == min_low) and (close > pre_high):
             return True
         else:
             return False
