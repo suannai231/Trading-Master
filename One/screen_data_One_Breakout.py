@@ -152,7 +152,7 @@ def run_last_20_days(ticker_chunk_df):
             
             if screen(slice_df,'podifan'):
                 podifan = True
-                
+
             Above_EMA20 = screen(slice_df,'Above EMA20')
 
             if((i==df_len) and (podifan==True) and Above_EMA20):
@@ -245,7 +245,7 @@ def screen_data():
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
         # sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
+        async_result = pool.apply_async(run_last_20_days, args=(ticker_chunk_df,))
         async_results.append(async_result)
     pool.close()
     log('info',"process pool start.")
