@@ -79,7 +79,7 @@ def screen(df,lines):
             return False
     elif lines=="turnover":
         turnover = df.iloc[-1]['volume']*close
-        if(turnover >= 500000):
+        if(turnover >= 100000):
             return True
         else:
             return False
@@ -99,6 +99,16 @@ def screen(df,lines):
         close = df.iloc[-1]['close']
         change = abs((close - open)/open)
         if change <= 0.05:
+            return True
+        else:
+            return False
+    elif lines=="podifan":
+        if(len(df)<20):
+            return False
+        min_close = min(df.close)
+        pre_close = df.iloc[-2]['close']
+        close = df.iloc[-1]['close']
+        if (pre_close == min_close) and (close >= pre_close):
             return True
         else:
             return False
@@ -175,11 +185,17 @@ def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-        OBV = screen(df,"OBV")
-        above_high_vol_low_20_days = screen(df,"above_high_vol_low_20_days")
-        if OBV and above_high_vol_low_20_days:
+        podifan = screen(df,'podifan')
+        turnover = screen(df,"turnover")
+        if podifan and turnover:
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
+
+        # OBV = screen(df,"OBV")
+        # above_high_vol_low_20_days = screen(df,"above_high_vol_low_20_days")
+        # if OBV and above_high_vol_low_20_days:
+        #     today_df = df.iloc[[-1]]
+        #     return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
         # if ticker not in sharesOutstanding_chunk_df.ticker.values:
         #     continue
         # sharesOutstanding_df = sharesOutstanding_chunk_df[sharesOutstanding_chunk_df.ticker==ticker]
@@ -235,7 +251,7 @@ def screen_data():
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
         # sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run_last_20_days, args=(ticker_chunk_df,))
+        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
         async_results.append(async_result)
     pool.close()
     log('info',"process pool start.")
