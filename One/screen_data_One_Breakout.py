@@ -108,7 +108,7 @@ def screen(df,lines):
         min_close = min(df.close)
         pre_close = df.iloc[-2]['close']
         close = df.iloc[-1]['close']
-        if (pre_close == min_close) and (close >= pre_close):
+        if (pre_close == min_close) and (close > pre_close):
             return True
         else:
             return False
