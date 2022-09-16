@@ -140,9 +140,8 @@ def run_last_20_days(ticker_chunk_df):
         df_len = len(ticker_df)
         if df_len < 20:
             continue
-        Pre_Above_EMA20 = False
-        Fall = False
-        close = ticker_df.iloc[-1].close
+        podifan = False
+        Above_EMA20 = False
         for i in range(df_len-19, df_len+1):
             slice_df = ticker_df.iloc[0:i]
             if slice_df.empty:
@@ -151,13 +150,12 @@ def run_last_20_days(ticker_chunk_df):
             # change  = screen(slice_df,"change")
             # OBV = screen(slice_df,"OBV")
             
-            Above_EMA20 = screen(slice_df,"Above EMA20")
+            if screen(slice_df,'podifan'):
+                podifan = True
+                
+            Above_EMA20 = screen(slice_df,'Above EMA20')
 
-            if ((Pre_Above_EMA20 == True) and (Above_EMA20 == False)):
-                close = ticker_df.iloc[i-1].close
-                Fall = True
-
-            if((i==df_len) and (Fall==True) and (ticker_df.iloc[i-1].close > close) and (ticker_df.iloc[i-2].close <= close)):
+            if((i==df_len) and (podifan==True) and Above_EMA20):
                 # buy = screen(slice_df,"buy")
                 Close_to_EMA20 = screen(slice_df,"Close to EMA20")
                 change  = screen(slice_df,"change")
@@ -168,11 +166,6 @@ def run_last_20_days(ticker_chunk_df):
                     today_df = slice_df.iloc[[-1]]
                     return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                     log("info",ticker)
-
-            if(Above_EMA20):
-                Pre_Above_EMA20 = True
-            else:
-                Pre_Above_EMA20 = False
 
     return return_ticker_chunk_df
 
