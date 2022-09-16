@@ -159,7 +159,7 @@ def run_last_20_days(ticker_chunk_df):
             if Above_EMA20:
                 Above_EMA20_Nums += 1
 
-            if((i==df_len) and (podifan==True) and (Above_EMA20>=2) and Above_EMA20):
+            if((i==df_len) and (podifan==True) and (Above_EMA20_Nums>=2) and Above_EMA20):
                 # buy = screen(slice_df,"buy")
                 Close_to_EMA20 = screen(slice_df,"Close to EMA20")
                 change  = screen(slice_df,"change")
