@@ -91,7 +91,7 @@ def screen(df,lines):
         vol_max = max(Last_20days_df.volume.dropna(axis=0))
         low = Last_20days_df.loc[Last_20days_df.volume==vol_max,'low'][0]
         close = Last_20days_df.iloc[-1]['close']
-        if close >= low:
+        if close > low:
             return True
         else:
             return False
