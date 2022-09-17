@@ -114,6 +114,15 @@ def screen(df,lines):
             return True
         else:
             return False
+    elif lines=="120day High":
+        if(len(df)<120):
+            return False
+        Last_120days_df = df.iloc[len(df)-120:]
+        high = max(Last_120days_df.close)
+        if df.iloc[-1].close == high:
+            return True
+        else:
+            return False
     # elif lines=="active":
     #     Last_20days_df = df.iloc[len(df)-20:]
     #     vol_max = max(Last_20days_df.volume)
@@ -141,35 +150,24 @@ def run_last_20_days(ticker_chunk_df):
         df_len = len(ticker_df)
         if df_len < 20:
             continue
-        podifan = False
-        Above_EMA20 = False
-        Above_EMA20_Nums = 0
+        _120day_High = False
+        Close_to_EMA20 = False
+        above_high_vol_low_20_days = False
         for i in range(df_len-19, df_len+1):
             slice_df = ticker_df.iloc[0:i]
             if slice_df.empty:
                 log("error","slice_df is empty")
-            # above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
-            # change  = screen(slice_df,"change")
-            # OBV = screen(slice_df,"OBV")
-            
-            if screen(slice_df,'podifan'):
-                podifan = True
 
-            Above_EMA20 = screen(slice_df,'Above EMA20')
-            if Above_EMA20:
-                Above_EMA20_Nums += 1
+            if screen(slice_df,'120day High'):
+                _120day_High = True
+            Close_to_EMA20 = screen(slice_df,'Close to EMA20')
+            above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
+            turnover = screen(slice_df,"turnover")
 
-            if((i==df_len) and (podifan==True) and (Above_EMA20_Nums>=3) and Above_EMA20):
-                # buy = screen(slice_df,"buy")
-                Close_to_EMA20 = screen(slice_df,"Close to EMA20")
-                change  = screen(slice_df,"change")
-                above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
-                # if(buy and above_high_vol_low_20_days and Close_to_EMA20):
-                turnover = screen(slice_df,"turnover")
-                if turnover and Close_to_EMA20 and change and above_high_vol_low_20_days:
-                    today_df = slice_df.iloc[[-1]]
-                    return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
-                    log("info",ticker)
+            if((i==df_len) and (_120day_High==True) and Close_to_EMA20 and above_high_vol_low_20_days and turnover):
+                today_df = slice_df.iloc[[-1]]
+                return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
+                log("info",ticker)
 
     return return_ticker_chunk_df
 
