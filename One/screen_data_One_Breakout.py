@@ -80,7 +80,7 @@ def screen(df,lines):
             return False
     elif lines=="turnover":
         turnover = df.iloc[-1]['volume']*close
-        if(turnover >= 100000):
+        if(turnover >= 200000):
             return True
         else:
             return False
