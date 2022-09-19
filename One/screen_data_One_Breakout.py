@@ -129,6 +129,14 @@ def screen(df,lines):
             return False
         else:
             return True
+    elif lines=="AMP":
+        open = df.iloc[-1].open
+        close = df.iloc[-1].close
+        amp = abs((close-open)/open)
+        if amp <= 0.05:
+            return True
+        else:
+            return False
     # elif lines=="active":
     #     Last_20days_df = df.iloc[len(df)-20:]
     #     vol_max = max(Last_20days_df.volume)
@@ -170,8 +178,9 @@ def run_last_20_days(ticker_chunk_df):
             above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
             turnover = screen(slice_df,"turnover")
             price_limit = screen(slice_df,"price limit")
+            AMP = screen(slice_df,"AMP")
 
-            if((i==df_len) and _120day_High and Close_to_EMA20 and above_high_vol_low_20_days and turnover and price_limit):
+            if((i==df_len) and _120day_High and Close_to_EMA20 and above_high_vol_low_20_days and turnover and price_limit and AMP):
                 today_df = slice_df.iloc[[-1]]
                 return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 log("info",ticker)
