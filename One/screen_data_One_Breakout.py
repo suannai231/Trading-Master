@@ -42,7 +42,7 @@ def screen(df,lines):
     change = df.iloc[-1]['change']
 
     if lines=="Close to EMA20":
-        if(close <= ema20*1.1):
+        if(ema20 <= close <= ema20*1.15):
             return True
         else:
             return False
@@ -57,12 +57,12 @@ def screen(df,lines):
             return True
         else:
             return False
-    elif lines=="OBV":
-        if(len(df)<60):
-            return False
-        last_60days_df = df.iloc[len(df)-60:]
-        obv_max = max(last_60days_df.OBV)
-        OBV = df.iloc[-1]['OBV']
+    # elif lines=="OBV":
+    #     if(len(df)<60):
+    #         return False
+    #     last_60days_df = df.iloc[len(df)-60:]
+    #     obv_max = max(last_60days_df.OBV)
+    #     OBV = df.iloc[-1]['OBV']
         # OBV_SMA20 = df.iloc[-1]['OBV_SMA20']
         # OBV_SMA60 = df.iloc[-1]['OBV_SMA60']
         # last_20days_df = df.iloc[len(df)-20:]
@@ -74,10 +74,10 @@ def screen(df,lines):
         # if ticker=="PHIO":
         #     log("info",ticker)
 
-        if OBV == obv_max:
-            return True
-        else:
-            return False
+        # if OBV == obv_max:
+        #     return True
+        # else:
+        #     return False
     elif lines=="turnover":
         turnover = df.iloc[-1]['volume']*close
         if(turnover >= 500000):
@@ -95,25 +95,25 @@ def screen(df,lines):
             return True
         else:
             return False
-    elif lines=="buy":
-        open = df.iloc[-1]['open']
-        close = df.iloc[-1]['close']
-        change = abs((close - open)/open)
-        if change <= 0.05:
-            return True
-        else:
-            return False
-    elif lines=="podifan":
-        if(len(df)<20):
-            return False
-        min_low = min(df.low)
-        pre_low = df.iloc[-2]['low']
-        # pre_close = df.iloc[-2]['close']
-        close = df.iloc[-1]['close']
-        if (pre_low == min_low) and (close > pre_low):
-            return True
-        else:
-            return False
+    # elif lines=="buy":
+    #     open = df.iloc[-1]['open']
+    #     close = df.iloc[-1]['close']
+    #     change = abs((close - open)/open)
+    #     if change <= 0.05:
+    #         return True
+    #     else:
+    #         return False
+    # elif lines=="podifan":
+    #     if(len(df)<20):
+    #         return False
+    #     min_low = min(df.low)
+    #     pre_low = df.iloc[-2]['low']
+    #     # pre_close = df.iloc[-2]['close']
+    #     close = df.iloc[-1]['close']
+    #     if (pre_low == min_low) and (close > pre_low):
+    #         return True
+    #     else:
+    #         return False
     elif lines=="60day High":
         if(len(df)<60):
             return False
@@ -133,7 +133,7 @@ def screen(df,lines):
         open = df.iloc[-1].open
         close = df.iloc[-1].close
         amp = abs((close-open)/open)
-        if amp <= 0.05:
+        if amp <= 0.07:
             return True
         else:
             return False
