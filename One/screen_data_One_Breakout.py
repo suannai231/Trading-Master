@@ -267,7 +267,7 @@ def screen_data():
         return
 
     tickers = df.ticker.unique()
-    cores = int(multiprocessing.cpu_count()/2)
+    cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
     pool=Pool(cores)
 
@@ -331,24 +331,6 @@ if __name__ == '__main__':
     isPathExists = os.path.exists(screened_data_path)
     if not isPathExists:
         os.makedirs(screened_data_path)
-
-    # sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
-    # sharesOutstanding_df = pd.DataFrame()
-    # while(sharesOutstanding_df.empty):
-    #     today_date = datetime.datetime.now().strftime("%m%d%Y")
-    #     file_name = today_date + "_sharesOutstanding.feather"
-    #     full_path_name = sharesOutstanding_path + today_date + "_sharesOutstanding.feather"
-    #     files = os.listdir(sharesOutstanding_path)
-    #     if file_name not in files:
-    #         log('warning',"sharesOutstanding_file is not ready, sleep 10 seconds...")
-    #         time.sleep(10)
-    #         continue
-    #     try:
-    #         sharesOutstanding_df = pd.read_feather(full_path_name)
-    #         log('info','sharesOutstanding_df is ready')
-    #     except Exception as e:
-    #         log('critical','sharesOutstanding_df read_feather:'+str(e))
-    #         continue
 
     screen_data()
 
