@@ -141,9 +141,9 @@ def screen(df,lines):
         if(len(df)<60):
             return False
         Last_60days_df = df.iloc[len(df)-60:]
-        ema20_max = max(Last_60days_df.ema20)
-        ema20 = df.iloc[-1].ema20
-        if(ema20==ema20_max):
+        EMA20_MAX = max(Last_60days_df.EMA20)
+        EMA20 = df.iloc[-1].EMA20
+        if(EMA20==EMA20_MAX):
             return True
         else:
             return False
