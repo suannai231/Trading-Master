@@ -147,13 +147,13 @@ def screen(df,lines):
             return True
         else:
             return False
-    elif lines=="VOL_EMA5 20days Low":
+    elif lines=="VOL_EMA10 20days Low":
         if(len(df)<20):
             return False
         Last_20days_df = df.iloc[len(df)-20:]
-        VOL_EMA5_MIN = min(Last_20days_df.VOL_EMA5)
-        VOL_EMA5 = df.iloc[-1].VOL_EMA5
-        if(VOL_EMA5==VOL_EMA5_MIN):
+        VOL_EMA10_MIN = min(Last_20days_df.VOL_EMA10)
+        VOL_EMA10 = df.iloc[-1].VOL_EMA10
+        if(VOL_EMA10==VOL_EMA10_MIN):
             return True
         else:
             return False
@@ -199,10 +199,10 @@ def run_last_20_days(ticker_chunk_df):
             AMP = screen(slice_df,"AMP")
             change = screen(slice_df,"change")
             EMA60_60days_High = screen(slice_df,"EMA20 60days High")
-            VOL_EMA5_20days_Low = screen(slice_df,"VOL_EMA5 20days Low")
+            VOL_EMA10_20days_Low = screen(slice_df,"VOL_EMA5 20days Low")
 
             if((i==df_len) and _60day_High and Close_to_EMA20 and turnover and price_limit and AMP and change and EMA60_60days_High
-            and VOL_EMA5_20days_Low):
+            and VOL_EMA10_20days_Low):
                 today_df = slice_df.iloc[[-1]]
                 return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 log("info",ticker)
