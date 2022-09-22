@@ -46,6 +46,8 @@ def cal_basics(df):
     df['VOL_EMA5'] = VOL_EMA5
     VOL_EMA10 = df['volume'].ewm(span = 10, adjust = False).mean()
     df['VOL_EMA10'] = VOL_EMA10
+    VOL_EMA20 = df['volume'].ewm(span = 20, adjust = False).mean()
+    df['VOL_EMA20'] = VOL_EMA20
 
     OBV_SMA20 = df['OBV'].rolling(20).mean()
     df['OBV_SMA20'] = OBV_SMA20
