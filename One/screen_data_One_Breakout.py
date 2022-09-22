@@ -133,7 +133,7 @@ def screen(df,lines):
         open = df.iloc[-1].open
         close = df.iloc[-1].close
         amp = abs((close-open)/open)
-        if amp <= 0.07:
+        if amp <= 0.05:
             return True
         else:
             return False
