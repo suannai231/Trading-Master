@@ -125,7 +125,7 @@ def screen(df,lines):
             return False
     elif lines=="price limit":
         low = min(df.close)
-        if(close>low*2):
+        if(close>low*2.5):
             return False
         else:
             return True
@@ -137,13 +137,13 @@ def screen(df,lines):
             return True
         else:
             return False
-    elif lines=="EMA20 60days High":
+    elif lines=="EMA60 60days High":
         if(len(df)<60):
             return False
         Last_60days_df = df.iloc[len(df)-60:]
-        EMA20_MAX = max(Last_60days_df.EMA20)
-        EMA20 = df.iloc[-1].EMA20
-        if(EMA20==EMA20_MAX):
+        EMA60_MAX = max(Last_60days_df.EMA60)
+        EMA60 = df.iloc[-1].EMA60
+        if(EMA60==EMA60_MAX):
             return True
         else:
             return False
@@ -185,8 +185,6 @@ def run_last_20_days(ticker_chunk_df):
         if df_len < 20:
             continue
         _60day_High = False
-        Close_to_EMA20 = False
-        above_high_vol_low_20_days = False
         for i in range(df_len-19, df_len+1):
             slice_df = ticker_df.iloc[0:i]
             if slice_df.empty:
@@ -200,10 +198,10 @@ def run_last_20_days(ticker_chunk_df):
             price_limit = screen(slice_df,"price limit")
             AMP = screen(slice_df,"AMP")
             change = screen(slice_df,"change")
-            EMA20_60days_High = screen(slice_df,"EMA20 60days High")
+            EMA60_60days_High = screen(slice_df,"EMA20 60days High")
             VOL_EMA5_20days_Low = screen(slice_df,"VOL_EMA5 20days Low")
 
-            if((i==df_len) and _60day_High and Close_to_EMA20 and above_high_vol_low_20_days and turnover and price_limit and AMP and change and EMA20_60days_High
+            if((i==df_len) and _60day_High and Close_to_EMA20 and above_high_vol_low_20_days and turnover and price_limit and AMP and change and EMA60_60days_High
             and VOL_EMA5_20days_Low):
                 today_df = slice_df.iloc[[-1]]
                 return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
@@ -226,11 +224,12 @@ def run(ticker_chunk_df):
         turnover = screen(df,"turnover")
         price_limit = screen(df,"price limit")
         AMP = screen(df,"AMP")
-        change = screen(df,"change")
-        EMA20_60days_High = screen(df,"EMA20 60days High")
+        # change = screen(df,"change")
+        EMA60_60days_High = screen(df,"EMA60 60days High")
+        VOL_EMA5_20days_Low = screen(df,"VOL_EMA5 20days Low")
         if(df.iloc[-1].ticker=="ANNX"):
             log("info","")
-        if(Close_to_EMA20 and above_high_vol_low_20_days and turnover and price_limit and AMP and EMA20_60days_High):
+        if(Close_to_EMA20 and above_high_vol_low_20_days and turnover and price_limit and AMP and EMA60_60days_High and VOL_EMA5_20days_Low):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
             log("info",ticker)
