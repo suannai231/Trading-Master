@@ -222,14 +222,14 @@ def run(ticker_chunk_df):
         Close_to_EMA20 = screen(df,'Close to EMA20')
         above_high_vol_low_20_days = screen(df,"above_high_vol_low_20_days")
         turnover = screen(df,"turnover")
-        price_limit = screen(df,"price limit")
-        AMP = screen(df,"AMP")
+        # price_limit = screen(df,"price limit")
+        # AMP = screen(df,"AMP")
         # change = screen(df,"change")
         EMA60_60days_High = screen(df,"EMA60 60days High")
         VOL_EMA5_20days_Low = screen(df,"VOL_EMA5 20days Low")
         if(df.iloc[-1].ticker=="ANNX"):
             log("info","")
-        if(Close_to_EMA20 and above_high_vol_low_20_days and turnover and price_limit and AMP and EMA60_60days_High and VOL_EMA5_20days_Low):
+        if(Close_to_EMA20 and above_high_vol_low_20_days and turnover and EMA60_60days_High and VOL_EMA5_20days_Low):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
             log("info",ticker)
