@@ -119,7 +119,7 @@ def screen(df,lines):
             return False
         Last_60days_df = df.iloc[len(df)-60:]  
         high = max(Last_60days_df.close)
-        if df.iloc[-1].close >= high*0.9:
+        if df.iloc[-1].close == high:
             return True
         else:
             return False
