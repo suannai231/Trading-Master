@@ -219,6 +219,8 @@ def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
+        if(df.iloc[-1].ticker=="ATXI"):
+            log("info","")
         # Close_to_EMA20 = screen(df,'Close to EMA20')
         # above_high_vol_low_20_days = screen(df,"above_high_vol_low_20_days")
         turnover = screen(df,"turnover")
@@ -228,6 +230,7 @@ def run(ticker_chunk_df):
         # EMA60_60days_High = screen(df,"EMA60 60days High")
         # VOL_EMA20_20days_Low = screen(df,"VOL_EMA20 20days Low")
         _60day_High = screen(df,"60day High")
+
 
         if(turnover and _60day_High):
             today_df = df.iloc[[-1]]
