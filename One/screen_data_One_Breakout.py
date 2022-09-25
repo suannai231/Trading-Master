@@ -42,7 +42,7 @@ def screen(df,lines):
     change = df.iloc[-1]['change']
 
     if lines=="Close to EMA20":
-        if(ema20 <= close <= ema20*1.15):
+        if(ema20 <= close <= ema20*1.1):
             return True
         else:
             return False
