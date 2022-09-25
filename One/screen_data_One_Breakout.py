@@ -53,7 +53,7 @@ def screen(df,lines):
         else:
             return True
     elif lines=="change":
-        if change >= 0:
+        if change >= -0.05:
             return True
         else:
             return False
@@ -197,11 +197,11 @@ def run_last_20_days(ticker_chunk_df):
             turnover = screen(slice_df,"turnover")
             # price_limit = screen(slice_df,"price limit")
             # AMP = screen(slice_df,"AMP")
-            # change = screen(slice_df,"change")
+            change = screen(slice_df,"change")
             # EMA60_60days_High = screen(slice_df,"EMA20 60days High")
             # VOL_EMA10_20days_Low = screen(slice_df,"VOL_EMA5 20days Low")
 
-            if((i==df_len) and _60day_High and Close_to_EMA20 and turnover):
+            if((i==df_len) and _60day_High and Close_to_EMA20 and turnover and change):
                 today_df = slice_df.iloc[[-1]]
                 return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 log("info",ticker)
