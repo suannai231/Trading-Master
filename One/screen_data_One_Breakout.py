@@ -195,14 +195,13 @@ def run_last_20_days(ticker_chunk_df):
             Close_to_EMA20 = screen(slice_df,'Close to EMA20')
             # above_high_vol_low_20_days = screen(slice_df,"above_high_vol_low_20_days")
             turnover = screen(slice_df,"turnover")
-            price_limit = screen(slice_df,"price limit")
-            AMP = screen(slice_df,"AMP")
-            change = screen(slice_df,"change")
-            EMA60_60days_High = screen(slice_df,"EMA20 60days High")
-            VOL_EMA10_20days_Low = screen(slice_df,"VOL_EMA5 20days Low")
+            # price_limit = screen(slice_df,"price limit")
+            # AMP = screen(slice_df,"AMP")
+            # change = screen(slice_df,"change")
+            # EMA60_60days_High = screen(slice_df,"EMA20 60days High")
+            # VOL_EMA10_20days_Low = screen(slice_df,"VOL_EMA5 20days Low")
 
-            if((i==df_len) and _60day_High and Close_to_EMA20 and turnover and price_limit and AMP and change and EMA60_60days_High
-            and VOL_EMA10_20days_Low):
+            if((i==df_len) and _60day_High and Close_to_EMA20 and turnover):
                 today_df = slice_df.iloc[[-1]]
                 return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
                 log("info",ticker)
@@ -273,7 +272,7 @@ def screen_data():
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
         # sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
+        async_result = pool.apply_async(run_last_20_days, args=(ticker_chunk_df,))
         async_results.append(async_result)
     pool.close()
     log('info',"process pool start.")
