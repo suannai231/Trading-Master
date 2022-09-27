@@ -72,18 +72,6 @@ def cal_basics(df):
     df['EMA60'] = ema60
     df['EMA120'] = ema120
 
-    VOL_EMA5 = df['volume'].ewm(span = 5, adjust = False).mean()
-    df['VOL_EMA5'] = VOL_EMA5
-    VOL_EMA10 = df['volume'].ewm(span = 10, adjust = False).mean()
-    df['VOL_EMA10'] = VOL_EMA10
-    VOL_EMA20 = df['volume'].ewm(span = 20, adjust = False).mean()
-    df['VOL_EMA20'] = VOL_EMA20
-
-    OBV_SMA20 = df['OBV'].rolling(20).mean()
-    df['OBV_SMA20'] = OBV_SMA20
-    OBV_SMA60 = df['OBV'].rolling(60).mean()
-    df['OBV_SMA60'] = OBV_SMA60
-
     Long_EMA20 = df['Long'].ewm(span = 20, adjust = False).mean()
     df['Long_EMA20'] = Long_EMA20
     Short_EMA20 = df['Short'].ewm(span = 20, adjust = False).mean()
