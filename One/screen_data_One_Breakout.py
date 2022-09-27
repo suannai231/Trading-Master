@@ -169,8 +169,7 @@ def screen(df,lines):
     elif lines=="Fight":
         if len(df)<2:
             return False
-        else:
-            return True
+
         Pre_Long_Diff = df.iloc[-2].Long_Diff
         Pre_Long_Diff_EMA20 = df.iloc[-2].Long_Diff_EMA20
         Pre_Short_Diff = df.iloc[-2].Short_Diff
