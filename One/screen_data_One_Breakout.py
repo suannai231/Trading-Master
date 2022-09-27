@@ -166,6 +166,17 @@ def screen(df,lines):
             return True
         else:
             return False
+    elif lines=="Fight":
+        Long_Diff = df.iloc[-1].Long_Diff
+        Long_Diff_EMA20 = df.iloc[-1].Long_Diff_EMA20
+        Short_Diff = df.iloc[-1].Short_Diff
+        Short_Diff_EMA20 = df.iloc[-1].Short_Diff_EMA20
+
+        if (Long_Diff>=Long_Diff_EMA20) and (Short_Diff<=Short_Diff_EMA20) and (Long_Diff>=Short_Diff):
+            return True
+        else:
+            return False
+
     # elif lines=="active":
     #     Last_20days_df = df.iloc[len(df)-20:]
     #     vol_max = max(Last_20days_df.volume)
@@ -227,20 +238,10 @@ def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-        if(df.iloc[-1].ticker=="ATXI"):
-            log("info","")
-        # Close_to_EMA20 = screen(df,'Close to EMA20')
-        # above_high_vol_low_20_days = screen(df,"above_high_vol_low_20_days")
-        turnover = screen(df,"turnover")
-        # price_limit = screen(df,"price limit")
-        # AMP = screen(df,"AMP")
-        # change = screen(df,"change")
-        # EMA60_60days_High = screen(df,"EMA60 60days High")
-        # VOL_EMA20_20days_Low = screen(df,"VOL_EMA20 20days Low")
-        _60day_High = screen(df,"60day High")
 
+        Fight = screen(df,"Fight")
 
-        if(turnover and _60day_High):
+        if(Fight):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
             log("info",ticker)
@@ -281,7 +282,7 @@ def screen_data():
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
         # sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run_last_20_days, args=(ticker_chunk_df,))
+        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
         async_results.append(async_result)
     pool.close()
     log('info',"process pool start.")
@@ -300,12 +301,12 @@ def screen_data():
             log('info',screened_data_path + processed_data_files[-1] +" is saved.")
         except Exception as e:
             log('critical',"df to_csv:"+str(e))
-    else:
+    else: 
         log('error',"df empty")
 
     log('info',"screen_data stop.")
 
-def chunks(lst, n):
+def chunks(lst, n): 
     """Yield successive n-sized chunks from lst."""
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
