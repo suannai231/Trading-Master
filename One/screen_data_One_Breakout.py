@@ -240,8 +240,9 @@ def run(ticker_chunk_df):
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
 
         Fight = screen(df,"Fight")
+        turnover = screen(df,"turnover")
 
-        if(Fight):
+        if(Fight and turnover):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
             log("info",ticker)
