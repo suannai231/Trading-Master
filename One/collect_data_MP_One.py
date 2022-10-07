@@ -147,7 +147,7 @@ def log(type,string):
         logging.critical(log_time+":"+string)
 
 if __name__ == '__main__':
-    path = 'C:/Python/RawData/'
+    path = '//jack-nas.home/Work/Python/RawData/'
     isPathExists = os.path.exists(path)
     if not isPathExists:
         os.makedirs(path)

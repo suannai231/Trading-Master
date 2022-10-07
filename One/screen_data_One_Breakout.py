@@ -344,8 +344,8 @@ def log(type,string):
 if __name__ == '__main__':
 
     screened_data_path="//jack-nas.home/Work/Python/ScreenedData/"
-    processed_data_path="C:/Python/ProcessedData/"
-    raw_data_path = 'C:/Python/RawData/'
+    processed_data_path="//jack-nas.home/Work/Python/ProcessedData/"
+    raw_data_path = '//jack-nas.home/Work/Python/RawData/'
 
     log('info',"screen_data process start.")
 

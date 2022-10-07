@@ -190,8 +190,8 @@ def log(type,string):
         logging.critical(log_time+":"+string)
 
 if __name__ == '__main__':
-    raw_data_path='C:/Python/RawData/'
-    processed_data_path='C:/Python/ProcessedData/'
+    raw_data_path='//jack-nas.home/Work/Python/RawData/'
+    processed_data_path='//jack-nas.home/Work/Python/ProcessedData/'
 
 
     log('info','process_data process start.')
