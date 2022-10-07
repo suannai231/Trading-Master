@@ -131,7 +131,7 @@ def collect_data(func,cores):
     return df
 
 def log(type,string):
-    logpath = 'C:/Python/'
+    logpath = '//jack-nas.home/Work/Python/'
     logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_collect.log"
     logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
     

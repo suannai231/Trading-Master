@@ -326,7 +326,7 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 def log(type,string):
-    logpath = 'C:/Python/'
+    logpath = '//jack-nas.home/Work/Python/'
     logfile = logpath + datetime.datetime.now().strftime("%m%d%Y") + "_screen.log"
     logging.basicConfig(filename=logfile, encoding='utf-8', level=logging.INFO)
 
