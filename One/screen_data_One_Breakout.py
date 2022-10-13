@@ -189,7 +189,7 @@ def screen(df,lines):
         Short_Diff_EMA20 = df.iloc[-1].Short_Diff_EMA20
 
         # Pre = (Pre_Long_Diff>=Pre_Long_Diff_EMA20) and (Pre_Short_Diff<=Pre_Short_Diff_EMA20) and (Pre_Long_Diff>=Pre_Short_Diff)
-        today = (Long_Diff>=Long_Diff_EMA20) and (Short_Diff<=Short_Diff_EMA20) and (Long_Diff>=Short_Diff)
+        today = (Long_Diff>=Long_Diff_EMA20) and (Short_Diff<=Short_Diff_EMA20) and (Long_Diff_EMA20>=Short_Diff_EMA20)
 
         if (Long_Diff>=Pre_Long_Diff) and (today==True):
             return True
