@@ -253,9 +253,9 @@ def run(ticker_chunk_df):
 
         Fight = screen(df,"Fight")
         turnover = screen(df,"turnover")
-        Close_to_EMA20 = screen(df,"Close to EMA20")
+        # Close_to_EMA20 = screen(df,"Close to EMA20")
 
-        if(Fight and turnover and Close_to_EMA20):
+        if(Fight and turnover):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
             log("info",ticker)
