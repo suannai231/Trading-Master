@@ -56,20 +56,18 @@ def get_stock_history(ticker):
 def get_stock_realtime(ticker):
     df = pd.DataFrame()
     try:
-        df = si.get_data(ticker,end,end + datetime.timedelta(1),index_as_date=True)
-        if(df.empty):
-            close = float(si.get_live_price(ticker))
-            quote_table = si.get_quote_table(ticker)
-            open = float(quote_table['Open'])
-            low = float(quote_table["Day's Range"].split(" - ")[0])
-            high = float(quote_table["Day's Range"].split(" - ")[1])
-            volume = int(quote_table['Volume'])
-            d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
-            df=pd.DataFrame(d,index=[str(end)])
+        close = float(si.get_live_price(ticker))
+        quote_table = si.get_quote_table(ticker)
+        open = float(quote_table['Open'])
+        low = float(quote_table["Day's Range"].split(" - ")[0])
+        high = float(quote_table["Day's Range"].split(" - ")[1])
+        volume = int(quote_table['Volume'])
+        d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
+        df=pd.DataFrame(d,index=[str(end)])
         df.index.name = 'date'
-        if (not df.empty) and df.index[-1]!=datetime.date.today():
-            log("error",ticker+" date error")
-            return pd.DataFrame()
+        # if (not df.empty) and df.index[-1]!=str(datetime.date.today()):
+        #     log("error",ticker+" date error")
+        #     return pd.DataFrame()
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
