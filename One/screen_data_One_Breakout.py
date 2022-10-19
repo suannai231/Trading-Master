@@ -184,17 +184,15 @@ def screen(df,lines):
         Pre_Short_Diff_EMA20 = df.iloc[-2].Short_Diff_EMA20
 
         Long_Diff = df.iloc[-1].Long_Diff
+        Long_Diff_MAX = max(df.Long_Diff)
         Long_Diff_EMA20 = df.iloc[-1].Long_Diff_EMA20
         Short_Diff = df.iloc[-1].Short_Diff
         Short_Diff_EMA20 = df.iloc[-1].Short_Diff_EMA20
 
         # Pre = (Pre_Long_Diff>=Pre_Long_Diff_EMA20) and (Pre_Short_Diff<=Pre_Short_Diff_EMA20) and (Pre_Long_Diff>=Pre_Short_Diff)
-        today = (Long_Diff>=Short_Diff) 
+        ready = Long_Diff>=Pre_Long_Diff and Long_Diff>=Short_Diff and Long_Diff == Long_Diff_MAX
 
-        if (Long_Diff>=Pre_Long_Diff) and (today==True):
-            return True
-        else:
-            return False
+        return ready
 
     # elif lines=="active":
     #     Last_20days_df = df.iloc[len(df)-20:]
@@ -250,7 +248,8 @@ def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-
+        if ticker=="CEI":
+            log("info",ticker)
         Fight = screen(df,"Fight")
         turnover = screen(df,"turnover")
         # Close_to_EMA20 = screen(df,"Close to EMA20")

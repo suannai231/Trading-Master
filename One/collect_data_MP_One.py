@@ -48,6 +48,9 @@ def get_stock_history(ticker):
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
     df.index.name = 'date'
+    if (not df.empty) and df.index[-1]!=datetime.date.today():
+        log("error",ticker+" date error")
+        return pd.DataFrame()
     return df
 
 def get_stock_realtime(ticker):
@@ -64,6 +67,9 @@ def get_stock_realtime(ticker):
             d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
             df=pd.DataFrame(d,index=[str(end)])
         df.index.name = 'date'
+        if (not df.empty) and df.index[-1]!=datetime.date.today():
+            log("error",ticker+" date error")
+            pd.DataFrame()
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
@@ -127,6 +133,8 @@ def collect_data(func,cores):
                 break
             if not stock_chunk_df.empty:
                 df = pd.concat([df,stock_chunk_df])
+            else:
+                log("error","collect_data" + str(func) + " stock_chunk_df empty.")
     log('info',"collect_data" + str(func) + " stop.")
     return df
 
