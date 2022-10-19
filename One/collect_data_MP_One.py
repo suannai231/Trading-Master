@@ -12,14 +12,16 @@ import math
 
 days=365
 date_time = datetime.datetime.now()
-start = date_time - datetime.timedelta(days)
+
 today8am = date_time.replace(hour=8,minute=0,second=0,microsecond=0)
 today3pm = date_time.replace(hour=15,minute=0,second=0,microsecond=0)
 
-if((date_time.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):
-    end = datetime.date.today()
-else:
-    end = datetime.date.today()+ datetime.timedelta(1)
+end = datetime.date.today()
+start = end - datetime.timedelta(days)
+# if((date_time.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):
+#     end = datetime.date.today()
+# else:
+#     end = datetime.date.today()+ datetime.timedelta(1)
 
 # def get_quote_data(ticker):
 #     df = pd.DataFrame()
@@ -43,11 +45,11 @@ else:
 def get_stock_history(ticker):
     df = pd.DataFrame()
     try:
-        df = si.get_data(ticker,start,end,index_as_date=True)
+        df = si.get_data(ticker,start,end,index_as_date=False)
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
-    df.index.name = 'date'
+    # df.index.name = 'date'
     # if (not df.empty) and df.index[-1]!=datetime.date.today():
     #     log("error",ticker+" date error")
     #     return pd.DataFrame()
@@ -62,15 +64,19 @@ def get_stock_realtime(ticker):
         low = float(quote_table["Day's Range"].split(" - ")[0])
         high = float(quote_table["Day's Range"].split(" - ")[1])
         volume = int(quote_table['Volume'])
-        d = {'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
+        d = {'date':end, 'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
+        # df=pd.DataFrame(d,index=[str(end)])
         df=pd.DataFrame(d,index=[str(end)])
-        df.index.name = 'date'
+        df.date=pd.to_datetime(df.date)
+        # df.index.name = 'date'
         # if (not df.empty) and df.index[-1]!=str(datetime.date.today()):
         #     log("error",ticker+" date error")
         #     return pd.DataFrame()
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
+        else:
+            return pd.DataFrame()
     return df
 
 def get_stock_data_mt(func,ticker_chunk,thread_number):
@@ -190,23 +196,23 @@ if __name__ == '__main__':
 
     stock_history_concat_df=collect_data(get_stock_history,cores)
     log('info','stock_history_concat_df is ready.')
-    if (not stock_history_concat_df.empty):
-        stock_history_concat_df.reset_index(inplace=True)
-        stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-        try:
-            stock_history_concat_df.to_feather(path + stop_time + ".feather")
-            log('info','stock_history_concat_df to_feather saved.')
-        except Exception as e:
-            log('critical',"to_feather:"+str(e))
+    # if (not stock_history_concat_df.empty):
+    #     stock_history_concat_df.reset_index(inplace=True)
+    #     stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+    #     try:
+    #         stock_history_concat_df.to_feather(path + stop_time + ".feather")
+    #         log('info','stock_history_concat_df to_feather saved.')
+    #     except Exception as e:
+    #         log('critical',"to_feather:"+str(e))
 
     now = datetime.datetime.now()
     today8am = now.replace(hour=8,minute=0,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
-    while((now.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):         #get real time stock price
+    while(True):         #get real time stock price
         realtime_df=collect_data(get_stock_realtime,cores)
         log('info','realtime_df is ready')
         if not realtime_df.empty:
-            realtime_df.reset_index(inplace=True)
+            realtime_df.reset_index(inplace=True,drop=True)
             stock_concat_df = pd.concat([stock_history_concat_df,realtime_df])
             stock_concat_df.reset_index(inplace=True,drop=True)
             # stock_realtime_concat_df = stock_concat_df
@@ -216,5 +222,9 @@ if __name__ == '__main__':
                 log('info',path + stop_time + ".feather" + "saved")
             except Exception as e:
                 log('critical',"to_feather:"+str(e))
+        if((now.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):
+            continue
+        else:
+            break
 
     log('info','collect process exit.')
