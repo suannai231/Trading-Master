@@ -56,6 +56,8 @@ def get_stock_history(ticker):
     return df
 
 def get_stock_realtime(ticker):
+    if ticker=="AGFY":
+        log("info",ticker)
     df = pd.DataFrame()
     try:
         close = float(si.get_live_price(ticker))
