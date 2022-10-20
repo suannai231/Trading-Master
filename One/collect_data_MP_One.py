@@ -103,10 +103,9 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def collect_data(func,cores):
+def collect_data(func,cores,thread_number):
     log('info',"collect_data" + str(func) + " start.")
 
-    thread_number = 20
     df = pd.DataFrame()
     while(df.empty):
         pool = Pool(cores)
@@ -200,7 +199,7 @@ if __name__ == '__main__':
     #     except Exception as e:
     #         log('critical',"to_feather:"+str(e))
 
-    stock_history_concat_df=collect_data(get_stock_history,cores)
+    stock_history_concat_df=collect_data(get_stock_history,cores,30)
     log('info','stock_history_concat_df is ready.')
     # if (not stock_history_concat_df.empty):
     #     stock_history_concat_df.reset_index(inplace=True)
@@ -215,7 +214,7 @@ if __name__ == '__main__':
     today8am = now.replace(hour=8,minute=0,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
     while(True):         #get real time stock price
-        realtime_df=collect_data(get_stock_realtime,cores)
+        realtime_df=collect_data(get_stock_realtime,cores,1)
         log('info','realtime_df is ready')
         if not realtime_df.empty:
             realtime_df.reset_index(inplace=True,drop=True)
