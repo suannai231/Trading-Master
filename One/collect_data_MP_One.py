@@ -49,6 +49,9 @@ def get_stock_history(ticker):
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
+        else:
+            log("error","get_stock_history " + ticker + " " + str(e))
+            return pd.DataFrame()
     # df.index.name = 'date'
     # if (not df.empty) and df.index[-1]!=datetime.date.today():
     #     log("error",ticker+" date error")
@@ -76,7 +79,7 @@ def get_stock_realtime(ticker):
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
         else:
-            log("error",ticker + " " + str(e))
+            log("error","get_stock_realtime " + ticker + " " + str(e))
             return pd.DataFrame()
     # if ticker=="NEXA":
     #     log("info",ticker)
