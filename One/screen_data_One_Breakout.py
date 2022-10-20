@@ -248,7 +248,10 @@ def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-        if ticker=="CEI":
+        if (not df.empty) and df.index[-1]!=datetime.date.today():
+            log("error",ticker+" date error.")
+            continue
+        if ticker=="NEXA":
             log("info",ticker)
         Fight = screen(df,"Fight")
         turnover = screen(df,"turnover")

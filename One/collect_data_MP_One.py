@@ -56,8 +56,6 @@ def get_stock_history(ticker):
     return df
 
 def get_stock_realtime(ticker):
-    if ticker=="AGFY":
-        log("info",ticker)
     df = pd.DataFrame()
     try:
         close = float(si.get_live_price(ticker))
@@ -78,7 +76,11 @@ def get_stock_realtime(ticker):
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
         else:
+            if ticker=="NEXA":
+                log("info",ticker)
             return pd.DataFrame()
+    if ticker=="NEXA":
+        log("info",ticker)
     return df
 
 def get_stock_data_mt(func,ticker_chunk,thread_number):
