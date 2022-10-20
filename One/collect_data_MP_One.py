@@ -76,11 +76,10 @@ def get_stock_realtime(ticker):
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
         else:
-            if ticker=="NEXA":
-                log("info",ticker)
+            log("error",ticker + " " + str(e))
             return pd.DataFrame()
-    if ticker=="NEXA":
-        log("info",ticker)
+    # if ticker=="NEXA":
+    #     log("info",ticker)
     return df
 
 def get_stock_data_mt(func,ticker_chunk,thread_number):
