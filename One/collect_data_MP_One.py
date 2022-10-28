@@ -9,6 +9,7 @@ import concurrent.futures as cf
 from concurrent.futures import ThreadPoolExecutor
 import logging
 import math
+import numpy as np
 
 days=365
 date_time = datetime.datetime.now()
@@ -62,11 +63,15 @@ def get_stock_realtime(ticker):
     df = pd.DataFrame()
     try:
         close = float(si.get_live_price(ticker))
-        quote_table = si.get_quote_table(ticker)
-        open = float(quote_table['Open'])
-        low = float(quote_table["Day's Range"].split(" - ")[0])
-        high = float(quote_table["Day's Range"].split(" - ")[1])
-        volume = int(quote_table['Volume'])
+        # quote_table = si.get_quote_table(ticker)
+        # open = float(quote_table['Open'])
+        # low = float(quote_table["Day's Range"].split(" - ")[0])
+        # high = float(quote_table["Day's Range"].split(" - ")[1])
+        # volume = int(quote_table['Volume'])
+        open = np.nan
+        low = np.nan
+        high = np.nan
+        volume = np.nan
         d = {'date':end, 'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
         # df=pd.DataFrame(d,index=[str(end)])
         df=pd.DataFrame(d,index=[str(end)])
@@ -214,7 +219,7 @@ if __name__ == '__main__':
     today8am = now.replace(hour=8,minute=0,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
     while(True):         #get real time stock price
-        realtime_df=collect_data(get_stock_realtime,cores,1)
+        realtime_df=collect_data(get_stock_realtime,cores,30)
         log('info','realtime_df is ready')
         if not realtime_df.empty:
             realtime_df.reset_index(inplace=True,drop=True)

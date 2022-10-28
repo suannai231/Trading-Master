@@ -41,8 +41,18 @@ def screen(df,lines):
     ema20 = df.iloc[-1]['EMA20']
     change = df.iloc[-1]['change']
 
-    if lines=="Close to EMA20":
+    if lines == "Close to EMA20":
         if(ema20 <= close <= ema20*1.2):
+            return True
+        else:
+            return False
+    elif lines == "EMA60P20":
+        close = df.iloc[-1]['close']
+        ema20 = df.iloc[-1]['EMA20']
+        ema60 = df.iloc[-1]['EMA60']
+        Last_20days_df = df.iloc[len(df)-20:]  
+        ema20_20days_max = max(Last_20days_df.EMA20)
+        if(ema20<= close <=ema60) and (ema20 == ema20_20days_max):
             return True
         else:
             return False
@@ -79,7 +89,8 @@ def screen(df,lines):
         # else:
         #     return False
     elif lines=="turnover":
-        turnover = df.iloc[-1]['volume']*close
+        Last_20days_df = df.iloc[len(df)-20:len(df)-1]
+        turnover = Last_20days_df.volume.mean()
         if(turnover >= 200000):
             return True
         else:
@@ -251,13 +262,13 @@ def run(ticker_chunk_df):
         if (not df.empty) and df.index[-1]!=datetime.date.today():
             log("error",ticker+" date error.")
             continue
-        if ticker=="NEXA":
+        if ticker=="LTRY":
             log("info",ticker)
-        Fight = screen(df,"Fight")
+        EMA60P20 = screen(df,"EMA60P20")
         turnover = screen(df,"turnover")
         Close_to_EMA20 = screen(df,"Close to EMA20")
 
-        if(Fight and turnover and Close_to_EMA20):
+        if(EMA60P20 and turnover):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
             log("info",ticker)

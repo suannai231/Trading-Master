@@ -72,20 +72,20 @@ def cal_basics(df):
     df['EMA60'] = ema60
     df['EMA120'] = ema120
 
-    Long_EMA20 = df['Long'].ewm(span = 20, adjust = False).mean()
-    df['Long_EMA20'] = Long_EMA20
-    Short_EMA20 = df['Short'].ewm(span = 20, adjust = False).mean()
-    df['Short_EMA20'] = Short_EMA20
+    # Long_EMA20 = df['Long'].ewm(span = 20, adjust = False).mean()
+    # df['Long_EMA20'] = Long_EMA20
+    # Short_EMA20 = df['Short'].ewm(span = 20, adjust = False).mean()
+    # df['Short_EMA20'] = Short_EMA20
 
-    Long_Diff = df['Long'] - df['Long_EMA20']
-    df['Long_Diff'] = Long_Diff
-    Short_Diff = df['Short'] - df['Short_EMA20']
-    df['Short_Diff'] = Short_Diff
+    # Long_Diff = df['Long'] - df['Long_EMA20']
+    # df['Long_Diff'] = Long_Diff
+    # Short_Diff = df['Short'] - df['Short_EMA20']
+    # df['Short_Diff'] = Short_Diff
 
-    Long_Diff_EMA20 = df['Long_Diff'].ewm(span = 20, adjust = False).mean()
-    df['Long_Diff_EMA20'] = Long_Diff_EMA20
-    Short_Diff_EMA20 = df['Short_Diff'].ewm(span = 20, adjust = False).mean()
-    df['Short_Diff_EMA20'] = Short_Diff_EMA20
+    # Long_Diff_EMA20 = df['Long_Diff'].ewm(span = 20, adjust = False).mean()
+    # df['Long_Diff_EMA20'] = Long_Diff_EMA20
+    # Short_Diff_EMA20 = df['Short_Diff'].ewm(span = 20, adjust = False).mean()
+    # df['Short_Diff_EMA20'] = Short_Diff_EMA20
 
     return df
 
@@ -103,8 +103,8 @@ def run(ticker_chunk_df):
             df = df.iloc[len(df)-250:]
             df.reset_index(drop=True,inplace=True)
             
-        df = cal_Long(df)
-        df = cal_Short(df)
+        # df = cal_Long(df)
+        # df = cal_Short(df)
         df = cal_basics(df)
 
         if not df.empty:
