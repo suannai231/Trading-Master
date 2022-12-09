@@ -9,53 +9,53 @@ import math
 
 Price_Limit = 9.5
 
-def cal_Long(df):
-    startindex = 0
-    endindex = len(df)
-    Long = []
-    Long.append(0)
+# def cal_Long(df):
+#     startindex = 0
+#     endindex = len(df)
+#     Long = []
+#     Long.append(0)
 
-    for i in range(startindex+1, endindex):
-        previous_close = df.close[i-1]
-        if df.close[i] >= previous_close:
-            Long.append(Long[-1] + df.volume[i])
-        else:
-            Long.append(Long[-1])
-    df['Long'] = Long
-    return df
+#     for i in range(startindex+1, endindex):
+#         previous_close = df.close[i-1]
+#         if df.close[i] >= previous_close:
+#             Long.append(Long[-1] + df.volume[i])
+#         else:
+#             Long.append(Long[-1])
+#     df['Long'] = Long
+#     return df
 
-def cal_Short(df):
-    startindex = 0
-    endindex = len(df)
-    Short = []
-    Short.append(0)
+# def cal_Short(df):
+#     startindex = 0
+#     endindex = len(df)
+#     Short = []
+#     Short.append(0)
 
-    for i in range(startindex+1, endindex):
-        previous_close = df.close[i-1]
-        if df.close[i] < previous_close:
-            Short.append(Short[-1] + df.volume[i])
-        else:
-            Short.append(Short[-1])
-    df['Short'] = Short
-    return df
+#     for i in range(startindex+1, endindex):
+#         previous_close = df.close[i-1]
+#         if df.close[i] < previous_close:
+#             Short.append(Short[-1] + df.volume[i])
+#         else:
+#             Short.append(Short[-1])
+#     df['Short'] = Short
+#     return df
 
-def cal_OBV(df):
-    startindex = 0
-    endindex = len(df)
-    OBV = []
-    OBV.append(0)
+# def cal_OBV(df):
+#     startindex = 0
+#     endindex = len(df)
+#     OBV = []
+#     OBV.append(0)
 
-    for i in range(startindex+1, endindex):
-        previous_close = df.close[i-1]
-        if df.close[i] >= previous_close:
-            OBV.append(OBV[-1] + df.volume[i])
-        elif df.close[i] < previous_close:
-            OBV.append(OBV[-1] - df.volume[i])
-        else:
-            OBV.append(OBV[-1])
-        # OBV_MAX.append(max(OBV))
-    df['OBV'] = OBV
-    return df
+#     for i in range(startindex+1, endindex):
+#         previous_close = df.close[i-1]
+#         if df.close[i] >= previous_close:
+#             OBV.append(OBV[-1] + df.volume[i])
+#         elif df.close[i] < previous_close:
+#             OBV.append(OBV[-1] - df.volume[i])
+#         else:
+#             OBV.append(OBV[-1])
+#         # OBV_MAX.append(max(OBV))
+#     df['OBV'] = OBV
+#     return df
 
 def cal_basics(df):
     df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
@@ -72,21 +72,6 @@ def cal_basics(df):
     df['EMA60'] = ema60
     df['EMA120'] = ema120
 
-    # Long_EMA20 = df['Long'].ewm(span = 20, adjust = False).mean()
-    # df['Long_EMA20'] = Long_EMA20
-    # Short_EMA20 = df['Short'].ewm(span = 20, adjust = False).mean()
-    # df['Short_EMA20'] = Short_EMA20
-
-    # Long_Diff = df['Long'] - df['Long_EMA20']
-    # df['Long_Diff'] = Long_Diff
-    # Short_Diff = df['Short'] - df['Short_EMA20']
-    # df['Short_Diff'] = Short_Diff
-
-    # Long_Diff_EMA20 = df['Long_Diff'].ewm(span = 20, adjust = False).mean()
-    # df['Long_Diff_EMA20'] = Long_Diff_EMA20
-    # Short_Diff_EMA20 = df['Short_Diff'].ewm(span = 20, adjust = False).mean()
-    # df['Short_Diff_EMA20'] = Short_Diff_EMA20
-
     return df
 
 def run(ticker_chunk_df):
@@ -102,9 +87,7 @@ def run(ticker_chunk_df):
         if(len(df)>250):
             df = df.iloc[len(df)-250:]
             df.reset_index(drop=True,inplace=True)
-            
-        # df = cal_Long(df)
-        # df = cal_Short(df)
+
         df = cal_basics(df)
 
         if not df.empty:
