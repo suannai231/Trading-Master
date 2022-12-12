@@ -9,12 +9,18 @@ import math
 
 
 def screen(df,lines):
-    # close = df.iloc[-1]['close']
-    close_max_10days = max(df.tail(10)['close'])
-    close_max_120days = max(df.tail(120)['close'])
-
     if lines == "Volatile":
-        if(close_max_10days == close_max_120days):
+        close_max_10days = max(df.tail(10)['close'])
+        close_max_120days = max(df.tail(120)['close'])
+        volume = df.iloc[-1].volume
+        close = df.iloc[-1].close
+        turnover = volume*close
+        turnover_flag = turnover > 100000
+        ema20 = df.iloc[-1].EMA20
+        ema20_flag = close >= ema20
+        if df.iloc[-1].ticker == "AGRIW":
+            log("info", "AGRIW")
+        if((close_max_10days == close_max_120days) and turnover_flag and ema20_flag):
             return True
         else:
             return False
@@ -31,11 +37,10 @@ def run(ticker_chunk_df):
     return_ticker_chunk_df = pd.DataFrame()
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
-        if (not df.empty) and df.index[-1]!=datetime.date.today():
-            log("error",ticker+" date error.")
-            continue
-        if ticker=="LTRY":
-            log("info",ticker)
+        # if (not df.empty) and df.index[-1]!=datetime.date.today():
+        #     log("error",ticker+" date error.")
+        #     continue
+
         Volatile = screen(df,"Volatile")
 
         if(Volatile):
