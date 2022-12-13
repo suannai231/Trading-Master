@@ -66,11 +66,13 @@ def cal_basics(df):
     ema20 = df['close'].ewm(span = 20, adjust = False).mean()
     ema60 = df['close'].ewm(span = 60, adjust = False).mean()
     ema120 = df['close'].ewm(span = 120, adjust = False).mean()
+    ema250 = df['close'].ewm(span = 250, adjust = False).mean()
     df['EMA5'] = ema5
     df['EMA10'] = ema10
     df['EMA20'] = ema20
     df['EMA60'] = ema60
     df['EMA120'] = ema120
+    df['EMA250'] = ema250
 
     return df
 
