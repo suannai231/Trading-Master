@@ -12,10 +12,10 @@ def screen(df,lines):
     if lines == "Volatile":
         close_max_10days = max(df.tail(10)['close'])
         close_max_120days = max(df.tail(120)['close'])
-        volume = df.iloc[-1].volume
+        volume = df.tail(10).volume.mean()
         close = df.iloc[-1].close
         turnover = volume*close
-        turnover_flag = turnover > 100000
+        turnover_flag = turnover > 200000
         ema20 = df.iloc[-1].EMA20
         ema20_flag = close >= ema20
         if df.iloc[-1].ticker == "AGRIW":
