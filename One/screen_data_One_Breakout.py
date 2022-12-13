@@ -15,7 +15,7 @@ def screen(df,lines):
         volume = df.tail(10).volume.mean()
         close = df.iloc[-1].close
         turnover = volume*close
-        turnover_flag = turnover > 200000
+        turnover_flag = turnover > 1000000
         ema250 = df.iloc[-1].EMA250
         ema250_flag = ema250*1.2 >= close >= ema250
         if df.iloc[-1].ticker == "AGRIW":
