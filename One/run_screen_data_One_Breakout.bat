@@ -1,4 +1,4 @@
-call C:\ProgramData\Anaconda3\Scripts\activate.bat C:\ProgramData\Anaconda3
+call C:\Users\Jack\anaconda3\Scripts\activate.bat C:\Users\Jack\anaconda3
 cd C:\Code\One
 powercfg /setactive e9a42b02-d5df-448d-aa00-03f14749eb61
 python screen_data_One_Breakout.py
