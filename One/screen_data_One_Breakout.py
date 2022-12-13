@@ -76,7 +76,7 @@ def screen_data():
         return
 
     tickers = df.ticker.unique()
-    cores = int(multiprocessing.cpu_count()/2)
+    cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
     pool=Pool(cores)
 
