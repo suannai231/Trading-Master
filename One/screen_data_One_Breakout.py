@@ -17,7 +17,7 @@ def screen(df,lines):
         turnover = volume*close
         turnover_flag = turnover > 200000
         ema250 = df.iloc[-1].EMA250
-        ema250_flag = close >= ema250
+        ema250_flag = ema250*1.2 >= close >= ema250
         if df.iloc[-1].ticker == "AGRIW":
             log("info", "AGRIW")
         if((close_max_10days == close_max_120days) and turnover_flag and ema250_flag):
