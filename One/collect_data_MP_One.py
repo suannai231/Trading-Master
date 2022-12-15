@@ -207,19 +207,19 @@ if __name__ == '__main__':
     stock_history_concat_df=collect_data(get_stock_history,cores,10)
     log('info','stock_history_concat_df is ready.')
 
-    if (not stock_history_concat_df.empty):
-        stock_history_concat_df.reset_index(inplace=True,drop=True)
-        stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
-        try:
-            stock_history_concat_df.to_feather(path + stop_time + ".feather")
-            log('info','stock_history_concat_df to_feather saved.')
-        except Exception as e:
-            log('critical',"to_feather:"+str(e))
+    # if (not stock_history_concat_df.empty):
+    #     stock_history_concat_df.reset_index(inplace=True,drop=True)
+    #     stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
+    #     try:
+    #         stock_history_concat_df.to_feather(path + stop_time + ".feather")
+    #         log('info','stock_history_concat_df to_feather saved.')
+    #     except Exception as e:
+    #         log('critical',"to_feather:"+str(e))
 
     now = datetime.datetime.now()
     today8am = now.replace(hour=8,minute=0,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
-    while((now.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):         #get real time stock price
+    while(True):         #get real time stock price
         realtime_df=collect_data(get_stock_realtime,cores,10)
         log('info','realtime_df is ready')
         if not realtime_df.empty:
@@ -233,5 +233,9 @@ if __name__ == '__main__':
                 log('info',path + stop_time + ".feather" + "saved")
             except Exception as e:
                 log('critical',"to_feather:"+str(e))
+        if ((now.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):
+            continue
+        else:
+            break
 
     log('info','collect process exit.')
