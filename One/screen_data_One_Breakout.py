@@ -10,17 +10,17 @@ import math
 
 def screen(df,lines):
     if lines == "Volatile":
-        close_max_10days = max(df.tail(10)['close'])
-        close_max_120days = max(df.tail(120)['close'])
+        close_max_20days = max(df.tail(20)['close'])
+        close_max_100days = max(df.tail(100)['close'])
         volume = df.tail(10).volume.mean()
         close = df.iloc[-1].close
         turnover = volume*close
         turnover_flag = turnover > 200000
-        ema250 = df.iloc[-1].EMA250
-        ema250_flag = ema250*1.2 >= close >= ema250
+        ema120 = df.iloc[-1].EMA120
+        ema120_flag = close >= ema120
         if df.iloc[-1].ticker == "FTEK":
             log("info", "FTEK")
-        if((close_max_10days == close_max_120days) and turnover_flag and ema250_flag):
+        if((close_max_20days == close_max_100days) and turnover_flag and ema120_flag):
             return True
         else:
             return False
