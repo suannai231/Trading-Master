@@ -7,8 +7,6 @@ import time
 import logging
 import math
 
-Price_Limit = 20
-
 # def cal_Long(df):
 #     startindex = 0
 #     endindex = len(df)
@@ -83,7 +81,7 @@ def run(ticker_chunk_df):
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker].reset_index(drop=True)
         lastindex = df.index[-1]
 
-        if df['close'][lastindex] > Price_Limit:
+        if 11 > df['close'][lastindex] > 10:
             continue
 
         if(len(df)>250):

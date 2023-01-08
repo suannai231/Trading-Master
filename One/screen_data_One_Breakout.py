@@ -16,11 +16,12 @@ def screen(df,lines):
         volume = df.tail(10).volume.mean()
         close = df.iloc[-1].close
         turnover = volume*close
-        turnover_flag = turnover > 200000
+        turnover_flag = turnover > 500000
         if(len(df)<=2):
             return False
         last_high = df.iloc[-2].high
-        strong = close >= last_high
+        ema120 = df.iloc[-1].EMA120
+        strong = (close > last_high) and (close > ema120)
         if df.iloc[-1].ticker == "RAIN":
             log("info", df.iloc[-1].ticker)
         if(new_high and turnover_flag and strong):
