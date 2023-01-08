@@ -22,9 +22,10 @@ def screen(df,lines):
         last_high = df.iloc[-2].high
         ema120 = df.iloc[-1].EMA120
         strong = (close > last_high) and (close > ema120)
+        change = df.iloc[-1].change > 0.05
         if df.iloc[-1].ticker == "RAIN":
             log("info", df.iloc[-1].ticker)
-        if(new_high and turnover_flag and strong):
+        if(new_high and turnover_flag and strong and change):
             return True
         else:
             return False
