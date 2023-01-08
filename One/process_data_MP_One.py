@@ -81,7 +81,7 @@ def run(ticker_chunk_df):
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker].reset_index(drop=True)
         lastindex = df.index[-1]
 
-        if 11 > df['close'][lastindex] > 10:
+        if (11 > df['close'][lastindex] > 10) or (df['close'][lastindex]>20):
             continue
 
         if(len(df)>250):
