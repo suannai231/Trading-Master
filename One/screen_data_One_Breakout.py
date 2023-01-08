@@ -13,17 +13,18 @@ def screen(df,lines):
         close_max_30days = max(df.tail(30)['close'])
         close_max_100days = max(df.tail(100)['close'])
         new_high = close_max_30days == close_max_100days
-        volume = df.tail(10).volume.mean()
+        volume_10d_avg = df.tail(10).volume.mean()
+        volume = df.tail[-1].volume
         close = df.iloc[-1].close
-        turnover = volume*close
-        turnover_flag = turnover > 500000
+        turnover_10d_avg = volume_10d_avg*close
+        turnover_flag = (turnover_10d_avg > 300000) & (volume <= turnover_10d_avg*2)
         if(len(df)<=2):
             return False
         last_high = df.iloc[-2].high
         ema120 = df.iloc[-1].EMA120
         strong = (close > last_high) and (close > ema120)
         change = df.iloc[-1].change > 0.05
-        if df.iloc[-1].ticker == "RAIN":
+        if df.iloc[-1].ticker == "FTEK":
             log("info", df.iloc[-1].ticker)
         if(new_high and turnover_flag and strong and change):
             return True

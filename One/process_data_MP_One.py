@@ -80,7 +80,8 @@ def run(ticker_chunk_df):
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker].reset_index(drop=True)
         lastindex = df.index[-1]
-
+        if df.iloc[-1].ticker == "DIDIY":
+            log("info", df.iloc[-1].ticker)
         if (11 > df['close'][lastindex] > 10) or (df['close'][lastindex]>20):
             continue
 
