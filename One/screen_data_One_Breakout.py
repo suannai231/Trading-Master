@@ -17,7 +17,7 @@ def screen(df,lines):
         volume = df.tail[-1].volume
         close = df.iloc[-1].close
         turnover_10d_avg = volume_10d_avg*close
-        turnover_flag = (turnover_10d_avg > 300000) & (volume <= turnover_10d_avg*2)
+        turnover_flag = (turnover_10d_avg > 300000) & (volume <= volume_10d_avg*2)
         if(len(df)<=2):
             return False
         last_high = df.iloc[-2].high
