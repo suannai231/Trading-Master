@@ -14,7 +14,7 @@ def screen(df,lines):
         close_max_100days = max(df.tail(100)['close'])
         new_high = close_max_30days == close_max_100days
         volume_10d_avg = df.tail(10).volume.mean()
-        volume = df.tail[-1].volume
+        volume = df.iloc[-1].volume
         close = df.iloc[-1].close
         turnover_10d_avg = volume_10d_avg*close
         turnover_flag = (turnover_10d_avg > 300000) & (volume <= volume_10d_avg*2)
