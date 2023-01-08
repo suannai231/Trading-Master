@@ -16,11 +16,11 @@ def screen(df,lines):
         close = df.iloc[-1].close
         turnover = volume*close
         turnover_flag = turnover > 200000
-        ema120 = df.iloc[-1].EMA120
-        ema120_flag = close >= ema120
+        last_high = df.iloc[-2].High
+        strong = close >= last_high
         if df.iloc[-1].ticker == "FTEK":
             log("info", "FTEK")
-        if((close_max_20days == close_max_100days) and turnover_flag and ema120_flag):
+        if((close_max_20days == close_max_100days) and turnover_flag and strong):
             return True
         else:
             return False
