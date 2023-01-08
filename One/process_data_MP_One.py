@@ -7,7 +7,7 @@ import time
 import logging
 import math
 
-Price_Limit = 9.5
+Price_Limit = 20
 
 # def cal_Long(df):
 #     startindex = 0
