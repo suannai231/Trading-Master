@@ -82,7 +82,7 @@ def run(ticker_chunk_df):
         lastindex = df.index[-1]
         if df.iloc[-1].ticker == "DIDIY":
             log("info", df.iloc[-1].ticker)
-        if (11 > df['close'][lastindex] > 10) or (df['close'][lastindex]>20):
+        if (11 > df['close'][lastindex] > 10) or (df['close'][lastindex]>20) or (df['close'][lastindex]<1):
             continue
 
         if(len(df)>250):
