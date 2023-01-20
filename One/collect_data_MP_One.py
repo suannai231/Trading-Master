@@ -10,6 +10,8 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 import math
 import numpy as np
+import time
+import sys
 
 days=365
 date_time = datetime.datetime.now()
@@ -170,24 +172,41 @@ def log(type,string):
 
 if __name__ == '__main__':
     path = '//jack-nas.home/Work/Python/RawData/'
+    quote_data_path = '//jack-nas.home/Work/Python/QuoteData/'
     isPathExists = os.path.exists(path)
     if not isPathExists:
         os.makedirs(path)
 
     log('info','collect process started.')
 
-    nasdaq = []
-    other = []
-    tickers = []
+    # nasdaq = []
+    # other = []
+    # tickers = []
 
-    while((len(nasdaq)==0) or (len(other)==0)):
-        try:
-            nasdaq = si.tickers_nasdaq()
-            other = si.tickers_other()
-        except Exception as e:
-            log('critical','get tickers exception:'+str(e))
-            continue
-        tickers = nasdaq + other
+    # while((len(nasdaq)==0) or (len(other)==0)):
+    #     try:
+    #         nasdaq = si.tickers_nasdaq()
+    #         other = si.tickers_other()
+    #     except Exception as e:
+    #         log('critical','get tickers exception:'+str(e))
+    #         continue
+    #     tickers = nasdaq + other
+    quote_data_files = os.listdir(quote_data_path)
+    while len(quote_data_files) == 0:
+        log('warning',"quote data not ready, sleep 10 seconds...")
+        time.sleep(10)
+        quote_data_files = os.listdir(quote_data_path)
+
+    log('info',"processing "+quote_data_files[-1])
+    try:
+        time.sleep(1)
+        quote_data_df = pd.read_feather(quote_data_path + quote_data_files[-1])
+        log('info',quote_data_path + quote_data_files[-1]+" loaded.")
+    except Exception as e:
+        log('critical',str(e))
+        sys.exit()
+
+    tickers = quote_data_df[quote_data_df.marketCap<=5000000000].ticker
 
     cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
