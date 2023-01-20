@@ -206,7 +206,7 @@ if __name__ == '__main__':
         log('critical',str(e))
         sys.exit()
 
-    tickers = quote_data_df[quote_data_df.marketCap<=5000000000].ticker
+    tickers = quote_data_df[quote_data_df.marketCap<=500000000].ticker
 
     cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
