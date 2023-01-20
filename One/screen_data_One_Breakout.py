@@ -21,8 +21,8 @@ def screen(df,lines):
         if(len(df)<=2):
             return False
         last_high = df.iloc[-2].high
-        EMA250 = df.iloc[-1].EMA250
-        strong = (close > last_high) and (close > EMA250)
+        EMA120 = df.iloc[-1].EMA120
+        strong = (close > last_high) and (close > EMA120)
         change = df.iloc[-1].change > 0.05
         if df.iloc[-1].ticker == "FREQ":
             log("info", df.iloc[-1].ticker)
