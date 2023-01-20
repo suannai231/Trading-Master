@@ -23,12 +23,16 @@ def get_quote_data(ticker):
             marketCap = dict['marketCap']
         else:
             return pd.DataFrame()
+        if 'regularMarketPreviousClose' in dict.keys():
+            regularMarketPreviousClose = dict['regularMarketPreviousClose']
+        else:
+            return pd.DataFrame()
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
         else:
             return pd.DataFrame()
-    d={'ticker':[ticker],'marketCap':[marketCap]}
+    d={'ticker':[ticker],'marketCap':[marketCap],'regularMarketPreviousClose':[regularMarketPreviousClose]}
     df = pd.DataFrame(d)
     df = df.set_index('ticker')
     return df
