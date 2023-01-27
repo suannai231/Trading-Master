@@ -16,13 +16,15 @@ def screen(df,lines):
         volume_10d_avg = df.tail(10).volume.mean()
         # volume = df.iloc[-1].volume
         close = df.iloc[-1].close
+        last_close = df.iloc[-2].close
         turnover_10d_avg = volume_10d_avg*close
         turnover_flag = turnover_10d_avg > 300000
-        if(len(df)<=2):
+        if(len(df)<=3):
             return False
         last_high = df.iloc[-2].high
+        last_2_high = df.iloc[-3].high
         EMA120 = df.iloc[-1].EMA120
-        strong = (close > last_high) and (close > EMA120)
+        strong = (close >= last_high) and (close >= EMA120) and (last_close<=last_2_high)
         change = df.iloc[-1].change > 0.05
         # if df.iloc[-1].ticker == "FREQ":
         #     log("info", df.iloc[-1].ticker)
