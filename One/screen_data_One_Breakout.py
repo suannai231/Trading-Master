@@ -9,6 +9,8 @@ import math
 
 
 def screen(df,lines):
+    if len(df)<=2:
+        return False
     if lines == "Volatile":
         close_max_30days = max(df.tail(30)['close'])
         close_max_100days = max(df.tail(100)['close'])
@@ -26,8 +28,8 @@ def screen(df,lines):
         EMA120 = df.iloc[-1].EMA120
         strong = (close >= last_high) and (close >= EMA120) and (last_close<=last_2_high)
         change = df.iloc[-1].change > 0.05
-        # if df.iloc[-1].ticker == "FREQ":
-        #     log("info", df.iloc[-1].ticker)
+        if df.iloc[-1].ticker == "IVDA":
+            log("info", df.iloc[-1].ticker)
         if(new_high and turnover_flag and strong and change):
             return True
         else:
@@ -48,9 +50,11 @@ def run(ticker_chunk_df):
         # if (not df.empty) and df.index[-1]!=datetime.date.today():
         #     log("error",ticker+" date error.")
         #     continue
-
-        Volatile = screen(df,"Volatile")
-
+        try:
+            Volatile = screen(df,"Volatile")
+        except Exception as e:
+            log('critical',str(e))
+            return pd.DataFrame()
         if(Volatile):
             today_df = df.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
