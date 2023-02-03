@@ -44,6 +44,8 @@ def get_quote_data(ticker):
     else:
         try:
             stock = yf.Ticker(ticker)
+            if(ticker=="GNS"):
+                log("info",ticker)
             marketCap = stock.fast_info['market_cap']
         except Exception as e:
             if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
@@ -53,8 +55,6 @@ def get_quote_data(ticker):
                 log("error",ticker+" "+str(e))
                 return pd.DataFrame()
         if (not isinstance(marketCap,float)) or (stock.fast_info['market_cap'] is None):
-            if(ticker=="GNS"):
-                log("info",ticker)
             log("error",ticker+" stock.fast_info['market_cap'] error")
             return pd.DataFrame()
     if 'regularMarketPreviousClose' in dict.keys():
