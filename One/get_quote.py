@@ -11,8 +11,8 @@ import logging
 import math
 import numpy as np
 import yfinance as yf
-
-API_Key = "HJFHKO8AZ3N5BZ58"
+import requests
+from bs4 import BeautifulSoup
 
 def convert_to_num(s):
     if s[-1] == 'M':
@@ -32,7 +32,7 @@ def get_quote_data(ticker):
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             log("critical",ticker+" "+str(e))
             return -1
-        elif str(e).startswith('Invalid response from server'):
+        elif str(e).startswith('Invalid response from server') | str(e).startswith("IndexError('list index out of range')"):
             return pd.DataFrame()
         else:
             log("error",ticker+" "+str(e))
@@ -42,24 +42,27 @@ def get_quote_data(ticker):
     if 'marketCap' in dict.keys():
         marketCap = dict['marketCap']
     else:
-        try:
-            stock = yf.Ticker(ticker)
-            marketCap = stock.fast_info['market_cap']
-        except Exception as e:
-            if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-                log("critical",ticker+" "+str(e))
-                return -1
-            else:
-                log("error",ticker+" "+str(e))
+        url = f"https://finance.yahoo.com/quote/{ticker}"
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'
+        }
+        response = requests.get(url,headers=headers)
+        soup = BeautifulSoup(response.text, "html.parser")
+        market_cap_element = soup.find("td", {"data-test": "MARKET_CAP-value"})
+        if market_cap_element is not None:
+            marketCap = market_cap_element.text
+            if marketCap == "N/A":
+                log("error",ticker+" marketCap is N/A")
                 return pd.DataFrame()
-        if (not isinstance(marketCap,float)) or (stock.fast_info['market_cap'] is None):
-            if(ticker=="GNS"):
-                log("info",ticker)
-            log("error",ticker+" stock.fast_info['market_cap'] error")
+            else:
+                marketCap = convert_to_num(marketCap)
+        else:
+            # log("error",ticker+" marketCap is None")
             return pd.DataFrame()
     if 'regularMarketPreviousClose' in dict.keys():
         regularMarketPreviousClose = dict['regularMarketPreviousClose']
     else:
+        log("error",ticker+" regularMarketPreviousClose is not available")
         return pd.DataFrame()
 
     d={'ticker':[ticker],'marketCap':[marketCap],'regularMarketPreviousClose':[regularMarketPreviousClose]}

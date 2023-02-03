@@ -179,9 +179,9 @@ if __name__ == '__main__':
 
     log('info','collect process started.')
 
-    # nasdaq = []
-    # other = []
-    # tickers = []
+    nasdaq = []
+    other = []
+    tickers = []
 
     # while((len(nasdaq)==0) or (len(other)==0)):
     #     try:
