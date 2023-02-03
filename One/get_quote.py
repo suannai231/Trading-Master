@@ -54,10 +54,10 @@ def get_quote_data(ticker):
             if marketCap == "N/A":
                 log("error",ticker+" marketCap is N/A")
                 return pd.DataFrame()
-        if (not isinstance(marketCap,float)) or (stock.fast_info['market_cap'] is None):
-            if(ticker=="GNS"):
-                log("info",ticker)
-            log("error",ticker+" stock.fast_info['market_cap'] error")
+            else:
+                marketCap = convert_to_num(marketCap)
+        else:
+            # log("error",ticker+" marketCap is None")
             return pd.DataFrame()
     if 'regularMarketPreviousClose' in dict.keys():
         regularMarketPreviousClose = dict['regularMarketPreviousClose']
