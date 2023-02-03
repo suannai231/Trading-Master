@@ -28,7 +28,7 @@ def screen(df,lines):
         EMA120 = df.iloc[-1].EMA120
         strong = (close >= last_high) and (close >= EMA120) and (last_close<=last_2_high)
         change = df.iloc[-1].change > 0.05
-        if df.iloc[-1].ticker == "IVDA":
+        if df.iloc[-1].ticker == "GNS":
             log("info", df.iloc[-1].ticker)
         if(new_high and turnover_flag and strong and change):
             return True

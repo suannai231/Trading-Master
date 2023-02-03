@@ -10,28 +10,58 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 import math
 import numpy as np
+import yfinance as yf
 
-days=365
-date_time = datetime.datetime.now()
+API_Key = "HJFHKO8AZ3N5BZ58"
+
+def convert_to_num(s):
+    if s[-1] == 'M':
+        return float(s[:-1]) * 1000000
+    elif s[-1] == 'B':
+        return float(s[:-1]) * 1000000000
+    elif s[-1] == 'T':
+        return float(s[:-1]) * 1000000000000
+    else:
+        raise ValueError("Input string must end with 'M', 'B', or 'T'")
 
 def get_quote_data(ticker):
     df = pd.DataFrame()
     try:
         dict = si.get_quote_data(ticker)
-        # dict['ticker'] = ticker
-        if 'marketCap' in dict.keys():
-            marketCap = dict['marketCap']
-        else:
-            return pd.DataFrame()
-        if 'regularMarketPreviousClose' in dict.keys():
-            regularMarketPreviousClose = dict['regularMarketPreviousClose']
-        else:
-            return pd.DataFrame()
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+            log("critical",ticker+" "+str(e))
             return -1
-        else:
+        elif str(e).startswith('Invalid response from server'):
             return pd.DataFrame()
+        else:
+            log("error",ticker+" "+str(e))
+            return pd.DataFrame()
+
+    # dict['ticker'] = ticker
+    if 'marketCap' in dict.keys():
+        marketCap = dict['marketCap']
+    else:
+        try:
+            stock = yf.Ticker(ticker)
+            marketCap = stock.fast_info['market_cap']
+        except Exception as e:
+            if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+                log("critical",ticker+" "+str(e))
+                return -1
+            else:
+                log("error",ticker+" "+str(e))
+                return pd.DataFrame()
+        if (not isinstance(marketCap,float)) or (stock.fast_info['market_cap'] is None):
+            if(ticker=="GNS"):
+                log("info",ticker)
+            log("error",ticker+" stock.fast_info['market_cap'] error")
+            return pd.DataFrame()
+    if 'regularMarketPreviousClose' in dict.keys():
+        regularMarketPreviousClose = dict['regularMarketPreviousClose']
+    else:
+        return pd.DataFrame()
+
     d={'ticker':[ticker],'marketCap':[marketCap],'regularMarketPreviousClose':[regularMarketPreviousClose]}
     df = pd.DataFrame(d)
     df = df.set_index('ticker')
