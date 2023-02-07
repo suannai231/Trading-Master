@@ -179,9 +179,9 @@ if __name__ == '__main__':
 
     log('info','collect process started.')
 
-    # nasdaq = []
-    # other = []
-    # tickers = []
+    nasdaq = []
+    other = []
+    tickers = []
 
     # while((len(nasdaq)==0) or (len(other)==0)):
     #     try:
@@ -206,7 +206,7 @@ if __name__ == '__main__':
         log('critical',str(e))
         sys.exit()
 
-    tickers = quote_data_df[(quote_data_df.marketCap<=500000000) & (((quote_data_df.regularMarketPreviousClose<=10) & (quote_data_df.regularMarketPreviousClose>=1)) | ((quote_data_df.regularMarketPreviousClose>=11) & (quote_data_df.regularMarketPreviousClose<=20)))].ticker.values
+    tickers = quote_data_df[(quote_data_df.marketCap<=1000000000) & (((quote_data_df.regularMarketPreviousClose<=10) & (quote_data_df.regularMarketPreviousClose>=1)) | ((quote_data_df.regularMarketPreviousClose>=11) & (quote_data_df.regularMarketPreviousClose<=20)))].ticker.values
 
     cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))

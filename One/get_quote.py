@@ -10,28 +10,61 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 import math
 import numpy as np
+import yfinance as yf
+import requests
+from bs4 import BeautifulSoup
 
-days=365
-date_time = datetime.datetime.now()
+def convert_to_num(s):
+    if s[-1] == 'M':
+        return float(s[:-1]) * 1000000
+    elif s[-1] == 'B':
+        return float(s[:-1]) * 1000000000
+    elif s[-1] == 'T':
+        return float(s[:-1]) * 1000000000000
+    else:
+        raise ValueError("Input string must end with 'M', 'B', or 'T'")
 
 def get_quote_data(ticker):
     df = pd.DataFrame()
     try:
         dict = si.get_quote_data(ticker)
-        # dict['ticker'] = ticker
-        if 'marketCap' in dict.keys():
-            marketCap = dict['marketCap']
-        else:
-            return pd.DataFrame()
-        if 'regularMarketPreviousClose' in dict.keys():
-            regularMarketPreviousClose = dict['regularMarketPreviousClose']
-        else:
-            return pd.DataFrame()
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+            log("critical",ticker+" "+str(e))
             return -1
-        else:
+        elif str(e).startswith('Invalid response from server') | str(e).startswith("IndexError('list index out of range')"):
             return pd.DataFrame()
+        else:
+            log("error",ticker+" "+str(e))
+            return pd.DataFrame()
+
+    # dict['ticker'] = ticker
+    if 'marketCap' in dict.keys():
+        marketCap = dict['marketCap']
+    else:
+        url = f"https://finance.yahoo.com/quote/{ticker}"
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'
+        }
+        response = requests.get(url,headers=headers)
+        soup = BeautifulSoup(response.text, "html.parser")
+        market_cap_element = soup.find("td", {"data-test": "MARKET_CAP-value"})
+        if market_cap_element is not None:
+            marketCap = market_cap_element.text
+            if marketCap == "N/A":
+                log("error",ticker+" marketCap is N/A")
+                return pd.DataFrame()
+            else:
+                marketCap = convert_to_num(marketCap)
+        else:
+            # log("error",ticker+" marketCap is None")
+            return pd.DataFrame()
+    if 'regularMarketPreviousClose' in dict.keys():
+        regularMarketPreviousClose = dict['regularMarketPreviousClose']
+    else:
+        log("error",ticker+" regularMarketPreviousClose is not available")
+        return pd.DataFrame()
+
     d={'ticker':[ticker],'marketCap':[marketCap],'regularMarketPreviousClose':[regularMarketPreviousClose]}
     df = pd.DataFrame(d)
     df = df.set_index('ticker')
