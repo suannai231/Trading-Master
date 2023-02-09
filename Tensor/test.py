@@ -18,24 +18,32 @@ df = df[df.ticker=="MARK"]
 df = df.set_index("date",drop=True)
 df = df.drop(columns=["ticker"])
 
-data = df[['Close', 'Volume']]
+data = df[['close', 'volume']]
 
-# Normalize the values of the two features
+# Normalize the values of the close and volume features
 scaler = MinMaxScaler()
-data[['Close', 'Volume']] = scaler.fit_transform(data[['Close', 'Volume']])
+data = scaler.fit_transform(data)
 
 # Split the data into training, validation, and test sets
 train_data, test_data = train_test_split(data, test_size=0.2, shuffle=False)
 train_data, val_data = train_test_split(train_data, test_size=0.2, shuffle=False)
 
-# Convert the close prices into labels that can be used to train the neural network
-train_labels = train_data.pop('Close')
-val_labels = val_data.pop('Close')
-test_labels = test_data.pop('Close')
+# Convert the data into numpy arrays
+train_data = np.array(train_data)
+val_data = np.array(val_data)
+test_data = np.array(test_data)
+
+# Split the data into features and labels
+train_features = train_data[:, :-1]
+train_labels = train_data[:, -1]
+val_features = val_data[:, :-1]
+val_labels = val_data[:, -1]
+test_features = test_data[:, :-1]
+test_labels = test_data[:, -1]
 
 # Define the neural network architecture
 model = tf.keras.Sequential([
-    tf.keras.layers.Dense(64, activation='relu', input_shape=(1,)),
+    tf.keras.layers.Dense(64, activation='relu', input_shape=(2,)),
     tf.keras.layers.Dense(32, activation='relu'),
     tf.keras.layers.Dense(1)
 ])
@@ -44,16 +52,16 @@ model = tf.keras.Sequential([
 model.compile(optimizer='adam', loss='mean_squared_error')
 
 # Train the model
-history = model.fit(train_data, train_labels, epochs=50, batch_size=32, validation_data=(val_data, val_labels))
+history = model.fit(train_features, train_labels, epochs=50, batch_size=32, validation_data=(val_features, val_labels))
 
 # Make predictions on the test data
-predictions = model.predict(test_data)
+predictions = model.predict(test_features)
 
-# Un-normalize the predicted values to get the actual close prices
+# Un-normalize the predicted values
 predictions = scaler.inverse_transform(predictions)
 
-# Plot the actual close prices and the predicted close prices
-plt.plot(range(len(test_labels)), test_labels, label='Actual Close Price')
-plt.plot(range(len(test_labels)), predictions, label='Predicted Close Price')
+# Plot the actual and predicted values
+plt.plot(test_labels, label='Actual')
+plt.plot(predictions, label='Predicted')
 plt.legend()
 plt.show()
