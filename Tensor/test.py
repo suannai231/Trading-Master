@@ -18,50 +18,46 @@ df = df[df.ticker=="MARK"]
 df = df.set_index("date",drop=True)
 df = df.drop(columns=["ticker"])
 
-data = df[['close', 'volume']]
+# Prepare the data by extracting close price and volume
+features = df[["close", "volume"]].values
+labels = df["close"].values
 
-# Normalize the values of the close and volume features
+# Normalize the data
 scaler = MinMaxScaler()
-data = scaler.fit_transform(data)
+features = scaler.fit_transform(features)
 
-# Split the data into training, validation, and test sets
-train_data, test_data = train_test_split(data, test_size=0.2, shuffle=False)
-train_data, val_data = train_test_split(train_data, test_size=0.2, shuffle=False)
+# Split the data into training and testing sets
+split = int(0.7 * features.shape[0])
+train_features = features[:split, :]
+train_labels = labels[:split]
+test_features = features[split:, :]
+test_labels = labels[split:]
 
-# Convert the data into numpy arrays
-train_data = np.array(train_data)
-val_data = np.array(val_data)
-test_data = np.array(test_data)
+# Reshape the data for LSTM
+train_features = train_features.reshape(train_features.shape[0], 1, train_features.shape[1])
+test_features = test_features.reshape(test_features.shape[0], 1, test_features.shape[1])
 
-# Split the data into features and labels
-train_features = train_data[:, :-1]
-train_labels = train_data[:, -1]
-val_features = val_data[:, :-1]
-val_labels = val_data[:, -1]
-test_features = test_data[:, :-1]
-test_labels = test_data[:, -1]
-
-# Define the neural network architecture
-model = tf.keras.Sequential([
-    tf.keras.layers.Dense(64, activation='relu', input_shape=(2,)),
-    tf.keras.layers.Dense(32, activation='relu'),
-    tf.keras.layers.Dense(1)
-])
+# Create the LSTM model
+model = Sequential()
+model.add(LSTM(50, return_sequences=True, input_shape=(train_features.shape[1], train_features.shape[2])))
+model.add(LSTM(50, return_sequences=False))
+model.add(Dense(1))
 
 # Compile the model
-model.compile(optimizer='adam', loss='mean_squared_error')
+model.compile(loss="mean_squared_error", optimizer="adam")
 
 # Train the model
-history = model.fit(train_features, train_labels, epochs=50, batch_size=32, validation_data=(val_features, val_labels))
+model.fit(train_features, train_labels, epochs=100, batch_size=32, verbose=0)
 
 # Make predictions on the test data
 predictions = model.predict(test_features)
 
-# Un-normalize the predicted values
-predictions = scaler.inverse_transform(predictions)
+# Invert the normalization to get the actual close prices
+predictions = scaler.inverse_transform(predictions.reshape(-1, 1))
+test_labels = scaler.inverse_transform(test_labels.reshape(-1, 1))
 
-# Plot the actual and predicted values
-plt.plot(test_labels, label='Actual')
-plt.plot(predictions, label='Predicted')
+# Plot the actual close price and the predicted close price
+plt.plot(test_labels, label='Actual close Price')
+plt.plot(predictions, label='Predicted close Price')
 plt.legend()
 plt.show()
