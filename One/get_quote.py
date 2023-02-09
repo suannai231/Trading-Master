@@ -10,7 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 import math
 import numpy as np
-import yfinance as yf
+# import yfinance as yf
 import requests
 from bs4 import BeautifulSoup
 

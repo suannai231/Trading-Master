@@ -7,18 +7,18 @@ from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, LSTM
 
-print("TensorFlow version:", tf.__version__)
-print("cuDNN enabled:", tf.test.is_built_with_cuda())
+# print("TensorFlow version:", tf.__version__)
+# print("cuDNN enabled:", tf.test.is_built_with_cuda())
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "1" # change 0 to the number of the GPU you want to use
-print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+# # os.environ["CUDA_VISIBLE_DEVICES"] = "1" # change 0 to the number of the GPU you want to use
+# print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
 
-from tensorflow.compat.v1 import GPUOptions
-from tensorflow.compat.v1 import ConfigProto
+# from tensorflow.compat.v1 import GPUOptions
+# from tensorflow.compat.v1 import ConfigProto
 
-config = ConfigProto()
-config.gpu_options.allow_growth = True
-config.gpu_options.per_process_gpu_memory_fraction = 0.9
+# config = ConfigProto()
+# config.gpu_options.allow_growth = True
+# config.gpu_options.per_process_gpu_memory_fraction = 0.9
 
 # Load the stock data
 # df = pd.read_csv('stock_data.csv')
