@@ -120,9 +120,9 @@ if __name__ == '__main__':
         exit()
 
     tickers = df.ticker.unique()
-    cores = int(multiprocessing.cpu_count())
+    cores = 12 #int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
-    pool = Pool(10)
+    pool = Pool(cores)
     async_results = []
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
