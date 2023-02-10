@@ -12,13 +12,16 @@ def screen(df,lines):
     if len(df)<=2:
         return False
     if lines == "Volatile":
-        close_max_30days = max(df.tail(30)['close'])
-        close_max_100days = max(df.tail(100)['close'])
-        new_high = close_max_30days == close_max_100days
-        volume_10d_avg = df.tail(10).volume.mean()
-        # volume = df.iloc[-1].volume
         close = df.iloc[-1].close
         last_close = df.iloc[-2].close
+
+        close_max_30days = max(df.tail(30)['close'])
+        close_max_100days = max(df.tail(100)['close'])
+
+        new_high = (close_max_30days == close_max_100days) and (close < close_max_30days)
+        volume_10d_avg = df.tail(10).volume.mean()
+        # volume = df.iloc[-1].volume
+
         turnover_10d_avg = volume_10d_avg*close
         turnover_flag = turnover_10d_avg > 300000
         if(len(df)<=3):
