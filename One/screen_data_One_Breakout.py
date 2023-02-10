@@ -6,11 +6,34 @@ from multiprocessing import Pool
 import time
 import logging
 import math
+import matplotlib as plt
 
 
 def screen(df,lines):
     if len(df)<=2:
         return False
+    if df.iloc[-1].ticker == "UBX":
+        data = df
+        # Plot the stock data
+        plt.plot(data['Date'], data['Close'])
+
+        # Draw the neckline by connecting the highs of the two troughs on the chart
+        high1 = data[data['Close'] == data['Close'].min()].iloc[0]['Close']
+        high2 = data[data['Close'] == data['Close'].min()].iloc[1]['Close']
+        plt.hlines(y=high1, xmin=data.iloc[0]['Date'], xmax=data.iloc[-1]['Date'], color='red', linewidth=2)
+        plt.hlines(y=high2, xmin=data.iloc[0]['Date'], xmax=data.iloc[-1]['Date'], color='red', linewidth=2)
+
+        # Find the stock prices that break the neckline
+        break_dates = data[data['Close'] > high1]['Date']
+        break_prices = data[data['Close'] > high1]['Close']
+        plt.scatter(break_dates, break_prices, color='green', marker='o', s=50)
+
+        # Add labels and show the plot
+        plt.xlabel('Date')
+        plt.ylabel('Close Price')
+        plt.title('Stock Price with Neckline and Breakouts')
+        plt.show()
+
     if lines == "Volatile":
         close_max_30days = max(df.tail(30)['close'])
         close_max_100days = max(df.tail(100)['close'])
