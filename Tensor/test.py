@@ -119,18 +119,19 @@ if __name__ == '__main__':
         log('critical',str(e))
         exit()
 
-    tickers = df.ticker.unique()
-    cores = 12 #int(multiprocessing.cpu_count())
-    ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
-    pool = Pool(cores)
-    async_results = []
-    for ticker_chunk in ticker_chunk_list:
-        ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(train, args=(ticker_chunk_df,))
-        async_results.append(async_result)
-    pool.close()
-    del(df)
-    log('info',"process pool start.")
-    pool.join()
-    log('info',"process pool stop.")
+    train(df)
+    # tickers = df.ticker.unique()
+    # cores = 2 #int(multiprocessing.cpu_count())
+    # ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
+    # pool = Pool(cores)
+    # async_results = []
+    # for ticker_chunk in ticker_chunk_list:
+    #     ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
+    #     async_result = pool.apply_async(train, args=(ticker_chunk_df,))
+    #     async_results.append(async_result)
+    # pool.close()
+    # del(df)
+    # log('info',"process pool start.")
+    # pool.join()
+    # log('info',"process pool stop.")
   
