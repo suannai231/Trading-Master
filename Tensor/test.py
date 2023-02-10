@@ -92,7 +92,7 @@ def train(ticker_chunk_df):
 
                 # Train the model
                 model.fit(train_features, train_labels, epochs=100, batch_size=32, verbose=0)
-                model.save(model_file)
+                model.save(model_path+model_file)
 
 
             # Invert the normalization to get the actual close prices
