@@ -79,7 +79,7 @@ def train(ticker_chunk_df):
             model_file = ticker+".h5"
             if model_file in model_files:
             # if os.path.exists(model_file):
-                model = keras.models.load_model(model_file)
+                model = keras.models.load_model(model_path+model_file)
             else:
                 # Create the LSTM model
                 model = Sequential()
