@@ -45,9 +45,14 @@ def chunks(lst, n):
 
 def train(ticker_chunk_df):
     tickers= ticker_chunk_df.ticker.unique()
+    picture_files = os.listdir(picture_path)
+    model_files = os.listdir(model_path)
     for ticker in tickers:
         picture_file = picture_path+ticker+".png"
-        if not os.path.exists(picture_file):
+        if picture_file in picture_files:
+            continue
+        else:
+        # if not os.path.exists(picture_file):
             ticker_df = ticker_chunk_df[ticker_chunk_df.ticker==ticker]
             ticker_df = ticker_df.set_index("date",drop=True)
             ticker_df = ticker_df.drop(columns=["ticker"])
@@ -72,7 +77,8 @@ def train(ticker_chunk_df):
             test_features = test_features.reshape(test_features.shape[0], 1, test_features.shape[1])
 
             model_file = model_path+ticker+".h5"
-            if os.path.exists(model_file):
+            if model_file in model_files:
+            # if os.path.exists(model_file):
                 model = keras.models.load_model(model_file)
             else:
                 # Create the LSTM model
