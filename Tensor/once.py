@@ -141,11 +141,11 @@ def train(ticker,df):
     print(f'Test Score: {test_score:.2f}')
 
     # Predict prices
-    train_predict = model.predict(X_train)
+    # train_predict = model.predict(X_train)
     test_predict = model.predict(X_test)
 
     # Inverse transform predictions and actual prices
-    train_predict = scaler.inverse_transform(np.concatenate((train_predict, X_train[:, -1, 1:]), axis=1))[:, 0]
+    # train_predict = scaler.inverse_transform(np.concatenate((train_predict, X_train[:, -1, 1:]), axis=1))[:, 0]
     test_predict = scaler.inverse_transform(np.concatenate((test_predict, X_test[:, -1, 1:]), axis=1))[:, 0]
     train_actual = scaler.inverse_transform(np.concatenate((y_train.reshape(-1, 1), X_train[:, -1, 1:]), axis=1))[:, 0]
     test_actual = scaler.inverse_transform(np.concatenate((y_test.reshape(-1, 1), X_test[:, -1, 1:]), axis=1))[:, 0]
@@ -231,7 +231,7 @@ if __name__ == '__main__':
         log('critical',str(e))
         exit()
 
-    train(ticker,sh_df)
+    train(ticker,stock_concat_df)
     # tickers = df.ticker.unique()
     # cores = 2 #int(multiprocessing.cpu_count())
     # ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
