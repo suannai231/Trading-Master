@@ -59,6 +59,7 @@ def get_stock_realtime(ticker):
     df = pd.DataFrame()
     try:
         close = float(si.get_live_price(ticker))
+        stock_volume = si.get_quote_table('AAPL')['Volume']
         # quote_table = si.get_quote_table(ticker)
         # open = float(quote_table['Open'])
         # low = float(quote_table["Day's Range"].split(" - ")[0])
@@ -67,7 +68,7 @@ def get_stock_realtime(ticker):
         open = np.nan
         low = np.nan
         high = np.nan
-        volume = np.nan
+        volume = stock_volume
         d = {'date':end, 'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
         # df=pd.DataFrame(d,index=[str(end)])
         df=pd.DataFrame(d,index=[str(end)])
@@ -219,7 +220,7 @@ def train_old(ticker_chunk_df):
             # plt.show()
 
 if __name__ == '__main__':
-    ticker = "GNS"
+    ticker = "FUSN"
     try:
         sh_df=get_stock_history(ticker)
         sr_df=get_stock_realtime(ticker)
