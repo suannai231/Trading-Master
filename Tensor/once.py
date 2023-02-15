@@ -147,7 +147,7 @@ def train(ticker,df):
     # Inverse transform predictions and actual prices
     # train_predict = scaler.inverse_transform(np.concatenate((train_predict, X_train[:, -1, 1:]), axis=1))[:, 0]
     test_predict = scaler.inverse_transform(np.concatenate((test_predict, X_test[:, -1, 1:]), axis=1))[:, 0]
-    train_actual = scaler.inverse_transform(np.concatenate((y_train.reshape(-1, 1), X_train[:, -1, 1:]), axis=1))[:, 0]
+    # train_actual = scaler.inverse_transform(np.concatenate((y_train.reshape(-1, 1), X_train[:, -1, 1:]), axis=1))[:, 0]
     test_actual = scaler.inverse_transform(np.concatenate((y_test.reshape(-1, 1), X_test[:, -1, 1:]), axis=1))[:, 0]
 
     # Plot actual and predicted prices
@@ -220,7 +220,7 @@ def train_old(ticker_chunk_df):
             # plt.show()
 
 if __name__ == '__main__':
-    ticker = "FUSN"
+    ticker = "SSY"
     try:
         sh_df=get_stock_history(ticker)
         sr_df=get_stock_realtime(ticker)
