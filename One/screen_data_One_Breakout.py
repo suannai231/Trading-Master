@@ -10,30 +10,53 @@ import numpy as np
 
 
 def screen(df,lines):
-    if len(df)<=2:
+    if len(df)<10:
         return False
-    if lines == "Volatile":
-        close = df.iloc[-1].close
+    close = df.iloc[-1].close
+    volume_10d_avg = df.tail(10).volume.mean()
+    turnover_10d_avg = volume_10d_avg*close
+    turnover_flag = turnover_10d_avg > 300000
+    EMA120 = df.iloc[-1].EMA120
+    ema120_flag = (close >= EMA120)
+    change = df.iloc[-1].change > 0.05
+    if df.iloc[-1].ticker == "GMBL":
+        log("info", df.iloc[-1].ticker)
+    if lines == "STD_MACD":
+        DIF_Yesterday = df.iloc[-2].DIF
+        DEA_Yesterday = df.iloc[-2].DEA
+        MACD_Yesterday = DIF_Yesterday>=DEA_Yesterday
+        STD20_Yesterday = df.iloc[-2].STD20
+        STD20_EMA5_Yesterday = df.iloc[-2].STD20_EMA5
+        STD_Yesterday = STD20_Yesterday>=STD20_EMA5_Yesterday
+        yesterday = MACD_Yesterday and STD_Yesterday
+        DIF = df.iloc[-1].DIF
+        DEA = df.iloc[-1].DEA
+        MACD = DIF>=DEA
+        STD20 = df.iloc[-1].STD20
+        STD20_EMA5 = df.iloc[-1].STD20_EMA5
+        STD = STD20>=STD20_EMA5
+        today = MACD and STD and turnover_flag and ema120_flag and change
+        if today and (not yesterday):
+            return True
+        else:
+            return False
+    elif lines == "Volatile":
+        
         last_close = df.iloc[-2].close
 
         close_max_30days = max(df.tail(30)['close'])
         close_max_100days = max(df.tail(100)['close'])
 
         new_high = (close_max_30days == close_max_100days) and (close < close_max_30days)
-        volume_10d_avg = df.tail(10).volume.mean()
-        # volume = df.iloc[-1].volume
 
-        turnover_10d_avg = volume_10d_avg*close
-        turnover_flag = turnover_10d_avg > 300000
         if(len(df)<=3):
             return False
         last_high = df.iloc[-2].high
         last_2_high = df.iloc[-3].high
-        EMA120 = df.iloc[-1].EMA120
-        strong = (close >= last_high) and (close >= EMA120) and (last_close<=last_2_high)
-        change = df.iloc[-1].change > 0.05
-        if df.iloc[-1].ticker == "PIK":
-            log("info", df.iloc[-1].ticker)
+        
+        strong = (close >= last_high) and ema120_flag and (last_close<=last_2_high)
+        
+
         if(new_high and turnover_flag and strong and change):
             return True
         else:
@@ -55,7 +78,7 @@ def run(ticker_chunk_df):
         #     log("error",ticker+" date error.")
         #     continue
         try:
-            Volatile = screen(df,"Volatile")
+            Volatile = screen(df,"STD_MACD")
         except Exception as e:
             log('critical',str(e))
             return pd.DataFrame()

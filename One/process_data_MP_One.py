@@ -61,17 +61,25 @@ def cal_basics(df):
 
     ema5 = df['close'].ewm(span = 5, adjust = False).mean()
     ema10 = df['close'].ewm(span = 10, adjust = False).mean()
+    ema12 = df['close'].ewm(span = 12, adjust = False).mean()
     ema20 = df['close'].ewm(span = 20, adjust = False).mean()
+    ema26 = df['close'].ewm(span = 26, adjust = False).mean()
     ema60 = df['close'].ewm(span = 60, adjust = False).mean()
     ema120 = df['close'].ewm(span = 120, adjust = False).mean()
     ema250 = df['close'].ewm(span = 250, adjust = False).mean()
+    std20 = df['close'].rolling(window=20).std()
     df['EMA5'] = ema5
     df['EMA10'] = ema10
+    df['EMA12'] = ema12
     df['EMA20'] = ema20
+    df['EMA26'] = ema26
     df['EMA60'] = ema60
     df['EMA120'] = ema120
     df['EMA250'] = ema250
-
+    df['DIF'] = ema12-ema26
+    df['DEA'] = df['DIF'].ewm(span = 9, adjust = False).mean()
+    df['STD20'] = std20
+    df['STD20_EMA5'] = df['STD20'].ewm(span = 5, adjust = False).mean()
     return df
 
 def run(ticker_chunk_df):

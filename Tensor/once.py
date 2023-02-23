@@ -220,7 +220,7 @@ def train_old(ticker_chunk_df):
             # plt.show()
 
 if __name__ == '__main__':
-    ticker = "SSY"
+    ticker = "SQQQ"
     try:
         sh_df=get_stock_history(ticker)
         sr_df=get_stock_realtime(ticker)
