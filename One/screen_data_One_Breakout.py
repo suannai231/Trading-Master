@@ -13,13 +13,16 @@ def screen(df,lines):
     if len(df)<10:
         return False
     close = df.iloc[-1].close
+    close_Yesterday = df.iloc[-2].close
     volume_10d_avg = df.tail(10).volume.mean()
     turnover_10d_avg = volume_10d_avg*close
     turnover_flag = turnover_10d_avg > 300000
     EMA120 = df.iloc[-1].EMA120
     ema120_flag = (close >= EMA120)
+    EMA120_Yesterday = df.iloc[-2].EMA120
+    ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
     change = df.iloc[-1].change > 0.05
-    if df.iloc[-1].ticker == "GMBL":
+    if df.iloc[-1].ticker == "XPER":
         log("info", df.iloc[-1].ticker)
     if lines == "STD_MACD":
         DIF_Yesterday = df.iloc[-2].DIF
@@ -28,7 +31,7 @@ def screen(df,lines):
         STD20_Yesterday = df.iloc[-2].STD20
         STD20_EMA5_Yesterday = df.iloc[-2].STD20_EMA5
         STD_Yesterday = STD20_Yesterday>=STD20_EMA5_Yesterday
-        yesterday = MACD_Yesterday and STD_Yesterday
+        yesterday = MACD_Yesterday and STD_Yesterday and ema120_Yesterday_flag
         DIF = df.iloc[-1].DIF
         DEA = df.iloc[-1].DEA
         MACD = DIF>=DEA
@@ -41,8 +44,6 @@ def screen(df,lines):
         else:
             return False
     elif lines == "Volatile":
-        
-        last_close = df.iloc[-2].close
 
         close_max_30days = max(df.tail(30)['close'])
         close_max_100days = max(df.tail(100)['close'])
@@ -54,7 +55,7 @@ def screen(df,lines):
         last_high = df.iloc[-2].high
         last_2_high = df.iloc[-3].high
         
-        strong = (close >= last_high) and ema120_flag and (last_close<=last_2_high)
+        strong = (close >= last_high) and ema120_flag and (close_Yesterday<=last_2_high)
         
 
         if(new_high and turnover_flag and strong and change):
