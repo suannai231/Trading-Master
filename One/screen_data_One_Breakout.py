@@ -22,7 +22,7 @@ def screen(df,lines):
     # EMA120_Yesterday = df.iloc[-2].EMA120
     # ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
     change = df.iloc[-1].change >= 0.07
-    if df.iloc[-1].ticker == "LHDX":
+    if df.iloc[-1].ticker == "FTCI":
         log("info", df.iloc[-1].ticker)
 
     highest_volume_30days=df.tail(30).volume.max()
