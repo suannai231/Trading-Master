@@ -10,58 +10,63 @@ import numpy as np
 
 
 def screen(df,lines):
-    if len(df)<10:
+    if len(df)<30:
         return False
     close = df.iloc[-1].close
-    close_Yesterday = df.iloc[-2].close
+    # close_Yesterday = df.iloc[-2].close
     volume_10d_avg = df.tail(10).volume.mean()
     turnover_10d_avg = volume_10d_avg*close
     turnover_flag = turnover_10d_avg > 300000
     EMA120 = df.iloc[-1].EMA120
     ema120_flag = (close >= EMA120)
-    EMA120_Yesterday = df.iloc[-2].EMA120
-    ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
-    change = df.iloc[-1].change > 0.05
-    if df.iloc[-1].ticker == "XPER":
+    # EMA120_Yesterday = df.iloc[-2].EMA120
+    # ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
+    change = df.iloc[-1].change >= 0.07
+    if df.iloc[-1].ticker == "LHDX":
         log("info", df.iloc[-1].ticker)
-    if lines == "STD_MACD":
-        DIF_Yesterday = df.iloc[-2].DIF
-        DEA_Yesterday = df.iloc[-2].DEA
-        MACD_Yesterday = DIF_Yesterday>=DEA_Yesterday
-        STD20_Yesterday = df.iloc[-2].STD20
-        STD20_EMA5_Yesterday = df.iloc[-2].STD20_EMA5
-        STD_Yesterday = STD20_Yesterday>=STD20_EMA5_Yesterday
-        yesterday = MACD_Yesterday and STD_Yesterday and ema120_Yesterday_flag
+
+    highest_volume_30days=df.tail(30).volume.max()
+    low = df[df.volume==highest_volume_30days].low[0]
+    bottom = True if low<=close<=low*1.5 else False
+
+    if lines == "bottom":
+        # DIF_Yesterday = df.iloc[-2].DIF
+        # DEA_Yesterday = df.iloc[-2].DEA
+        # MACD_Yesterday = DIF_Yesterday>=DEA_Yesterday
+        # STD20_Yesterday = df.iloc[-2].STD20
+        # STD20_EMA5_Yesterday = df.iloc[-2].STD20_EMA5
+        # STD_Yesterday = STD20_Yesterday>=STD20_EMA5_Yesterday
+        # yesterday = MACD_Yesterday and STD_Yesterday and ema120_Yesterday_flag
         DIF = df.iloc[-1].DIF
         DEA = df.iloc[-1].DEA
         MACD = DIF>=DEA
         STD20 = df.iloc[-1].STD20
         STD20_EMA5 = df.iloc[-1].STD20_EMA5
         STD = STD20>=STD20_EMA5
-        today = MACD and STD and turnover_flag and ema120_flag and change
-        if today and (not yesterday):
+        today = MACD and STD and turnover_flag and change
+        if today and bottom:
             return True
         else:
             return False
-    elif lines == "Volatile":
+    # elif lines == "Volatile":
 
-        close_max_30days = max(df.tail(30)['close'])
-        close_max_100days = max(df.tail(100)['close'])
+    #     close_max_30days = max(df.tail(30)['close'])
+    #     close_max_100days = max(df.tail(100)['close'])
 
-        new_high = (close_max_30days == close_max_100days) and (close < close_max_30days)
+    #     new_high = (close_max_30days == close_max_100days) and (close < close_max_30days)
 
-        if(len(df)<=3):
-            return False
-        last_high = df.iloc[-2].high
-        last_2_high = df.iloc[-3].high
+    #     if(len(df)<=3):
+    #         return False
+    #     last_high = df.iloc[-2].high
+    #     last_2_high = df.iloc[-3].high
         
-        strong = (close >= last_high) and ema120_flag and (close_Yesterday<=last_2_high)
+    #     strong = (close >= last_high) and ema120_flag and (close_Yesterday<=last_2_high)
         
 
-        if(new_high and turnover_flag and strong and change):
-            return True
-        else:
-            return False
+    #     if(new_high and turnover_flag and strong and change):
+    #         return True
+    #     else:
+    #         return False
 
     return False
 
@@ -79,7 +84,7 @@ def run(ticker_chunk_df):
         #     log("error",ticker+" date error.")
         #     continue
         try:
-            Volatile = screen(df,"STD_MACD")
+            Volatile = screen(df,"bottom")
         except Exception as e:
             log('critical',str(e))
             return pd.DataFrame()
@@ -114,7 +119,7 @@ def screen_data():
     except Exception as e:
         log('critical',str(e))
         return
-
+    # df=df[df.date!=str(datetime.date.today())]
     tickers = df.ticker.unique()
     cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))

@@ -206,7 +206,7 @@ if __name__ == '__main__':
         log('critical',str(e))
         sys.exit()
 
-    tickers = quote_data_df[(quote_data_df.marketCap<=1000000000) & (((quote_data_df.regularMarketPreviousClose<=10) & (quote_data_df.regularMarketPreviousClose>=1)) | ((quote_data_df.regularMarketPreviousClose>=11) & (quote_data_df.regularMarketPreviousClose<=20)))].ticker.values
+    tickers = quote_data_df[(quote_data_df.marketCap<=500000000) & (((quote_data_df.regularMarketPreviousClose<=10) & (quote_data_df.regularMarketPreviousClose>=0.1)) | ((quote_data_df.regularMarketPreviousClose>=11) & (quote_data_df.regularMarketPreviousClose<=20)))].ticker.values
 
     cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
@@ -223,7 +223,7 @@ if __name__ == '__main__':
     #     except Exception as e:
     #         log('critical',"to_feather:"+str(e))
 
-    stock_history_concat_df=collect_data(get_stock_history,cores,10)
+    stock_history_concat_df=collect_data(get_stock_history,cores,10).dropna()
     
     if (not stock_history_concat_df.empty):
         log('info','stock_history_concat_df is ready.')

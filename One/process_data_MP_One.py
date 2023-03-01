@@ -56,6 +56,8 @@ import math
 #     return df
 
 def cal_basics(df):
+    if df.iloc[-1].ticker == "LLAP":
+        log("info", df.iloc[-1].ticker)
     df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
     df['AMP'] = (df['high']-df['low'])/df['low']
 
