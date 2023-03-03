@@ -6,6 +6,7 @@ from multiprocessing import Pool
 import time
 import logging
 import math
+import numpy as np
 
 # def cal_Long(df):
 #     startindex = 0
@@ -82,6 +83,75 @@ def cal_basics(df):
     df['DEA'] = df['DIF'].ewm(span = 9, adjust = False).mean()
     df['STD20'] = std20
     df['STD20_EMA5'] = df['STD20'].ewm(span = 5, adjust = False).mean()
+
+
+    LLV7 = df['low'].rolling(window=7).min()
+    LLV14 = df['low'].rolling(window=14).min()
+    LLV28 = df['low'].rolling(window=28).min()
+    HHV7 = df['high'].rolling(window=7).max()
+    HHV14 = df['high'].rolling(window=14).max()
+    HHV28 = df['high'].rolling(window=28).max()
+    WSTA=((df['close']-LLV7)/(HHV7-LLV7))*4
+    WMTA=((df['close']-LLV14)/(HHV14-LLV14))*2
+    WLTA=((df['close']-LLV28)/(HHV28-LLV28))
+    UO=100*((WSTA+WMTA+WLTA)/(4+2+1))
+    df['UO']=UO
+
+    # HHV60 = df['volume'].rolling(window=60).max()
+    # VI = df.index[df.volume==HHV60].tolist()
+    # VL = df[VI].low
+    # DIFF= df['close']-VL
+    # DIFF_EMA20=DIFF.ewm(span = 20, adjust = False).mean()
+
+    # df['HHV60'] = df['volume'].rolling(window=60).max()  # calculate HHV(V, 60)
+    # df['bar_num'] = np.arange(len(df)) + 1  # create a column of bar numbers starting from 1
+    # last_bar_v_hhv_60 = df.loc[df['HHV60'].idxmax(), 'bar_num']  # find the bar number of the last occurrence of V = HHV(V, 60)
+    # df['VL'] = df['low'].shift(last_bar_v_hhv_60 - 1)  # shift L by the appropriate number of bars
+    # df['DIFF']= df['close']-df['VL']
+
+    # hhv = df['volume'].rolling(window=60).max()
+    # bars_last = df['volume'][::-1].eq(hhv[::-1].iloc[0]).cumsum()[::-1]
+    # mask = bars_last.eq(1)
+    # vl = df['low'].mask(~mask).ffill()
+    # df['DIFF']= df['close']-vl
+
+    # hhv_v = df['volume'].rolling(window=60).max()
+
+    # mask_v = df['volume'].eq(hhv_v) & (df['volume'] != 0)
+    # bars_last_v = mask_v[::-1].cumsum()[::-1]
+
+    # mask_l = bars_last_v.eq(1)
+    # vl = df['low'].shift()[mask_l].fillna(method='ffill')
+
+    # Define the functions
+    def REF(X, A):
+        return X.shift(A)
+
+    def BARSLAST(X):
+        return len(X) - 1 - np.argmax(np.flip(X != 0))
+
+    def HHV(X, N):
+        return X.rolling(N).max()
+
+    def EMA(X, N):
+        return X.ewm(span=N, min_periods=N).mean()
+
+    # assume you have a pandas DataFrame called 'data' with columns 'low' and 'volume'
+    df['max_volume_60days'] = df['volume'].rolling(window=60).max()
+    low = []
+    for vol in df['max_volume_60days']:
+        if not np.isnan(vol):
+            low.append(df.loc[df.volume==vol,'low'].values[0])
+        else:
+            low.append(np.nan)
+    df['max_volume_low_60days'] = low
+
+    # Calculate DIFF
+    df['DIFF'] = df["close"] - df['max_volume_low_60days']
+
+    # Calculate EMA20
+    df['DIFF_EMA20'] = df['DIFF'].ewm(span = 20, adjust = False).mean()
+
     return df
 
 def run(ticker_chunk_df):

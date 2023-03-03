@@ -10,7 +10,7 @@ import numpy as np
 
 
 def screen(df,lines):
-    if len(df)<30:
+    if len(df)<50:
         return False
     close = df.iloc[-1].close
     # close_Yesterday = df.iloc[-2].close
@@ -19,15 +19,25 @@ def screen(df,lines):
     turnover_flag = turnover_10d_avg > 300000
     EMA120 = df.iloc[-1].EMA120
     ema120_flag = (close >= EMA120)
+    EMA60 = df.iloc[-1].EMA60
+    ema60_flag = (close >= EMA60)
     # EMA120_Yesterday = df.iloc[-2].EMA120
     # ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
-    change = df.iloc[-1].change >= 0.07
-    if df.iloc[-1].ticker == "FTCI":
+    change = df.iloc[-1].change >=0.05
+    if df.iloc[-1].ticker == "IRNT":
         log("info", df.iloc[-1].ticker)
 
     highest_volume_30days=df.tail(30).volume.max()
     low = df[df.volume==highest_volume_30days].low[0]
     bottom = True if low<=close<=low*1.5 else False
+
+    volume = df.iloc[-1].volume
+    volume_spike = True if volume>=volume_10d_avg*2 else False
+
+    UO=df.iloc[-1].UO
+    buy = True if UO<=30 else False
+
+
 
     if lines == "bottom":
         # DIF_Yesterday = df.iloc[-2].DIF
@@ -37,14 +47,17 @@ def screen(df,lines):
         # STD20_EMA5_Yesterday = df.iloc[-2].STD20_EMA5
         # STD_Yesterday = STD20_Yesterday>=STD20_EMA5_Yesterday
         # yesterday = MACD_Yesterday and STD_Yesterday and ema120_Yesterday_flag
-        DIF = df.iloc[-1].DIF
-        DEA = df.iloc[-1].DEA
-        MACD = DIF>=DEA
-        STD20 = df.iloc[-1].STD20
-        STD20_EMA5 = df.iloc[-1].STD20_EMA5
-        STD = STD20>=STD20_EMA5
-        today = MACD and STD and turnover_flag and change
-        if today and bottom:
+        # DIF = df.iloc[-1].DIF
+        # DEA = df.iloc[-1].DEA
+        # MACD = DIF>=DEA
+        # STD20 = df.iloc[-1].STD20
+        # STD20_EMA5 = df.iloc[-1].STD20_EMA5
+        # STD = STD20>=STD20_EMA5
+        DIFF = df.iloc[-1].DIFF
+        DIFF_EMA20 = df.iloc[-1].DIFF_EMA20
+        flag = DIFF>=DIFF_EMA20>=0
+        today = flag and turnover_flag and ema60_flag and change
+        if today:
             return True
         else:
             return False

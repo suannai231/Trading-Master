@@ -12,6 +12,8 @@ import math
 import numpy as np
 import time
 import sys
+import requests
+from bs4 import BeautifulSoup
 
 days=365*5
 date_time = datetime.datetime.now()
@@ -65,6 +67,23 @@ def get_stock_realtime(ticker):
     df = pd.DataFrame()
     try:
         close = float(si.get_live_price(ticker))
+        url = f"https://finance.yahoo.com/quote/{ticker}"
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'
+        }
+        response = requests.get(url,headers=headers)
+        soup = BeautifulSoup(response.text, "html.parser")
+        regularMarketVolume_element = soup.find("fin-streamer", {"data-field": "regularMarketVolume"})
+        if regularMarketVolume_element is not None:
+            regularMarketVolume = regularMarketVolume_element.text
+            if regularMarketVolume == "N/A":
+                log("error",ticker+" marketCap is N/A")
+                return pd.DataFrame()
+            else:
+                volume = int(regularMarketVolume)
+        else:
+            # log("error",ticker+" marketCap is None")
+            return pd.DataFrame()
         # quote_table = si.get_quote_table(ticker)
         # open = float(quote_table['Open'])
         # low = float(quote_table["Day's Range"].split(" - ")[0])
@@ -73,7 +92,7 @@ def get_stock_realtime(ticker):
         open = np.nan
         low = np.nan
         high = np.nan
-        volume = np.nan
+        # volume = np.nan
         d = {'date':end, 'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
         # df=pd.DataFrame(d,index=[str(end)])
         df=pd.DataFrame(d,index=[str(end)])
@@ -206,7 +225,7 @@ if __name__ == '__main__':
         log('critical',str(e))
         sys.exit()
 
-    tickers = quote_data_df[(quote_data_df.marketCap<=500000000) & (((quote_data_df.regularMarketPreviousClose<=10) & (quote_data_df.regularMarketPreviousClose>=0.1)) | ((quote_data_df.regularMarketPreviousClose>=11) & (quote_data_df.regularMarketPreviousClose<=20)))].ticker.values
+    tickers = quote_data_df[(quote_data_df.marketCap<=300000000) & (((quote_data_df.regularMarketPreviousClose<=10) & (quote_data_df.regularMarketPreviousClose>=0.1)) | ((quote_data_df.regularMarketPreviousClose>=11) & (quote_data_df.regularMarketPreviousClose<=20)))].ticker.values
 
     cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
