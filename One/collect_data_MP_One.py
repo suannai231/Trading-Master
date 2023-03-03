@@ -64,6 +64,8 @@ def get_stock_history(ticker):
     return df
 
 def get_stock_realtime(ticker):
+    if ticker=="CDIO":
+        log("info",ticker)
     df = pd.DataFrame()
     try:
         close = float(si.get_live_price(ticker))
@@ -80,7 +82,7 @@ def get_stock_realtime(ticker):
                 log("error",ticker+" marketCap is N/A")
                 return pd.DataFrame()
             else:
-                volume = int(regularMarketVolume)
+                volume = int(regularMarketVolume.replace(",", ""))
         else:
             # log("error",ticker+" marketCap is None")
             return pd.DataFrame()

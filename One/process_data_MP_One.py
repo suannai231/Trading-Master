@@ -124,17 +124,17 @@ def cal_basics(df):
     # vl = df['low'].shift()[mask_l].fillna(method='ffill')
 
     # Define the functions
-    def REF(X, A):
-        return X.shift(A)
+    # def REF(X, A):
+    #     return X.shift(A)
 
-    def BARSLAST(X):
-        return len(X) - 1 - np.argmax(np.flip(X != 0))
+    # def BARSLAST(X):
+    #     return len(X) - 1 - np.argmax(np.flip(X != 0))
 
-    def HHV(X, N):
-        return X.rolling(N).max()
+    # def HHV(X, N):
+    #     return X.rolling(N).max()
 
-    def EMA(X, N):
-        return X.ewm(span=N, min_periods=N).mean()
+    # def EMA(X, N):
+    #     return X.ewm(span=N, min_periods=N).mean()
 
     # assume you have a pandas DataFrame called 'data' with columns 'low' and 'volume'
     df['max_volume_60days'] = df['volume'].rolling(window=60).max()
