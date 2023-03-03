@@ -37,6 +37,7 @@ def screen(df,lines):
     UO=df.iloc[-1].UO
     buy = True if UO<=30 else False
 
+    
 
 
     if lines == "bottom":
@@ -55,7 +56,9 @@ def screen(df,lines):
         # STD = STD20>=STD20_EMA5
         DIFF = df.iloc[-1].DIFF
         DIFF_EMA20 = df.iloc[-1].DIFF_EMA20
-        flag = DIFF>=DIFF_EMA20>=0
+        max_volume_low_60days = df.iloc[-1].max_volume_low_60days
+        gain_rate = DIFF/max_volume_low_60days
+        flag = (DIFF>=DIFF_EMA20>=0) and (gain_rate < 0.5)
         today = flag and turnover_flag and ema60_flag and change
         if today:
             return True
