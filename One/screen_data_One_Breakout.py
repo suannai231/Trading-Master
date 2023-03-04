@@ -58,7 +58,7 @@ def screen(df,lines):
         DIFF_EMA20 = df.iloc[-1].DIFF_EMA20
         max_volume_low_60days = df.iloc[-1].max_volume_low_60days
         gain_rate = DIFF/max_volume_low_60days
-        flag = (DIFF>=DIFF_EMA20>=0) and (gain_rate < 0.5)
+        flag = (DIFF>=DIFF_EMA20) and (DIFF>=0) and (gain_rate < 0.5)
         today = flag and turnover_flag and ema60_flag and change
         if today:
             return True
