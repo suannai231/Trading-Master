@@ -25,6 +25,26 @@ def convert_to_num(s):
         raise ValueError("Input string must end with 'M', 'B', or 'T'")
 
 def get_quote_data(ticker):
+    def get_marketCap_yahoo(ticker):
+        url = f"https://finance.yahoo.com/quote/{ticker}"
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'
+        }
+        try:
+            response = requests.get(url,headers=headers)
+        except Exception as e:
+            log("error",ticker+":"+e)
+        soup = BeautifulSoup(response.text, "html.parser")
+        market_cap_element = soup.find("td", {"data-test": "MARKET_CAP-value"})
+        if market_cap_element is not None:
+            marketCap = market_cap_element.text
+            if marketCap == "N/A":
+                return -1
+        else:
+            log("error",ticker+" marketCap is None")
+            return -1
+        marketCap = convert_to_num(marketCap)
+        return marketCap
     df = pd.DataFrame()
     try:
         dict = si.get_quote_data(ticker)
@@ -38,33 +58,21 @@ def get_quote_data(ticker):
             log("error",ticker+" "+str(e))
             return pd.DataFrame()
 
-    # dict['ticker'] = ticker
-    if 'marketCap' in dict.keys():
-        marketCap = dict['marketCap']
-    else:
-        url = f"https://finance.yahoo.com/quote/{ticker}"
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'
-        }
-        response = requests.get(url,headers=headers)
-        soup = BeautifulSoup(response.text, "html.parser")
-        market_cap_element = soup.find("td", {"data-test": "MARKET_CAP-value"})
-        if market_cap_element is not None:
-            marketCap = market_cap_element.text
-            if marketCap == "N/A":
-                log("error",ticker+" marketCap is N/A")
-                return pd.DataFrame()
-            else:
-                marketCap = convert_to_num(marketCap)
-        else:
-            # log("error",ticker+" marketCap is None")
-            return pd.DataFrame()
     if 'regularMarketPreviousClose' in dict.keys():
         regularMarketPreviousClose = dict['regularMarketPreviousClose']
     else:
         log("error",ticker+" regularMarketPreviousClose is not available")
         return pd.DataFrame()
-
+    
+    # dict['ticker'] = ticker
+    if 'marketCap' in dict.keys():
+        marketCap = dict['marketCap']
+    else:
+        marketCap = get_marketCap_yahoo(ticker)
+        if marketCap==-1:
+            return pd.DataFrame()
+    if ticker=="MPU":
+        log("info",ticker)
     d={'ticker':[ticker],'marketCap':[marketCap],'regularMarketPreviousClose':[regularMarketPreviousClose]}
     df = pd.DataFrame(d)
     df = df.set_index('ticker')
@@ -168,6 +176,7 @@ if __name__ == '__main__':
             log('critical','get tickers exception:'+str(e))
             continue
         tickers = nasdaq + other
+        tickers = [string for string in tickers if len(string) != 5]
 
     cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
