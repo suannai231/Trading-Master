@@ -187,4 +187,4 @@ if __name__ == '__main__':
     else:
         log('error','stock_quote_data_df is empty.')
 
-    log('info','collect process exit.')
+    log('info','collect process exit.')  

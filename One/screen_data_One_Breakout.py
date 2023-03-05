@@ -24,7 +24,7 @@ def screen(df,lines):
     # EMA120_Yesterday = df.iloc[-2].EMA120
     # ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
     change = df.iloc[-1].change >=0.05
-    if df.iloc[-1].ticker == "MTC":
+    if df.iloc[-1].ticker == "MPU":
         log("info", df.iloc[-1].ticker)
 
     highest_volume_30days=df.tail(30).volume.max()
@@ -54,12 +54,18 @@ def screen(df,lines):
         # STD20 = df.iloc[-1].STD20
         # STD20_EMA5 = df.iloc[-1].STD20_EMA5
         # STD = STD20>=STD20_EMA5
+        DIFF_Y = df.iloc[-2].DIFF
+        DIFF_EMA20_Y = df.iloc[-2].DIFF_EMA20
+        max_volume_low_60days_Y = df.iloc[-2].max_volume_low_60days
+        gain_rate_Y = DIFF_Y/max_volume_low_60days_Y
+        flag_Y = (DIFF_Y>=DIFF_EMA20_Y) and (DIFF_Y>=0) and (gain_rate_Y < 0.5)
+
         DIFF = df.iloc[-1].DIFF
         DIFF_EMA20 = df.iloc[-1].DIFF_EMA20
         max_volume_low_60days = df.iloc[-1].max_volume_low_60days
         gain_rate = DIFF/max_volume_low_60days
         flag = (DIFF>=DIFF_EMA20) and (DIFF>=0) and (gain_rate < 0.5)
-        today = flag and turnover_flag and ema60_flag and change
+        today = flag and not flag_Y and turnover_flag and ema60_flag and change
         if today:
             return True
         else:
