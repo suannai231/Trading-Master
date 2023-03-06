@@ -64,8 +64,6 @@ def get_stock_history(ticker):
     return df
 
 def get_stock_realtime(ticker):
-    if ticker=="CDIO":
-        log("info",ticker)
     df = pd.DataFrame()
     try:
         close = float(si.get_live_price(ticker))
@@ -80,12 +78,12 @@ def get_stock_realtime(ticker):
             regularMarketVolume = regularMarketVolume_element.text
             if regularMarketVolume == "N/A":
                 log("error",ticker+" marketCap is N/A")
-                return pd.DataFrame()
+                volume = -1
             else:
                 volume = int(regularMarketVolume.replace(",", ""))
         else:
             # log("error",ticker+" marketCap is None")
-            return pd.DataFrame()
+            volume = -1
         # quote_table = si.get_quote_table(ticker)
         # open = float(quote_table['Open'])
         # low = float(quote_table["Day's Range"].split(" - ")[0])
@@ -104,6 +102,8 @@ def get_stock_realtime(ticker):
         #     log("error",ticker+" date error")
         #     return pd.DataFrame()
     except Exception as e:
+        if ticker=="PKOH":
+            log("info",ticker)
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
         else:
@@ -111,6 +111,8 @@ def get_stock_realtime(ticker):
             return pd.DataFrame()
     # if ticker=="NEXA":
     #     log("info",ticker)
+    if ticker=="PKOH":
+        log("info",ticker)
     return df
 
 def get_stock_data_mt(func,ticker_chunk,thread_number):
