@@ -24,8 +24,6 @@ def screen(df,lines):
     # EMA120_Yesterday = df.iloc[-2].EMA120
     # ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
     change = df.iloc[-1].change >=0.05
-    if df.iloc[-1].ticker == "PKOH":
-        log("info", df.iloc[-1].ticker)
 
     highest_volume_30days=df.tail(30).volume.max()
     low = df[df.volume==highest_volume_30days].low[0]
@@ -66,6 +64,8 @@ def screen(df,lines):
         gain_rate = DIFF/max_volume_low_60days
         flag = (DIFF>=DIFF_EMA20) and (DIFF>=0) and (gain_rate < 0.5)
         today = flag and not flag_Y and turnover_flag and ema60_flag and change
+        if df.iloc[-1].ticker == "SPPI":
+            log("info", df.iloc[-1].ticker)
         if today:
             return True
         else:
