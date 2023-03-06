@@ -42,7 +42,7 @@ def get_quote_data(ticker):
                 return -1
         else:
             log("error",ticker+" marketCap is None")
-            return -1
+            return -2
         marketCap = convert_to_num(marketCap)
         return marketCap
     df = pd.DataFrame()
@@ -69,7 +69,7 @@ def get_quote_data(ticker):
         marketCap = dict['marketCap']
     else:
         marketCap = get_marketCap_yahoo(ticker)
-        if marketCap==-1:
+        if marketCap==-2:
             return pd.DataFrame()
     if ticker=="MPU":
         log("info",ticker)
