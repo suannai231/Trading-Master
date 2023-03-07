@@ -36,15 +36,17 @@ def screen(df,lines):
     # buy = True if UO<=30 else False
 
     if lines == "fly":
-        DIFF20_Y = df.iloc[-2].DIFF20
-        DIFF60_Y = df.iloc[-2].DIFF60
-        DIFF120_Y = df.iloc[-2].DIFF120
-        flag_Y = (DIFF20_Y>=0) and (DIFF60_Y>=0) and (DIFF120_Y>=0)
+        DIFF20L_Y = df.iloc[-2].DIFF20L
+        DIFF60L_Y = df.iloc[-2].DIFF60L
+        DIFF120L_Y = df.iloc[-2].DIFF120L
+        DIFF120H_Y = df.iloc[-2].DIFF120H
+        flag_Y = (DIFF20L_Y>=0) and (DIFF60L_Y>=0) and (DIFF120L_Y>=0) and (DIFF120H_Y>=0)
 
-        DIFF20 = df.iloc[-1].DIFF20
-        DIFF60 = df.iloc[-1].DIFF60
-        DIFF120 = df.iloc[-1].DIFF120
-        flag = (DIFF20>=0) and (DIFF60>=0) and (DIFF120>=0)
+        DIFF20L = df.iloc[-1].DIFF20L
+        DIFF60L = df.iloc[-1].DIFF60L
+        DIFF120L = df.iloc[-1].DIFF120L
+        DIFF120H = df.iloc[-1].DIFF120H
+        flag = (DIFF20L>=0) and (DIFF60L>=0) and (DIFF120L>=0) and (DIFF120H>=0)
         today = flag and not flag_Y and turnover_flag and ema60_flag and change
         if df.iloc[-1].ticker == "SPPI":
             log("info", df.iloc[-1].ticker)

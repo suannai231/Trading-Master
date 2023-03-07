@@ -97,35 +97,44 @@ def cal_basics(df):
     UO=100*((WSTA+WMTA+WLTA)/(4+2+1))
     df['UO']=UO
 
-    df['max_volume_20days'] = df['volume'].rolling(window=20).max()
+    df_v20 = df['volume'].rolling(window=20).max()
     low = []
-    for vol in df['max_volume_20days']:
+    high = []
+    for vol in df_v20:
         if not np.isnan(vol):
             low.append(df.loc[df.volume==vol,'low'].values[0])
+            high.append(df.loc[df.volume==vol,'high'].values[0])
         else:
             low.append(np.nan)
-    df['max_volume_low_20days'] = low
-    df['DIFF20'] = df["close"] - df['max_volume_low_20days']
+            high.append(np.nan)
+    df['DIFF20L'] = df["close"] - low
+    df['DIFF20H'] = df["close"] - high
 
-    df['max_volume_60days'] = df['volume'].rolling(window=60).max()
+    df_v60 = df['volume'].rolling(window=60).max()
     low = []
-    for vol in df['max_volume_60days']:
+    high = []
+    for vol in df_v60:
         if not np.isnan(vol):
             low.append(df.loc[df.volume==vol,'low'].values[0])
+            high.append(df.loc[df.volume==vol,'high'].values[0])
         else:
             low.append(np.nan)
-    df['max_volume_low_60days'] = low
-    df['DIFF60'] = df["close"] - df['max_volume_low_60days']
+            high.append(np.nan)
+    df['DIFF60L'] = df["close"] - low
+    df['DIFF60H'] = df["close"] - high
 
-    df['max_volume_120days'] = df['volume'].rolling(window=120).max()
+    df_v120 = df['volume'].rolling(window=120).max()
     low = []
-    for vol in df['max_volume_120days']:
+    high = []
+    for vol in df_v120:
         if not np.isnan(vol):
             low.append(df.loc[df.volume==vol,'low'].values[0])
+            high.append(df.loc[df.volume==vol,'high'].values[0])
         else:
             low.append(np.nan)
-    df['max_volume_low_120days'] = low
-    df['DIFF120'] = df["close"] - df['max_volume_low_120days']
+            high.append(np.nan)
+    df['DIFF120L'] = df["close"] - low
+    df['DIFF120H'] = df["close"] - high
     # Calculate EMA
     # df['DIFF_EMA20'] = df['DIFF'].ewm(span = 20, adjust = False).mean()
     # df['DIFF_EMA60'] = df['DIFF'].ewm(span = 60, adjust = False).mean()
