@@ -71,7 +71,7 @@ def get_quote_data(ticker):
         marketCap = get_marketCap_yahoo(ticker)
         if marketCap==-2:
             return pd.DataFrame()
-    if ticker=="MPU":
+    if ticker=="YOSH":
         log("info",ticker)
     d={'ticker':[ticker],'marketCap':[marketCap],'regularMarketPreviousClose':[regularMarketPreviousClose]}
     df = pd.DataFrame(d)
