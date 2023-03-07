@@ -10,59 +10,41 @@ import numpy as np
 
 
 def screen(df,lines):
-    if len(df)<50:
+    if len(df)<120:
         return False
     close = df.iloc[-1].close
     # close_Yesterday = df.iloc[-2].close
     volume_10d_avg = df.tail(10).volume.mean()
     turnover_10d_avg = volume_10d_avg*close
     turnover_flag = turnover_10d_avg > 300000
-    EMA120 = df.iloc[-1].EMA120
-    ema120_flag = (close >= EMA120)
+    # EMA120 = df.iloc[-1].EMA120
+    # ema120_flag = (close >= EMA120)
     EMA60 = df.iloc[-1].EMA60
     ema60_flag = (close >= EMA60)
     # EMA120_Yesterday = df.iloc[-2].EMA120
     # ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
     change = df.iloc[-1].change >=0.05
 
-    highest_volume_30days=df.tail(30).volume.max()
-    low = df[df.volume==highest_volume_30days].low[0]
-    bottom = True if low<=close<=low*1.5 else False
+    # highest_volume_30days=df.tail(30).volume.max()
+    # low = df[df.volume==highest_volume_30days].low[0]
+    # bottom = True if low<=close<=low*1.5 else False
 
-    volume = df.iloc[-1].volume
-    volume_spike = True if volume>=volume_10d_avg*2 else False
+    # volume = df.iloc[-1].volume
+    # volume_spike = True if volume>=volume_10d_avg*2 else False
 
-    UO=df.iloc[-1].UO
-    buy = True if UO<=30 else False
+    # UO=df.iloc[-1].UO
+    # buy = True if UO<=30 else False
 
-    
+    if lines == "fly":
+        DIFF20_Y = df.iloc[-2].DIFF20
+        DIFF60_Y = df.iloc[-2].DIFF60
+        DIFF120_Y = df.iloc[-2].DIFF120
+        flag_Y = (DIFF20_Y>=0) and (DIFF60_Y>=0) and (DIFF120_Y>=0)
 
-
-    if lines == "bottom":
-        # DIF_Yesterday = df.iloc[-2].DIF
-        # DEA_Yesterday = df.iloc[-2].DEA
-        # MACD_Yesterday = DIF_Yesterday>=DEA_Yesterday
-        # STD20_Yesterday = df.iloc[-2].STD20
-        # STD20_EMA5_Yesterday = df.iloc[-2].STD20_EMA5
-        # STD_Yesterday = STD20_Yesterday>=STD20_EMA5_Yesterday
-        # yesterday = MACD_Yesterday and STD_Yesterday and ema120_Yesterday_flag
-        # DIF = df.iloc[-1].DIF
-        # DEA = df.iloc[-1].DEA
-        # MACD = DIF>=DEA
-        # STD20 = df.iloc[-1].STD20
-        # STD20_EMA5 = df.iloc[-1].STD20_EMA5
-        # STD = STD20>=STD20_EMA5
-        DIFF_Y = df.iloc[-2].DIFF
-        DIFF_EMA20_Y = df.iloc[-2].DIFF_EMA20
-        max_volume_low_60days_Y = df.iloc[-2].max_volume_low_60days
-        gain_rate_Y = DIFF_Y/max_volume_low_60days_Y
-        flag_Y = (DIFF_Y>=DIFF_EMA20_Y) and (DIFF_Y>=0) and (gain_rate_Y < 0.5)
-
-        DIFF = df.iloc[-1].DIFF
-        DIFF_EMA20 = df.iloc[-1].DIFF_EMA20
-        max_volume_low_60days = df.iloc[-1].max_volume_low_60days
-        gain_rate = DIFF/max_volume_low_60days
-        flag = (DIFF>=DIFF_EMA20) and (DIFF>=0) and (gain_rate < 0.5)
+        DIFF20 = df.iloc[-1].DIFF20
+        DIFF60 = df.iloc[-1].DIFF60
+        DIFF120 = df.iloc[-1].DIFF120
+        flag = (DIFF20>=0) and (DIFF60>=0) and (DIFF120>=0)
         today = flag and not flag_Y and turnover_flag and ema60_flag and change
         if df.iloc[-1].ticker == "SPPI":
             log("info", df.iloc[-1].ticker)
@@ -70,26 +52,23 @@ def screen(df,lines):
             return True
         else:
             return False
-    # elif lines == "Volatile":
+    elif lines == "diamond":
+        DIFF20_Y = df.iloc[-2].DIFF20
+        DIFF60_Y = df.iloc[-2].DIFF60
+        DIFF120_Y = df.iloc[-2].DIFF120
+        flag_Y = (DIFF20_Y>=0) and (DIFF60_Y>=0) and (DIFF120_Y>=0)
 
-    #     close_max_30days = max(df.tail(30)['close'])
-    #     close_max_100days = max(df.tail(100)['close'])
-
-    #     new_high = (close_max_30days == close_max_100days) and (close < close_max_30days)
-
-    #     if(len(df)<=3):
-    #         return False
-    #     last_high = df.iloc[-2].high
-    #     last_2_high = df.iloc[-3].high
-        
-    #     strong = (close >= last_high) and ema120_flag and (close_Yesterday<=last_2_high)
-        
-
-    #     if(new_high and turnover_flag and strong and change):
-    #         return True
-    #     else:
-    #         return False
-
+        DIFF20 = df.iloc[-1].DIFF20
+        DIFF60 = df.iloc[-1].DIFF60
+        DIFF120 = df.iloc[-1].DIFF120
+        flag = (DIFF20>=0) and (DIFF60>=0) and (DIFF120>=0)
+        today = flag and not flag_Y and turnover_flag and ema60_flag and change
+        if df.iloc[-1].ticker == "SPPI":
+            log("info", df.iloc[-1].ticker)
+        if today:
+            return True
+        else:
+            return False
     return False
 
 def run(ticker_chunk_df):
@@ -106,7 +85,7 @@ def run(ticker_chunk_df):
         #     log("error",ticker+" date error.")
         #     continue
         try:
-            Volatile = screen(df,"bottom")
+            Volatile = screen(df,"fly")
         except Exception as e:
             log('critical',str(e))
             return pd.DataFrame()
