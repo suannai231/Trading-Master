@@ -57,8 +57,6 @@ import numpy as np
 #     return df
 
 def cal_basics(df):
-    if df.iloc[-1].ticker == "YOSH":
-        log("info", df.iloc[-1].ticker)
     df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
     df['AMP'] = (df['high']-df['low'])/df['low']
 
@@ -135,6 +133,8 @@ def cal_basics(df):
             high.append(np.nan)
     df['DIFF120L'] = df["close"] - low
     df['DIFF120H'] = df["close"] - high
+    if df.iloc[-1].ticker == "TDUP":
+        log("info", df.iloc[-1].ticker)
     # Calculate EMA
     # df['DIFF_EMA20'] = df['DIFF'].ewm(span = 20, adjust = False).mean()
     # df['DIFF_EMA60'] = df['DIFF'].ewm(span = 60, adjust = False).mean()

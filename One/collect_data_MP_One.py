@@ -89,9 +89,9 @@ def get_stock_realtime(ticker):
         # low = float(quote_table["Day's Range"].split(" - ")[0])
         # high = float(quote_table["Day's Range"].split(" - ")[1])
         # volume = int(quote_table['Volume'])
-        open = np.nan
-        low = np.nan
-        high = np.nan
+        open = -1
+        low = -1
+        high = -1
         # volume = np.nan
         d = {'date':end, 'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
         # df=pd.DataFrame(d,index=[str(end)])
