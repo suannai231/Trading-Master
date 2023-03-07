@@ -97,46 +97,16 @@ def cal_basics(df):
     UO=100*((WSTA+WMTA+WLTA)/(4+2+1))
     df['UO']=UO
 
-    # HHV60 = df['volume'].rolling(window=60).max()
-    # VI = df.index[df.volume==HHV60].tolist()
-    # VL = df[VI].low
-    # DIFF= df['close']-VL
-    # DIFF_EMA20=DIFF.ewm(span = 20, adjust = False).mean()
+    df['max_volume_20days'] = df['volume'].rolling(window=20).max()
+    low = []
+    for vol in df['max_volume_20days']:
+        if not np.isnan(vol):
+            low.append(df.loc[df.volume==vol,'low'].values[0])
+        else:
+            low.append(np.nan)
+    df['max_volume_low_20days'] = low
+    df['DIFF20'] = df["close"] - df['max_volume_low_20days']
 
-    # df['HHV60'] = df['volume'].rolling(window=60).max()  # calculate HHV(V, 60)
-    # df['bar_num'] = np.arange(len(df)) + 1  # create a column of bar numbers starting from 1
-    # last_bar_v_hhv_60 = df.loc[df['HHV60'].idxmax(), 'bar_num']  # find the bar number of the last occurrence of V = HHV(V, 60)
-    # df['VL'] = df['low'].shift(last_bar_v_hhv_60 - 1)  # shift L by the appropriate number of bars
-    # df['DIFF']= df['close']-df['VL']
-
-    # hhv = df['volume'].rolling(window=60).max()
-    # bars_last = df['volume'][::-1].eq(hhv[::-1].iloc[0]).cumsum()[::-1]
-    # mask = bars_last.eq(1)
-    # vl = df['low'].mask(~mask).ffill()
-    # df['DIFF']= df['close']-vl
-
-    # hhv_v = df['volume'].rolling(window=60).max()
-
-    # mask_v = df['volume'].eq(hhv_v) & (df['volume'] != 0)
-    # bars_last_v = mask_v[::-1].cumsum()[::-1]
-
-    # mask_l = bars_last_v.eq(1)
-    # vl = df['low'].shift()[mask_l].fillna(method='ffill')
-
-    # Define the functions
-    # def REF(X, A):
-    #     return X.shift(A)
-
-    # def BARSLAST(X):
-    #     return len(X) - 1 - np.argmax(np.flip(X != 0))
-
-    # def HHV(X, N):
-    #     return X.rolling(N).max()
-
-    # def EMA(X, N):
-    #     return X.ewm(span=N, min_periods=N).mean()
-
-    # assume you have a pandas DataFrame called 'data' with columns 'low' and 'volume'
     df['max_volume_60days'] = df['volume'].rolling(window=60).max()
     low = []
     for vol in df['max_volume_60days']:
@@ -145,13 +115,21 @@ def cal_basics(df):
         else:
             low.append(np.nan)
     df['max_volume_low_60days'] = low
+    df['DIFF60'] = df["close"] - df['max_volume_low_60days']
 
-    # Calculate DIFF
-    df['DIFF'] = df["close"] - df['max_volume_low_60days']
-
-    # Calculate EMA20
-    df['DIFF_EMA20'] = df['DIFF'].ewm(span = 20, adjust = False).mean()
-
+    df['max_volume_120days'] = df['volume'].rolling(window=120).max()
+    low = []
+    for vol in df['max_volume_120days']:
+        if not np.isnan(vol):
+            low.append(df.loc[df.volume==vol,'low'].values[0])
+        else:
+            low.append(np.nan)
+    df['max_volume_low_120days'] = low
+    df['DIFF120'] = df["close"] - df['max_volume_low_120days']
+    # Calculate EMA
+    # df['DIFF_EMA20'] = df['DIFF'].ewm(span = 20, adjust = False).mean()
+    # df['DIFF_EMA60'] = df['DIFF'].ewm(span = 60, adjust = False).mean()
+    # df['DIFF_EMA120'] = df['DIFF'].ewm(span = 120, adjust = False).mean()
     return df
 
 def run(ticker_chunk_df):
