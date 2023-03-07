@@ -35,7 +35,7 @@ def screen(df,lines):
     # UO=df.iloc[-1].UO
     # buy = True if UO<=30 else False
 
-    if lines == "fly":
+    if lines == "120":
         DIFF20L_Y = df.iloc[-2].DIFF20L
         DIFF60L_Y = df.iloc[-2].DIFF60L
         DIFF120L_Y = df.iloc[-2].DIFF120L
@@ -54,16 +54,37 @@ def screen(df,lines):
             return True
         else:
             return False
-    elif lines == "diamond":
-        DIFF20_Y = df.iloc[-2].DIFF20
-        DIFF60_Y = df.iloc[-2].DIFF60
-        DIFF120_Y = df.iloc[-2].DIFF120
-        flag_Y = (DIFF20_Y>=0) and (DIFF60_Y>=0) and (DIFF120_Y>=0)
+    elif lines == "60":
+        DIFF20L_Y = df.iloc[-2].DIFF20L
+        DIFF60L_Y = df.iloc[-2].DIFF60L
+        DIFF120L_Y = df.iloc[-2].DIFF120L
+        DIFF60H_Y = df.iloc[-2].DIFF60H
+        flag_Y = (DIFF20L_Y>=0) and (DIFF60L_Y>=0) and (DIFF120L_Y>=0) and (DIFF60H_Y>=0)
 
-        DIFF20 = df.iloc[-1].DIFF20
-        DIFF60 = df.iloc[-1].DIFF60
-        DIFF120 = df.iloc[-1].DIFF120
-        flag = (DIFF20>=0) and (DIFF60>=0) and (DIFF120>=0)
+        DIFF20L = df.iloc[-1].DIFF20L
+        DIFF60L = df.iloc[-1].DIFF60L
+        DIFF120L = df.iloc[-1].DIFF120L
+        DIFF60H = df.iloc[-1].DIFF60H
+        flag = (DIFF20L>=0) and (DIFF60L>=0) and (DIFF120L>=0) and (DIFF60H>=0)
+        today = flag and not flag_Y and turnover_flag and ema60_flag and change
+        if df.iloc[-1].ticker == "SPPI":
+            log("info", df.iloc[-1].ticker)
+        if today:
+            return True
+        else:
+            return False
+    elif lines == "20":
+        DIFF20L_Y = df.iloc[-2].DIFF20L
+        DIFF60L_Y = df.iloc[-2].DIFF60L
+        DIFF120L_Y = df.iloc[-2].DIFF120L
+        DIFF20H_Y = df.iloc[-2].DIFF20H
+        flag_Y = (DIFF20L_Y>=0) and (DIFF60L_Y>=0) and (DIFF120L_Y>=0) and (DIFF20H_Y>=0)
+
+        DIFF20L = df.iloc[-1].DIFF20L
+        DIFF60L = df.iloc[-1].DIFF60L
+        DIFF120L = df.iloc[-1].DIFF120L
+        DIFF20H = df.iloc[-1].DIFF20H
+        flag = (DIFF20L>=0) and (DIFF60L>=0) and (DIFF120L>=0) and (DIFF20H>=0)
         today = flag and not flag_Y and turnover_flag and ema60_flag and change
         if df.iloc[-1].ticker == "SPPI":
             log("info", df.iloc[-1].ticker)
@@ -87,7 +108,7 @@ def run(ticker_chunk_df):
         #     log("error",ticker+" date error.")
         #     continue
         try:
-            Volatile = screen(df,"fly")
+            Volatile = screen(df,"20")
         except Exception as e:
             log('critical',str(e))
             return pd.DataFrame()
