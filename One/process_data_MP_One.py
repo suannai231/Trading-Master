@@ -162,15 +162,15 @@ def run(ticker_chunk_df):
     tickers= ticker_chunk_df.ticker.unique()
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker].reset_index(drop=True)
-        lastindex = df.index[-1]
+        # lastindex = df.index[-1]
         # if df.iloc[-1].ticker == "DIDIY":
         #     log("info", df.iloc[-1].ticker)
         # if (11 > df['close'][lastindex] > 10) or (df['close'][lastindex]>20) or (df['close'][lastindex]<1):
         #     continue
 
-        if(len(df)>250):
-            df = df.iloc[len(df)-250:]
-            df.reset_index(drop=True,inplace=True)
+        # if(len(df)>250):
+        #     df = df.iloc[len(df)-250:]
+        #     df.reset_index(drop=True,inplace=True)
 
         df = cal_basics(df)
 
