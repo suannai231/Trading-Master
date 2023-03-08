@@ -14,9 +14,9 @@ def screen(df,lines):
         return False
     close = df.iloc[-1].close
     # close_Yesterday = df.iloc[-2].close
-    volume_10d_avg = df.tail(10).volume.mean()
+    volume_10d_avg = df.iloc[-12:-2].volume.mean()
     turnover_10d_avg = volume_10d_avg*close
-    turnover_flag = turnover_10d_avg > 300000
+    turnover_flag = turnover_10d_avg > 200000
     # EMA120 = df.iloc[-1].EMA120
     # ema120_flag = (close >= EMA120)
     EMA60 = df.iloc[-1].EMA60
