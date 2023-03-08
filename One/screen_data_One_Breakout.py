@@ -61,9 +61,10 @@ def screen(df,lines):
         DIFF20L = df.iloc[-1].DIFF20L
         DIFF60L = df.iloc[-1].DIFF60L
         DIFF120L = df.iloc[-1].DIFF120L
-        flag = (DIFF20L>=0) and (DIFF60L>=0) and (DIFF120L>=0) and (DIFF20L==DIFF60L)
-        today = flag and not flag_Y and turnover_flag and ema60_flag and change
-        if df.iloc[-1].ticker == "TDUP":
+        DIFF250L = df.iloc[-1].DIFF250L
+        flag = (DIFF20L>=0) and (DIFF60L>=0) and (DIFF120L>=0) and (DIFF20L==DIFF60L==DIFF120L)
+        today = flag and turnover_flag and ema60_flag and change
+        if df.iloc[-1].ticker == "AACG":
             log("info", df.iloc[-1].ticker)
         if today:
             return True

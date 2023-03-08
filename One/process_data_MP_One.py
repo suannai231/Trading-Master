@@ -135,6 +135,22 @@ def cal_basics(df):
     df['DIFF120H'] = df["close"] - high
     if df.iloc[-1].ticker == "TDUP":
         log("info", df.iloc[-1].ticker)
+
+
+    df_v250 = df['volume'].rolling(window=250).max()
+    low = []
+    high = []
+    for vol in df_v250:
+        if not np.isnan(vol):
+            low.append(df.loc[df.volume==vol,'low'].values[0])
+            high.append(df.loc[df.volume==vol,'high'].values[0])
+        else:
+            low.append(np.nan)
+            high.append(np.nan)
+    df['DIFF250L'] = df["close"] - low
+    df['DIFF250H'] = df["close"] - high
+    if df.iloc[-1].ticker == "VRAX":
+        log("info", df.iloc[-1].ticker)
     # Calculate EMA
     # df['DIFF_EMA20'] = df['DIFF'].ewm(span = 20, adjust = False).mean()
     # df['DIFF_EMA60'] = df['DIFF'].ewm(span = 60, adjust = False).mean()
