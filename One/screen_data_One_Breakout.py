@@ -62,7 +62,7 @@ def screen(df,lines):
         DIFF60L = df.iloc[-1].DIFF60L
         DIFF120L = df.iloc[-1].DIFF120L
         DIFF250L = df.iloc[-1].DIFF250L
-        flag = (DIFF20L>=0) and (DIFF60L>=0) and (DIFF120L>=0) and (DIFF20L==DIFF60L==DIFF120L)
+        flag = (DIFF20L>=0) and (DIFF60L>=0) and (DIFF120L>=0) and (DIFF250L>=0) and (DIFF250L>=DIFF120L>=DIFF60L>=DIFF20L)
         today = flag and turnover_flag and ema60_flag and change
         if df.iloc[-1].ticker == "AACG":
             log("info", df.iloc[-1].ticker)
