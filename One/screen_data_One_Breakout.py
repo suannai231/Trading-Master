@@ -16,7 +16,7 @@ def screen(df,lines):
     # close_Yesterday = df.iloc[-2].close
     volume_10d_avg = df.iloc[-12:-2].volume.mean()
     turnover_10d_avg = volume_10d_avg*close
-    turnover_flag = turnover_10d_avg > 200000
+    turnover_flag = turnover_10d_avg > 100000
     # EMA120 = df.iloc[-1].EMA120
     # ema120_flag = (close >= EMA120)
     EMA60 = df.iloc[-1].EMA60
@@ -64,7 +64,7 @@ def screen(df,lines):
         DIFF250L = df.iloc[-1].DIFF250L
         flag = (DIFF20L>=0) and (DIFF60L>=0) and (DIFF120L>=0) and (DIFF250L>=0) and (DIFF250L>=DIFF120L>=DIFF60L>=DIFF20L)
         today = flag and turnover_flag and ema60_flag and change
-        if df.iloc[-1].ticker == "ADIL":
+        if df.iloc[-1].ticker == "NLTX":
             log("info", df.iloc[-1].ticker)
         if today:
             return True
