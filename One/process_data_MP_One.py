@@ -149,7 +149,7 @@ def cal_basics(df):
             high.append(np.nan)
     df['DIFF250L'] = df["close"] - low
     df['DIFF250H'] = df["close"] - high
-    if df.iloc[-1].ticker == "VRAX":
+    if df.iloc[-1].ticker == "ADIL":
         log("info", df.iloc[-1].ticker)
     # Calculate EMA
     # df['DIFF_EMA20'] = df['DIFF'].ewm(span = 20, adjust = False).mean()

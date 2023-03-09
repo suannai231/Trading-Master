@@ -102,7 +102,7 @@ def get_stock_realtime(ticker):
         #     log("error",ticker+" date error")
         #     return pd.DataFrame()
     except Exception as e:
-        if ticker=="SPPI":
+        if ticker=="ADIL":
             log("info",ticker)
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
@@ -111,7 +111,7 @@ def get_stock_realtime(ticker):
             return pd.DataFrame()
     # if ticker=="NEXA":
     #     log("info",ticker)
-    if ticker=="SPPI":
+    if ticker=="ADIL":
         log("info",ticker)
     return df
 
