@@ -2,7 +2,7 @@
 import openai
 import os
 
-openai.api_key = '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'
+openai.api_key = ''
 
 prompt ='''
 Please explain what this call stack does:
