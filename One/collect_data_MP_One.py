@@ -49,25 +49,12 @@ start = end - timedelta(days)
 #     df = df.set_index('ticker')
 #     return df
 
-def get_stock_history(ticker):
-    df = pd.DataFrame()
-    try:
-        df = si.get_data(ticker,start,end,index_as_date=False)
-        if(df.tail(1).isnull().values.any()):
-            log("error",ticker+" nan")
-            return pd.DataFrame()
-    except Exception as e:
-        if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-            return -1
-        else:
-            # log("error","get_stock_history " + ticker + " " + str(e))
-            return pd.DataFrame()
-    # df.index.name = 'date'
-    # if (not df.empty) and df.index[-1]!=datetime.date.today():
-    #     log("error",ticker+" date error")
-    #     return pd.DataFrame()
-    return df
+def a():
 
+    dt_str = end.strftime('%Y-%m-%d')
+    np_dt = np.datetime64(dt_str)
+    realtime_required = not np_dt in stock_history_concat_df.date.values
+    
 def get_stock_realtime(ticker):
     df = pd.DataFrame()
     try:
@@ -118,6 +105,25 @@ def get_stock_realtime(ticker):
     #     log("info",ticker)
     if ticker=="ADIL":
         log("info",ticker)
+    return df
+
+def get_stock_history(ticker):
+    df = pd.DataFrame()
+    try:
+        df = si.get_data(ticker,start,end,index_as_date=False)
+        if(df.tail(1).isnull().values.any()):
+            log("error",ticker+" nan")
+            return pd.DataFrame()
+    except Exception as e:
+        if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+            return -1
+        else:
+            # log("error","get_stock_history " + ticker + " " + str(e))
+            return pd.DataFrame()
+    # df.index.name = 'date'
+    # if (not df.empty) and df.index[-1]!=datetime.date.today():
+    #     log("error",ticker+" date error")
+    #     return pd.DataFrame()
     return df
 
 def get_stock_data_mt(func,ticker_chunk,thread_number):
@@ -252,13 +258,13 @@ if __name__ == '__main__':
     #         log('critical',"to_feather:"+str(e))
 
     stock_history_concat_df=collect_data(get_stock_history,cores,10).dropna()
-    
+
     if (not stock_history_concat_df.empty):
         log('info','stock_history_concat_df is ready.')
         now = datetime.now()
         today15 = now.replace(hour=15,minute=0,second=0,microsecond=0)
         today235959 = now.replace(hour=23,minute=59,second=59,microsecond=0)
-        if ((now.weekday() <= 4) & (today15 <= datetime.now() <= today235959)):
+        if ((now.weekday() <= 4) & (today15 <= datetime.now() <= today235959) and realtime_required):
             realtime_df=collect_data(get_stock_realtime,cores,10)
             if not realtime_df.empty:
                 log('info','realtime_df is ready')
@@ -287,7 +293,7 @@ if __name__ == '__main__':
         today8 = now.replace(hour=8,minute=0,second=0,microsecond=0)
         today15 = now.replace(hour=15,minute=0,second=0,microsecond=0)
         while(True):         #get real time stock price
-            if ((now.weekday() <= 4) & (today8 <= datetime.now() <= today15)):
+            if ((now.weekday() <= 4) & (today8 <= datetime.now() <= today15) and realtime_required):
                 realtime_df=collect_data(get_stock_realtime,cores,10)
                 if not realtime_df.empty:
                     log('info','realtime_df is ready')
@@ -302,7 +308,7 @@ if __name__ == '__main__':
                     except Exception as e:
                         log('critical',"to_feather:"+str(e))
                 else:
-                    log('error','realtime_df is ready')
+                    log('error','realtime_df is empty')
             else:
                 break
     else:
