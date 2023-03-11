@@ -23,7 +23,7 @@ def screen(df,lines):
     ema60_flag = (close >= EMA60)
     # EMA120_Yesterday = df.iloc[-2].EMA120
     # ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
-    change = df.iloc[-1].change >=0.05
+    change = df.iloc[-1].change >=-0.05
 
     # highest_volume_30days=df.tail(30).volume.max()
     # low = df[df.volume==highest_volume_30days].low[0]
