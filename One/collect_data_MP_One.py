@@ -49,11 +49,11 @@ start = end - timedelta(days)
 #     df = df.set_index('ticker')
 #     return df
 
-def a():
+def realtime_required(df):
 
     dt_str = end.strftime('%Y-%m-%d')
     np_dt = np.datetime64(dt_str)
-    realtime_required = not np_dt in stock_history_concat_df.date.values
+    return not np_dt in df.date.values
     
 def get_stock_realtime(ticker):
     df = pd.DataFrame()
@@ -85,10 +85,10 @@ def get_stock_realtime(ticker):
         low = -1
         high = -1
         # volume = np.nan
-        d = {'date':end, 'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
+        d = {'date':pd.to_datetime(end.strftime('%Y-%m-%d')), 'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
         # df=pd.DataFrame(d,index=[str(end)])
         df=pd.DataFrame(d,index=[str(end)])
-        df.date=pd.to_datetime(df.date)
+        # df.date=pd.to_datetime(df.date)
         # df.index.name = 'date'
         # if (not df.empty) and df.index[-1]!=str(datetime.date.today()):
         #     log("error",ticker+" date error")
@@ -110,7 +110,7 @@ def get_stock_realtime(ticker):
 def get_stock_history(ticker):
     df = pd.DataFrame()
     try:
-        df = si.get_data(ticker,start,end,index_as_date=False)
+        df = si.get_data(ticker,start.strftime("%m/%d/%Y"),end.strftime("%m/%d/%Y"),index_as_date=False)
         if(df.tail(1).isnull().values.any()):
             log("error",ticker+" nan")
             return pd.DataFrame()
@@ -258,6 +258,7 @@ if __name__ == '__main__':
     #         log('critical',"to_feather:"+str(e))
 
     stock_history_concat_df=collect_data(get_stock_history,cores,10).dropna()
+    flag = realtime_required(stock_history_concat_df)
 
     if (not stock_history_concat_df.empty):
         log('info','stock_history_concat_df is ready.')

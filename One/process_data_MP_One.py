@@ -95,31 +95,31 @@ def cal_basics(df):
     UO=100*((WSTA+WMTA+WLTA)/(4+2+1))
     df['UO']=UO
 
-    df_v20 = df['volume'].rolling(window=20).max()
-    low = []
-    high = []
-    for vol in df_v20:
-        if not np.isnan(vol):
-            low.append(df.loc[df.volume==vol,'low'].values[0])
-            high.append(df.loc[df.volume==vol,'high'].values[0])
-        else:
-            low.append(np.nan)
-            high.append(np.nan)
-    df['DIFF20L'] = df["close"] - low
-    df['DIFF20H'] = df["close"] - high
+    # df_v20 = df['volume'].rolling(window=20).max()
+    # low = []
+    # high = []
+    # for vol in df_v20:
+    #     if not np.isnan(vol):
+    #         low.append(df.loc[df.volume==vol,'low'].values[0])
+    #         high.append(df.loc[df.volume==vol,'high'].values[0])
+    #     else:
+    #         low.append(np.nan)
+    #         high.append(np.nan)
+    # df['DIFF20L'] = df["close"] - low
+    # df['DIFF20H'] = df["close"] - high
 
-    df_v60 = df['volume'].rolling(window=60).max()
-    low = []
-    high = []
-    for vol in df_v60:
-        if not np.isnan(vol):
-            low.append(df.loc[df.volume==vol,'low'].values[0])
-            high.append(df.loc[df.volume==vol,'high'].values[0])
-        else:
-            low.append(np.nan)
-            high.append(np.nan)
-    df['DIFF60L'] = df["close"] - low
-    df['DIFF60H'] = df["close"] - high
+    # df_v60 = df['volume'].rolling(window=60).max()
+    # low = []
+    # high = []
+    # for vol in df_v60:
+    #     if not np.isnan(vol):
+    #         low.append(df.loc[df.volume==vol,'low'].values[0])
+    #         high.append(df.loc[df.volume==vol,'high'].values[0])
+    #     else:
+    #         low.append(np.nan)
+    #         high.append(np.nan)
+    # df['DIFF60L'] = df["close"] - low
+    # df['DIFF60H'] = df["close"] - high
 
     df_v120 = df['volume'].rolling(window=120).max()
     low = []
@@ -133,24 +133,26 @@ def cal_basics(df):
             high.append(np.nan)
     df['DIFF120L'] = df["close"] - low
     df['DIFF120H'] = df["close"] - high
-    if df.iloc[-1].ticker == "TDUP":
+    df['DIFF120L_10H'] = df['DIFF120L'].rolling(window=10).max()
+    df['DIFF120L_60H'] = df['DIFF120L'].rolling(window=60).max()
+    if df.iloc[-1].ticker == "TSQ":
         log("info", df.iloc[-1].ticker)
 
 
-    df_v250 = df['volume'].rolling(window=250).max()
-    low = []
-    high = []
-    for vol in df_v250:
-        if not np.isnan(vol):
-            low.append(df.loc[df.volume==vol,'low'].values[0])
-            high.append(df.loc[df.volume==vol,'high'].values[0])
-        else:
-            low.append(np.nan)
-            high.append(np.nan)
-    df['DIFF250L'] = df["close"] - low
-    df['DIFF250H'] = df["close"] - high
-    if df.iloc[-1].ticker == "ADIL":
-        log("info", df.iloc[-1].ticker)
+    # df_v250 = df['volume'].rolling(window=250).max()
+    # low = []
+    # high = []
+    # for vol in df_v250:
+    #     if not np.isnan(vol):
+    #         low.append(df.loc[df.volume==vol,'low'].values[0])
+    #         high.append(df.loc[df.volume==vol,'high'].values[0])
+    #     else:
+    #         low.append(np.nan)
+    #         high.append(np.nan)
+    # df['DIFF250L'] = df["close"] - low
+    # df['DIFF250H'] = df["close"] - high
+    # if df.iloc[-1].ticker == "ADIL":
+    #     log("info", df.iloc[-1].ticker)
     # Calculate EMA
     # df['DIFF_EMA20'] = df['DIFF'].ewm(span = 20, adjust = False).mean()
     # df['DIFF_EMA60'] = df['DIFF'].ewm(span = 60, adjust = False).mean()
