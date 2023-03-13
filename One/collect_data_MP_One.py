@@ -69,21 +69,44 @@ def get_stock_realtime(ticker):
         if regularMarketVolume_element is not None:
             regularMarketVolume = regularMarketVolume_element.text
             if regularMarketVolume == "N/A":
-                log("error",ticker+" marketCap is N/A")
                 volume = -1
             else:
                 volume = int(regularMarketVolume.replace(",", ""))
         else:
             # log("error",ticker+" marketCap is None")
             volume = -1
+        open_element = soup.find("td", {"data-test": "OPEN-value"})
+        if open_element is not None:
+            open_text = open_element.text
+            if open_text == "N/A":
+                open = -1
+            else:
+                open = float(open_text)
+        else:
+            # log("error",ticker+" marketCap is None")
+            open = -1
+        day_range_element = soup.find("td", {"data-test": "DAYS_RANGE-value"})
+        if day_range_element is not None:
+            day_range_text = day_range_element.text
+            if day_range_text == "N/A":
+                low = -1
+                high = -1
+            else:
+                numbers = day_range_text.split(' - ')
+                low = float(numbers[0])
+                high = float(numbers[1])
+        else:
+            # log("error",ticker+" marketCap is None")
+            low = -1
+            high = -1
         # quote_table = si.get_quote_table(ticker)
         # open = float(quote_table['Open'])
         # low = float(quote_table["Day's Range"].split(" - ")[0])
         # high = float(quote_table["Day's Range"].split(" - ")[1])
         # volume = int(quote_table['Volume'])
-        open = -1
-        low = -1
-        high = -1
+        # open = -1
+        # low = -1
+        # high = -1
         # volume = np.nan
         d = {'date':pd.to_datetime(end.strftime('%Y-%m-%d')), 'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
         # df=pd.DataFrame(d,index=[str(end)])

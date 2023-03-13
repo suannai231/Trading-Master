@@ -35,24 +35,7 @@ def screen(df,lines):
     # UO=df.iloc[-1].UO
     # buy = True if UO<=30 else False
 
-    if lines == "2060120":
-        DIFF20L_Y = df.iloc[-2].DIFF20L
-        DIFF60L_Y = df.iloc[-2].DIFF60L
-        DIFF120L_Y = df.iloc[-2].DIFF120L
-        flag_Y = (DIFF20L_Y>=0) and (DIFF60L_Y>=0) and (DIFF120L_Y>=0) and (DIFF20L_Y==DIFF60L_Y==DIFF120L_Y)
-
-        DIFF20L = df.iloc[-1].DIFF20L
-        DIFF60L = df.iloc[-1].DIFF60L
-        DIFF120L = df.iloc[-1].DIFF120L
-        flag = (DIFF20L>=0) and (DIFF60L>=0) and (DIFF120L>=0) and (DIFF20L==DIFF60L==DIFF120L)
-        today = flag and not flag_Y and turnover_flag and change and volume_flag
-        if df.iloc[-1].ticker == "SPPI":
-            log("info", df.iloc[-1].ticker)
-        if today:
-            return True
-        else:
-            return False
-    elif lines == "2060":
+    if lines == "2060":
         # DIFF20L_Y = df.iloc[-2].DIFF20L
         # DIFF60L_Y = df.iloc[-2].DIFF60L
         DIFF120L_Y = df.iloc[-2].DIFF120L
@@ -68,8 +51,8 @@ def screen(df,lines):
         DIFF120L_10H = df.iloc[-1].DIFF120L_10H
         DIFF120L_60H = df.iloc[-1].DIFF120L_60H
         flag = DIFF120L==DIFF120L_10H==DIFF120L_60H and DIFF120L_60H>=0
-        today = flag and not flag_Y and turnover_flag and change
-        if df.iloc[-1].ticker == "HYMC":
+        today = flag and not flag_Y and turnover_flag and change and volume_flag
+        if df.iloc[-1].ticker == "GLAD":
             log("info", df.iloc[-1].ticker)
         if today:
             return True
