@@ -14,8 +14,8 @@ def screen(df,lines):
         return False
     close = df.iloc[-1].close
     # close_Yesterday = df.iloc[-2].close
-    volume_10d_avg = df.tail(60).volume.mean()
-    turnover_10d_avg = volume_10d_avg*close
+    volume_60d_avg = df.tail(60).volume.mean()
+    turnover_10d_avg = volume_60d_avg*close
     turnover_flag = turnover_10d_avg > 100000
     # EMA120 = df.iloc[-1].EMA120
     # ema120_flag = (close >= EMA120)
@@ -29,8 +29,8 @@ def screen(df,lines):
     # low = df[df.volume==highest_volume_30days].low[0]
     # bottom = True if low<=close<=low*1.5 else False
 
-    # volume = df.iloc[-1].volume
-    # volume_spike = True if volume>=volume_10d_avg*2 else False
+    volume = df.iloc[-1].volume
+    volume_flag = True if volume>=volume_60d_avg*2 else False
 
     # UO=df.iloc[-1].UO
     # buy = True if UO<=30 else False
@@ -45,7 +45,7 @@ def screen(df,lines):
         DIFF60L = df.iloc[-1].DIFF60L
         DIFF120L = df.iloc[-1].DIFF120L
         flag = (DIFF20L>=0) and (DIFF60L>=0) and (DIFF120L>=0) and (DIFF20L==DIFF60L==DIFF120L)
-        today = flag and not flag_Y and turnover_flag and change
+        today = flag and not flag_Y and turnover_flag and change and volume_flag
         if df.iloc[-1].ticker == "SPPI":
             log("info", df.iloc[-1].ticker)
         if today:
