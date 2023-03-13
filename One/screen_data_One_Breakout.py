@@ -45,7 +45,7 @@ def screen(df,lines):
         DIFF60L = df.iloc[-1].DIFF60L
         DIFF120L = df.iloc[-1].DIFF120L
         flag = (DIFF20L>=0) and (DIFF60L>=0) and (DIFF120L>=0) and (DIFF20L==DIFF60L==DIFF120L)
-        today = flag and not flag_Y and turnover_flag and ema60_flag and change
+        today = flag and not flag_Y and turnover_flag and change
         if df.iloc[-1].ticker == "SPPI":
             log("info", df.iloc[-1].ticker)
         if today:
@@ -68,7 +68,7 @@ def screen(df,lines):
         DIFF120L_10H = df.iloc[-1].DIFF120L_10H
         DIFF120L_60H = df.iloc[-1].DIFF120L_60H
         flag = DIFF120L==DIFF120L_10H==DIFF120L_60H and DIFF120L_60H>=0
-        today = flag and not flag_Y and turnover_flag and ema60_flag and change
+        today = flag and not flag_Y and turnover_flag and change
         if df.iloc[-1].ticker == "HYMC":
             log("info", df.iloc[-1].ticker)
         if today:
