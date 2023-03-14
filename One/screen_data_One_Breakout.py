@@ -42,7 +42,7 @@ def screen(df,lines):
         DIFF120L_10H_Y = df.iloc[-2].DIFF120L_10H
         DIFF120L_60H_Y = df.iloc[-2].DIFF120L_60H
         # DIFF250L_Y = df.iloc[-2].DIFF250L
-        flag_Y = DIFF120L_Y==DIFF120L_10H_Y==DIFF120L_60H_Y and DIFF120L_60H_Y>=0
+        flag_Y = DIFF120L_Y==DIFF120L_10H_Y==DIFF120L_60H_Y and DIFF120L_60H_Y>=0 or (DIFF120L_Y==DIFF120L_10H_Y and np.isnan(DIFF120L_60H_Y) and DIFF120L_10H_Y>=0)
 
         # DIFF20L = df.iloc[-1].DIFF20L
         # DIFF60L = df.iloc[-1].DIFF60L
@@ -50,9 +50,9 @@ def screen(df,lines):
         # DIFF250L = df.iloc[-1].DIFF250L
         DIFF120L_10H = df.iloc[-1].DIFF120L_10H
         DIFF120L_60H = df.iloc[-1].DIFF120L_60H
-        flag = DIFF120L==DIFF120L_10H==DIFF120L_60H and DIFF120L_60H>=0
+        flag = DIFF120L==DIFF120L_10H==DIFF120L_60H and DIFF120L_60H>=0 or (DIFF120L==DIFF120L_10H and np.isnan(DIFF120L_60H) and DIFF120L_10H>=0)
         today = flag and not flag_Y and turnover_flag and change and volume_flag
-        if df.iloc[-1].ticker == "CING":
+        if df.iloc[-1].ticker == "PXMD":
             log("info", df.iloc[-1].ticker)
         if today:
             return True
