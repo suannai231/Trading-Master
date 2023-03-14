@@ -136,7 +136,7 @@ def get_stock_history(ticker):
         df = si.get_data(ticker,start.strftime("%m/%d/%Y"),end.strftime("%m/%d/%Y"),index_as_date=False)
         if(df.tail(1).isnull().values.any()):
             log("error",ticker+" nan")
-            return pd.DataFrame()
+            df = df[:-1]
     except Exception as e:
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
