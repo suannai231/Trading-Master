@@ -52,7 +52,7 @@ def screen(df,lines):
         DIFF120L_60H = df.iloc[-1].DIFF120L_60H
         flag = DIFF120L==DIFF120L_10H==DIFF120L_60H and DIFF120L_60H>=0
         today = flag and not flag_Y and turnover_flag and change and volume_flag
-        if df.iloc[-1].ticker == "PXMD":
+        if df.iloc[-1].ticker == "CING":
             log("info", df.iloc[-1].ticker)
         if today:
             return True
@@ -103,7 +103,6 @@ def screen_data():
 
     log('info',"processing "+processed_data_files[-1])
     try:
-        time.sleep(1)
         df = pd.read_feather(processed_data_path + processed_data_files[-1])
         log('info',processed_data_path + processed_data_files[-1] + " loaded.")
     except Exception as e:

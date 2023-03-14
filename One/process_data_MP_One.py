@@ -135,7 +135,7 @@ def cal_basics(df):
     df['DIFF120H'] = df["close"] - high
     df['DIFF120L_10H'] = df['DIFF120L'].rolling(window=10).max()
     df['DIFF120L_60H'] = df['DIFF120L'].rolling(window=60).max()
-    if df.iloc[-1].ticker == "PXMD":
+    if df.iloc[-1].ticker == "CING":
         log("info", df.iloc[-1].ticker)
 
 
