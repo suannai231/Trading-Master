@@ -49,12 +49,111 @@ start = end - timedelta(days)
 #     df = df.set_index('ticker')
 #     return df
 
+# Define a dictionary to map units to multipliers
+multipliers = {
+    '百': 100,
+    '千': 1000,
+    '万': 10000,
+    '亿': 100000000,
+}
+
+# Define a function to convert an input string to an integer
+def convert_int_string(input_string):
+    multiplier = 1
+    for unit, value in multipliers.items():
+        if unit in input_string:
+            multiplier = value
+            input_string = input_string.replace(unit, '')
+            break
+    return float(input_string) * multiplier
+
 def realtime_required(df):
 
     dt_str = end.strftime('%Y-%m-%d')
     np_dt = np.datetime64(dt_str)
     return not np_dt in df.date.values
-    
+
+def get_stock_realtime_xueqiu(ticker):
+    df = pd.DataFrame()
+    try:
+        close = float(si.get_live_price(ticker))
+        url = f"https://xueqiu.com/S/{ticker}"
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'
+        }
+        response = requests.get(url,headers=headers)
+        soup = BeautifulSoup(response.text, "html.parser")
+        regularMarketVolume_element = soup.find_all('td')[2].find('span')
+        if regularMarketVolume_element is not None:
+            regularMarketVolume = regularMarketVolume_element.text
+            if regularMarketVolume == "--":
+                volume = -1
+            else:
+                volume = convert_int_string(regularMarketVolume[:-1])
+        else:
+            # log("error",ticker+" marketCap is None")
+            volume = -1
+        open_element = soup.find_all('td')[1].find('span')
+        if open_element is not None:
+            open_text = open_element.text
+            if open_text == "--":
+                open = -1
+            else:
+                open = float(open_text)
+        else:
+            # log("error",ticker+" marketCap is None")
+            open = -1
+        day_range_element = soup.find_all('td')[0].find('span')
+        if day_range_element is not None:
+            day_range_text = day_range_element.text
+            if day_range_text == "--":
+                high = -1
+            else:
+                high = float(day_range_text)
+        else:
+            # log("error",ticker+" marketCap is None")
+            high = -1
+        day_range_element = soup.find_all('td')[4].find('span')
+        if day_range_element is not None:
+            day_range_text = day_range_element.text
+            if day_range_text == "--":
+                low = -1
+            else:
+                low = float(day_range_text)
+        else:
+            # log("error",ticker+" marketCap is None")
+            low = -1
+        # quote_table = si.get_quote_table(ticker)
+        # open = float(quote_table['Open'])
+        # low = float(quote_table["Day's Range"].split(" - ")[0])
+        # high = float(quote_table["Day's Range"].split(" - ")[1])
+        # volume = int(quote_table['Volume'])
+        # open = -1
+        # low = -1
+        # high = -1
+        # volume = np.nan
+        d = {'date':pd.to_datetime(end.strftime('%Y-%m-%d')), 'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
+        # df=pd.DataFrame(d,index=[str(end)])
+        df=pd.DataFrame(d,index=[str(end)])
+        # df.date=pd.to_datetime(df.date)
+        # df.index.name = 'date'
+        # if (not df.empty) and df.index[-1]!=str(datetime.date.today()):
+        #     log("error",ticker+" date error")
+        #     return pd.DataFrame()
+    except Exception as e:
+        if ticker=="ADIL":
+            log("info",ticker)
+        if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
+            return -1
+        else:
+            # log("error","get_stock_realtime " + ticker + " " + str(e))
+            return pd.DataFrame()
+    # if ticker=="NEXA":
+    #     log("info",ticker)
+    if ticker=="SOPH":
+        log("info",ticker)
+    return df
+
 def get_stock_realtime(ticker):
     df = pd.DataFrame()
     try:
@@ -126,7 +225,7 @@ def get_stock_realtime(ticker):
             return pd.DataFrame()
     # if ticker=="NEXA":
     #     log("info",ticker)
-    if ticker=="ADIL":
+    if ticker=="SOPH":
         log("info",ticker)
     return df
 
@@ -289,7 +388,7 @@ if __name__ == '__main__':
         today15 = now.replace(hour=15,minute=0,second=0,microsecond=0)
         today235959 = now.replace(hour=23,minute=59,second=59,microsecond=0)
         if ((now.weekday() <= 4) & (today15 <= datetime.now() <= today235959) and realtime_required):
-            realtime_df=collect_data(get_stock_realtime,cores,10)
+            realtime_df=collect_data(get_stock_realtime_xueqiu,cores,10)
             if not realtime_df.empty:
                 log('info','realtime_df is ready')
                 realtime_df.reset_index(inplace=True,drop=True)
