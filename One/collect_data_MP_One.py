@@ -417,7 +417,7 @@ if __name__ == '__main__':
         today15 = now.replace(hour=15,minute=0,second=0,microsecond=0)
         while(True):         #get real time stock price
             if ((now.weekday() <= 4) & (today8 <= datetime.now() <= today15) and realtime_required):
-                realtime_df=collect_data(get_stock_realtime,cores,10)
+                realtime_df=collect_data(get_stock_realtime_xueqiu,cores,10)
                 if not realtime_df.empty:
                     log('info','realtime_df is ready')
                     realtime_df.reset_index(inplace=True,drop=True)
