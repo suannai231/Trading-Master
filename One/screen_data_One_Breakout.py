@@ -30,7 +30,7 @@ def screen(df,lines):
     # bottom = True if low<=close<=low*1.5 else False
 
     volume = df.iloc[-1].volume
-    volume_flag = True if volume>=volume_60d_avg*2 else False
+    volume_flag = True if volume>=volume_60d_avg*1.5 else False
 
     # UO=df.iloc[-1].UO
     # buy = True if UO<=30 else False
@@ -52,7 +52,7 @@ def screen(df,lines):
         DIFF120L_60H = df.iloc[-1].DIFF120L_60H
         flag = DIFF120L==DIFF120L_10H==DIFF120L_60H and DIFF120L_60H>=0 or (DIFF120L==DIFF120L_10H and np.isnan(DIFF120L_60H) and DIFF120L_10H>=0)
         today = flag and not flag_Y and turnover_flag and change and volume_flag
-        if df.iloc[-1].ticker == "SOPH":
+        if df.iloc[-1].ticker == "AIMD":
             log("info", df.iloc[-1].ticker)
         if today:
             return True
