@@ -133,8 +133,8 @@ def cal_basics(df):
             high.append(np.nan)
     df['DIFF120L'] = df["close"] - low
     df['DIFF120H'] = df["close"] - high
-    df['DIFF120L_10H'] = df['DIFF120L'].rolling(window=10).max()
-    df['DIFF120L_60H'] = df['DIFF120L'].rolling(window=60).max()
+    # df['DIFF120L_10H'] = df['DIFF120L'].rolling(window=10).max()
+    # df['DIFF120L_60H'] = df['DIFF120L'].rolling(window=60).max()
     if df.iloc[-1].ticker == "CING":
         log("info", df.iloc[-1].ticker)
 

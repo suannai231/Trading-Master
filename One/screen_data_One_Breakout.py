@@ -19,8 +19,8 @@ def screen(df,lines):
     turnover_flag = turnover_10d_avg > 100000
     # EMA120 = df.iloc[-1].EMA120
     # ema120_flag = (close >= EMA120)
-    EMA60 = df.iloc[-1].EMA60
-    ema60_flag = (close >= EMA60)
+    # EMA60 = df.iloc[-1].EMA60
+    # ema60_flag = (close >= EMA60)
     # EMA120_Yesterday = df.iloc[-2].EMA120
     # ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
     change = df.iloc[-1].change >=-0.03
@@ -29,8 +29,8 @@ def screen(df,lines):
     # low = df[df.volume==highest_volume_30days].low[0]
     # bottom = True if low<=close<=low*1.5 else False
 
-    volume = df.iloc[-1].volume
-    volume_flag = True if volume>=volume_60d_avg*1.5 else False
+    # volume = df.iloc[-1].volume
+    # volume_flag = True if volume>=volume_60d_avg*1.5 else False
 
     # UO=df.iloc[-1].UO
     # buy = True if UO<=30 else False
@@ -38,20 +38,22 @@ def screen(df,lines):
     if lines == "2060":
         # DIFF20L_Y = df.iloc[-2].DIFF20L
         # DIFF60L_Y = df.iloc[-2].DIFF60L
-        DIFF120L_Y = df.iloc[-2].DIFF120L
-        DIFF120L_10H_Y = df.iloc[-2].DIFF120L_10H
-        DIFF120L_60H_Y = df.iloc[-2].DIFF120L_60H
+        # DIFF120L_Y = df.iloc[-2].DIFF120L
+        DIFF120H_Y = df.iloc[-2].DIFF120H
+        # DIFF120L_10H_Y = df.iloc[-2].DIFF120L_10H
+        # DIFF120L_60H_Y = df.iloc[-2].DIFF120L_60H
         # DIFF250L_Y = df.iloc[-2].DIFF250L
-        flag_Y = DIFF120L_Y==DIFF120L_10H_Y==DIFF120L_60H_Y and DIFF120L_60H_Y>=0 or (DIFF120L_Y==DIFF120L_10H_Y and np.isnan(DIFF120L_60H_Y) and DIFF120L_10H_Y>=0)
+        flag_Y = DIFF120H_Y>=0
 
         # DIFF20L = df.iloc[-1].DIFF20L
         # DIFF60L = df.iloc[-1].DIFF60L
-        DIFF120L = df.iloc[-1].DIFF120L
+        # DIFF120L = df.iloc[-1].DIFF120L
         # DIFF250L = df.iloc[-1].DIFF250L
-        DIFF120L_10H = df.iloc[-1].DIFF120L_10H
-        DIFF120L_60H = df.iloc[-1].DIFF120L_60H
-        flag = DIFF120L==DIFF120L_10H==DIFF120L_60H and DIFF120L_60H>=0 or (DIFF120L==DIFF120L_10H and np.isnan(DIFF120L_60H) and DIFF120L_10H>=0)
-        today = flag and not flag_Y and turnover_flag and change and volume_flag
+        # DIFF120L_10H = df.iloc[-1].DIFF120L_10H
+        # DIFF120L_60H = df.iloc[-1].DIFF120L_60H
+        DIFF120H = df.iloc[-1].DIFF120H
+        flag = DIFF120H>=0
+        today = flag and not flag_Y and turnover_flag and change
         if df.iloc[-1].ticker == "AIMD":
             log("info", df.iloc[-1].ticker)
         if today:
