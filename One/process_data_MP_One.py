@@ -129,10 +129,12 @@ def cal_basics(df):
         if not np.isnan(vol):
             low.append(df.loc[df.volume==vol,'low'].values[0])
             high.append(df.loc[df.volume==vol,'high'].values[0])
+            mid.append(df.loc[df.volume==vol,'low'].values[0]+(df.loc[df.volume==vol,'high'].values[0]-df.loc[df.volume==vol,'low'].values[0])/2)
         else:
             low.append(np.nan)
             high.append(np.nan)
-    mid = low + (high-low)/2
+            mid.append(np.nan)
+
     df['DIFF120L'] = df["close"] - low
     df['DIFF120H'] = df["close"] - high
     df['DIFF120M'] = df["close"] - mid
