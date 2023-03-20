@@ -57,7 +57,7 @@ def screen(df,lines):
         DIFF120L = df.iloc[-1].DIFF120L
         HHV20_DIFF120M = df.iloc[-1].HHV20_DIFF120M
         flag = DIFF120M>0 and DIFF120L>HHV20_DIFF120M
-        today = flag and not flag_Y and turnover_flag and change
+        today = flag and turnover_flag and change
         if df.iloc[-1].ticker == "AIMD":
             log("info", df.iloc[-1].ticker)
         if today:
