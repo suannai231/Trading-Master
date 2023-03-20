@@ -17,9 +17,10 @@ def screen(df,lines):
     volume_60d_avg = df.tail(60).volume.mean()
     turnover_10d_avg = volume_60d_avg*close
     turnover_flag = turnover_10d_avg > 100000
-    # EMA120 = df.iloc[-1].EMA120
+    EMA120 = df.iloc[-1].EMA120
     # ema120_flag = (close >= EMA120)
-    # EMA60 = df.iloc[-1].EMA60
+    EMA60 = df.iloc[-1].EMA60
+    EMA_flag = EMA60>=EMA120
     # ema60_flag = (close >= EMA60)
     # EMA120_Yesterday = df.iloc[-2].EMA120
     # ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
@@ -57,7 +58,7 @@ def screen(df,lines):
         DIFF120L = df.iloc[-1].DIFF120L
         HHV20_DIFF120M = df.iloc[-1].HHV20_DIFF120M
         flag = DIFF120M>0 and DIFF120L>HHV20_DIFF120M
-        today = flag and turnover_flag and change
+        today = flag and turnover_flag and change and EMA_flag
         if df.iloc[-1].ticker == "AIMD":
             log("info", df.iloc[-1].ticker)
         if today:
