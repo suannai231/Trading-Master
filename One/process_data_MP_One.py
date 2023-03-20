@@ -124,6 +124,7 @@ def cal_basics(df):
     df_v120 = df['volume'].rolling(window=120).max()
     low = []
     high = []
+    mid = []
     for vol in df_v120:
         if not np.isnan(vol):
             low.append(df.loc[df.volume==vol,'low'].values[0])
@@ -131,8 +132,14 @@ def cal_basics(df):
         else:
             low.append(np.nan)
             high.append(np.nan)
+    mid = low + (high-low)/2
     df['DIFF120L'] = df["close"] - low
     df['DIFF120H'] = df["close"] - high
+    df['DIFF120M'] = df["close"] - mid
+
+    df['HHV20_DIFF120L'] = df['DIFF120L'].rolling(window=20).max()
+    df['HHV20_DIFF120H'] = df['DIFF120H'].rolling(window=20).max()
+    df['HHV20_DIFF120M'] = df['DIFF120M'].rolling(window=20).max()
     # df['DIFF120L_10H'] = df['DIFF120L'].rolling(window=10).max()
     # df['DIFF120L_60H'] = df['DIFF120L'].rolling(window=60).max()
     if df.iloc[-1].ticker == "CING":
