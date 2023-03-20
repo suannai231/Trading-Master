@@ -17,10 +17,10 @@ def screen(df,lines):
     volume_60d_avg = df.tail(60).volume.mean()
     turnover_10d_avg = volume_60d_avg*close
     turnover_flag = turnover_10d_avg > 100000
-    EMA120 = df.iloc[-1].EMA120
+    EMA10 = df.iloc[-1].EMA10
     # ema120_flag = (close >= EMA120)
-    EMA60 = df.iloc[-1].EMA60
-    EMA_flag = EMA60>=EMA120
+    EMA20 = df.iloc[-1].EMA20
+    EMA_flag = EMA10>=EMA20
     # ema60_flag = (close >= EMA60)
     # EMA120_Yesterday = df.iloc[-2].EMA120
     # ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
