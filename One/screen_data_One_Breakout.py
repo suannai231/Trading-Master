@@ -37,27 +37,12 @@ def screen(df,lines):
     # buy = True if UO<=30 else False
 
     if lines == "2060":
-        # DIFF20L_Y = df.iloc[-2].DIFF20L
-        # DIFF60L_Y = df.iloc[-2].DIFF60L
-        # DIFF120L_Y = df.iloc[-2].DIFF120L
-        DIFF120M_Y = df.iloc[-2].DIFF120M
-        DIFF120L_Y = df.iloc[-2].DIFF120L
-        HHV20_DIFF120M_Y = df.iloc[-2].HHV20_DIFF120M
-        # DIFF120L_10H_Y = df.iloc[-2].DIFF120L_10H
-        # DIFF120L_60H_Y = df.iloc[-2].DIFF120L_60H
-        # DIFF250L_Y = df.iloc[-2].DIFF250L
-        flag_Y = DIFF120M_Y>0 and DIFF120L_Y>HHV20_DIFF120M_Y
-
-        # DIFF20L = df.iloc[-1].DIFF20L
-        # DIFF60L = df.iloc[-1].DIFF60L
-        # DIFF120L = df.iloc[-1].DIFF120L
-        # DIFF250L = df.iloc[-1].DIFF250L
-        # DIFF120L_10H = df.iloc[-1].DIFF120L_10H
-        # DIFF120L_60H = df.iloc[-1].DIFF120L_60H
-        DIFF120M = df.iloc[-1].DIFF120M
         DIFF120L = df.iloc[-1].DIFF120L
-        HHV20_DIFF120M = df.iloc[-1].HHV20_DIFF120M
-        flag = DIFF120M>0 and DIFF120L>HHV20_DIFF120M
+        HHV5_DIFF120L = df.iloc[-1].HHV5_DIFF120L
+        HHV10_DIFF120L = df.iloc[-1].HHV10_DIFF120L
+        HHV20_DIFF120L = df.iloc[-1].HHV20_DIFF120L
+
+        flag = DIFF120L>0 and DIFF120L==HHV5_DIFF120L==HHV10_DIFF120L==HHV20_DIFF120L
         today = flag and turnover_flag and change and EMA_flag
         if df.iloc[-1].ticker == "AIMD":
             log("info", df.iloc[-1].ticker)

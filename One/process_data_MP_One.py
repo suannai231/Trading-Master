@@ -123,25 +123,29 @@ def cal_basics(df):
 
     df_v120 = df['volume'].rolling(window=120).max()
     low = []
-    high = []
-    mid = []
+    # high = []
+    # mid = []
     for vol in df_v120:
         if not np.isnan(vol):
             low.append(df.loc[df.volume==vol,'low'].values[0])
-            high.append(df.loc[df.volume==vol,'high'].values[0])
-            mid.append(df.loc[df.volume==vol,'low'].values[0]+(df.loc[df.volume==vol,'high'].values[0]-df.loc[df.volume==vol,'low'].values[0])/2)
+            # high.append(df.loc[df.volume==vol,'high'].values[0])
+            # mid.append(df.loc[df.volume==vol,'low'].values[0]+(df.loc[df.volume==vol,'high'].values[0]-df.loc[df.volume==vol,'low'].values[0])/2)
         else:
             low.append(np.nan)
-            high.append(np.nan)
-            mid.append(np.nan)
+            # high.append(np.nan)
+            # mid.append(np.nan)
 
     df['DIFF120L'] = df["close"] - low
-    df['DIFF120H'] = df["close"] - high
-    df['DIFF120M'] = df["close"] - mid
+    # df['DIFF120H'] = df["close"] - high
+    # df['DIFF120M'] = df["close"] - mid
 
+    df['HHV5_DIFF120L'] = df['DIFF120L'].rolling(window=5).max()
+    df['HHV10_DIFF120L'] = df['DIFF120L'].rolling(window=10).max()
     df['HHV20_DIFF120L'] = df['DIFF120L'].rolling(window=20).max()
-    df['HHV20_DIFF120H'] = df['DIFF120H'].rolling(window=20).max()
-    df['HHV20_DIFF120M'] = df['DIFF120M'].rolling(window=20).max()
+    df['HHV60_DIFF120L'] = df['DIFF120L'].rolling(window=60).max()
+    df['HHV120_DIFF120L'] = df['DIFF120L'].rolling(window=120).max()
+    # df['HHV20_DIFF120H'] = df['DIFF120H'].rolling(window=20).max()
+    # df['HHV20_DIFF120M'] = df['DIFF120M'].rolling(window=20).max()
     # df['DIFF120L_10H'] = df['DIFF120L'].rolling(window=10).max()
     # df['DIFF120L_60H'] = df['DIFF120L'].rolling(window=60).max()
     if df.iloc[-1].ticker == "CING":
