@@ -8,186 +8,108 @@ import logging
 import math
 import numpy as np
 
-# def cal_Long(df):
-#     startindex = 0
-#     endindex = len(df)
-#     Long = []
-#     Long.append(0)
+def cal_basics(df,ticker_history_df):
+    if ticker_history_df.empty:
+        df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
+        # df['AMP'] = (df['high']-df['low'])/df['low']
 
-#     for i in range(startindex+1, endindex):
-#         previous_close = df.close[i-1]
-#         if df.close[i] >= previous_close:
-#             Long.append(Long[-1] + df.volume[i])
-#         else:
-#             Long.append(Long[-1])
-#     df['Long'] = Long
-#     return df
+        # ema5 = df['close'].ewm(span = 5, adjust = False).mean()
+        ema10 = df['close'].ewm(span = 10, adjust = False).mean()
+        # ema12 = df['close'].ewm(span = 12, adjust = False).mean()
+        ema20 = df['close'].ewm(span = 20, adjust = False).mean()
+        # ema26 = df['close'].ewm(span = 26, adjust = False).mean()
+        # ema60 = df['close'].ewm(span = 60, adjust = False).mean()
+        # ema120 = df['close'].ewm(span = 120, adjust = False).mean()
+        # ema250 = df['close'].ewm(span = 250, adjust = False).mean()
+        # std20 = df['close'].rolling(window=20).std()
+        # df['EMA5'] = ema5
+        df['EMA10'] = ema10
+        # df['EMA12'] = ema12
+        df['EMA20'] = ema20
+        # df['EMA26'] = ema26
+        # df['EMA60'] = ema60
+        # df['EMA120'] = ema120
+        # df['EMA250'] = ema250
+        # df['DIF'] = ema12-ema26
+        # df['DEA'] = df['DIF'].ewm(span = 9, adjust = False).mean()
+        # df['STD20'] = std20
+        # df['STD20_EMA5'] = df['STD20'].ewm(span = 5, adjust = False).mean()
 
-# def cal_Short(df):
-#     startindex = 0
-#     endindex = len(df)
-#     Short = []
-#     Short.append(0)
+        # LLV7 = df['low'].rolling(window=7).min()
+        # LLV14 = df['low'].rolling(window=14).min()
+        # LLV28 = df['low'].rolling(window=28).min()
+        # HHV7 = df['high'].rolling(window=7).max()
+        # HHV14 = df['high'].rolling(window=14).max()
+        # HHV28 = df['high'].rolling(window=28).max()
+        # WSTA=((df['close']-LLV7)/(HHV7-LLV7))*4
+        # WMTA=((df['close']-LLV14)/(HHV14-LLV14))*2
+        # WLTA=((df['close']-LLV28)/(HHV28-LLV28))
+        # UO=100*((WSTA+WMTA+WLTA)/(4+2+1))
+        # df['UO']=UO
 
-#     for i in range(startindex+1, endindex):
-#         previous_close = df.close[i-1]
-#         if df.close[i] < previous_close:
-#             Short.append(Short[-1] + df.volume[i])
-#         else:
-#             Short.append(Short[-1])
-#     df['Short'] = Short
-#     return df
+        df_v120 = df['volume'].rolling(window=120).max()
+        low = []
 
-# def cal_OBV(df):
-#     startindex = 0
-#     endindex = len(df)
-#     OBV = []
-#     OBV.append(0)
+        for vol in df_v120:
+            if not np.isnan(vol):
+                low.append(df.loc[df.volume==vol,'low'].values[0])
 
-#     for i in range(startindex+1, endindex):
-#         previous_close = df.close[i-1]
-#         if df.close[i] >= previous_close:
-#             OBV.append(OBV[-1] + df.volume[i])
-#         elif df.close[i] < previous_close:
-#             OBV.append(OBV[-1] - df.volume[i])
-#         else:
-#             OBV.append(OBV[-1])
-#         # OBV_MAX.append(max(OBV))
-#     df['OBV'] = OBV
-#     return df
-
-def cal_basics(df):
-    df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
-    df['AMP'] = (df['high']-df['low'])/df['low']
-
-    ema5 = df['close'].ewm(span = 5, adjust = False).mean()
-    ema10 = df['close'].ewm(span = 10, adjust = False).mean()
-    ema12 = df['close'].ewm(span = 12, adjust = False).mean()
-    ema20 = df['close'].ewm(span = 20, adjust = False).mean()
-    ema26 = df['close'].ewm(span = 26, adjust = False).mean()
-    ema60 = df['close'].ewm(span = 60, adjust = False).mean()
-    ema120 = df['close'].ewm(span = 120, adjust = False).mean()
-    ema250 = df['close'].ewm(span = 250, adjust = False).mean()
-    std20 = df['close'].rolling(window=20).std()
-    df['EMA5'] = ema5
-    df['EMA10'] = ema10
-    df['EMA12'] = ema12
-    df['EMA20'] = ema20
-    df['EMA26'] = ema26
-    df['EMA60'] = ema60
-    df['EMA120'] = ema120
-    df['EMA250'] = ema250
-    df['DIF'] = ema12-ema26
-    df['DEA'] = df['DIF'].ewm(span = 9, adjust = False).mean()
-    df['STD20'] = std20
-    df['STD20_EMA5'] = df['STD20'].ewm(span = 5, adjust = False).mean()
+            else:
+                low.append(np.nan)
 
 
-    LLV7 = df['low'].rolling(window=7).min()
-    LLV14 = df['low'].rolling(window=14).min()
-    LLV28 = df['low'].rolling(window=28).min()
-    HHV7 = df['high'].rolling(window=7).max()
-    HHV14 = df['high'].rolling(window=14).max()
-    HHV28 = df['high'].rolling(window=28).max()
-    WSTA=((df['close']-LLV7)/(HHV7-LLV7))*4
-    WMTA=((df['close']-LLV14)/(HHV14-LLV14))*2
-    WLTA=((df['close']-LLV28)/(HHV28-LLV28))
-    UO=100*((WSTA+WMTA+WLTA)/(4+2+1))
-    df['UO']=UO
+        df['DIFF120L'] = df["close"] - low
 
-    # df_v20 = df['volume'].rolling(window=20).max()
-    # low = []
-    # high = []
-    # for vol in df_v20:
-    #     if not np.isnan(vol):
-    #         low.append(df.loc[df.volume==vol,'low'].values[0])
-    #         high.append(df.loc[df.volume==vol,'high'].values[0])
-    #     else:
-    #         low.append(np.nan)
-    #         high.append(np.nan)
-    # df['DIFF20L'] = df["close"] - low
-    # df['DIFF20H'] = df["close"] - high
 
-    # df_v60 = df['volume'].rolling(window=60).max()
-    # low = []
-    # high = []
-    # for vol in df_v60:
-    #     if not np.isnan(vol):
-    #         low.append(df.loc[df.volume==vol,'low'].values[0])
-    #         high.append(df.loc[df.volume==vol,'high'].values[0])
-    #     else:
-    #         low.append(np.nan)
-    #         high.append(np.nan)
-    # df['DIFF60L'] = df["close"] - low
-    # df['DIFF60H'] = df["close"] - high
+        df['HHV5_DIFF120L'] = df['DIFF120L'].rolling(window=5).max()
+        df['HHV10_DIFF120L'] = df['DIFF120L'].rolling(window=10).max()
+        df['HHV20_DIFF120L'] = df['DIFF120L'].rolling(window=20).max()
+        df['HHV60_DIFF120L'] = df['DIFF120L'].rolling(window=60).max()
+        df['HHV120_DIFF120L'] = df['DIFF120L'].rolling(window=120).max()
 
-    df_v120 = df['volume'].rolling(window=120).max()
-    low = []
-    # high = []
-    # mid = []
-    for vol in df_v120:
-        if not np.isnan(vol):
-            low.append(df.loc[df.volume==vol,'low'].values[0])
-            # high.append(df.loc[df.volume==vol,'high'].values[0])
-            # mid.append(df.loc[df.volume==vol,'low'].values[0]+(df.loc[df.volume==vol,'high'].values[0]-df.loc[df.volume==vol,'low'].values[0])/2)
+        if df.iloc[-1].ticker == "CING":
+            log("info", df.iloc[-1].ticker)
+
+        return df
+    else:
+        if ticker_history_df.iloc[-1].date==df.iloc[-1].date:
+            index = len(ticker_history_df)-1
+
+            ticker_history_df.loc[index,'open']==df.iloc[-1].open
+            ticker_history_df.loc[index,'high']==df.iloc[-1].high
+            ticker_history_df.loc[index,'low']==df.iloc[-1].low
+            ticker_history_df.loc[index,'close']==df.iloc[-1].close
+            ticker_history_df.loc[index,'adjclose']==df.iloc[-1].adjclose
+            ticker_history_df.loc[index,'volume']==df.iloc[-1].volume
+            ticker_history_df.loc[index,'change']==(df.iloc[-1].close - df.iloc[-2].close)/df.iloc[-2].close
+            ticker_history_df.loc[index,'EMA10']==df.tail(10).close.mean()
+            ticker_history_df.loc[index,'EMA20']==df.tail(20).close.mean()
+
+            df_tail120 = df.tail(120)
+            low = df_tail120.loc[df_tail120.volume==df_tail120.volume.max(),'low'].values[0]
+
+            ticker_history_df.loc[index,'DIFF120L'] = df.iloc[-1].close - low
+
+            ticker_history_df.loc[index,'HHV5_DIFF120L'] = ticker_history_df.tail(5).DIFF120L.max()
+            ticker_history_df.loc[index,'HHV10_DIFF120L'] = ticker_history_df.tail(10).DIFF120L.max()
+            ticker_history_df.loc[index,'HHV20_DIFF120L'] = ticker_history_df.tail(20).DIFF120L.max()
+            ticker_history_df.loc[index,'HHV60_DIFF120L'] = ticker_history_df.tail(60).DIFF120L.max()
+            ticker_history_df.loc[index,'HHV120_DIFF120L'] = ticker_history_df.tail(120).DIFF120L.max()
+
+            return ticker_history_df
         else:
-            low.append(np.nan)
-            # high.append(np.nan)
-            # mid.append(np.nan)
+            log("error",df.iloc[-1].ticker+"date mismatch")
+            return pd.DataFrame()
 
-    df['DIFF120L'] = df["close"] - low
-    # df['DIFF120H'] = df["close"] - high
-    # df['DIFF120M'] = df["close"] - mid
-
-    df['HHV5_DIFF120L'] = df['DIFF120L'].rolling(window=5).max()
-    df['HHV10_DIFF120L'] = df['DIFF120L'].rolling(window=10).max()
-    df['HHV20_DIFF120L'] = df['DIFF120L'].rolling(window=20).max()
-    df['HHV60_DIFF120L'] = df['DIFF120L'].rolling(window=60).max()
-    df['HHV120_DIFF120L'] = df['DIFF120L'].rolling(window=120).max()
-    # df['HHV20_DIFF120H'] = df['DIFF120H'].rolling(window=20).max()
-    # df['HHV20_DIFF120M'] = df['DIFF120M'].rolling(window=20).max()
-    # df['DIFF120L_10H'] = df['DIFF120L'].rolling(window=10).max()
-    # df['DIFF120L_60H'] = df['DIFF120L'].rolling(window=60).max()
-    if df.iloc[-1].ticker == "CING":
-        log("info", df.iloc[-1].ticker)
-
-
-    # df_v250 = df['volume'].rolling(window=250).max()
-    # low = []
-    # high = []
-    # for vol in df_v250:
-    #     if not np.isnan(vol):
-    #         low.append(df.loc[df.volume==vol,'low'].values[0])
-    #         high.append(df.loc[df.volume==vol,'high'].values[0])
-    #     else:
-    #         low.append(np.nan)
-    #         high.append(np.nan)
-    # df['DIFF250L'] = df["close"] - low
-    # df['DIFF250H'] = df["close"] - high
-    # if df.iloc[-1].ticker == "ADIL":
-    #     log("info", df.iloc[-1].ticker)
-    # Calculate EMA
-    # df['DIFF_EMA20'] = df['DIFF'].ewm(span = 20, adjust = False).mean()
-    # df['DIFF_EMA60'] = df['DIFF'].ewm(span = 60, adjust = False).mean()
-    # df['DIFF_EMA120'] = df['DIFF'].ewm(span = 120, adjust = False).mean()
-    return df
-
-def run(ticker_chunk_df):
+def run(ticker_chunk_df,ticker_chunk_history_df):
     return_ticker_chunk_df = pd.DataFrame()
     tickers= ticker_chunk_df.ticker.unique()
     for ticker in tickers:
         df = ticker_chunk_df[ticker_chunk_df.ticker==ticker].reset_index(drop=True)
-        # lastindex = df.index[-1]
-        # if df.iloc[-1].ticker == "DIDIY":
-        #     log("info", df.iloc[-1].ticker)
-        # if (11 > df['close'][lastindex] > 10) or (df['close'][lastindex]>20) or (df['close'][lastindex]<1):
-        #     continue
-
-        # if(len(df)>250):
-        #     df = df.iloc[len(df)-250:]
-        #     df.reset_index(drop=True,inplace=True)
-
-        df = cal_basics(df)
+        ticker_history_df = pd.DataFrame()
+        if not ticker_chunk_history_df.empty:
+            ticker_history_df = ticker_chunk_history_df[ticker_chunk_history_df.ticker==ticker].reset_index(drop=True)
+        df = cal_basics(df,ticker_history_df)
 
         if not df.empty:
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,df],ignore_index=True)
@@ -198,12 +120,13 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def process_data():
+def process_data(history_df):
     log('info',"process_data start.")
+    global global_df
     raw_data_files = os.listdir(raw_data_path)
     if len(raw_data_files) == 0:
-        log('warning',"raw data not ready, sleep 10 seconds...")
-        time.sleep(10)
+        log('warning',"raw data not ready, sleep 1 second...")
+        time.sleep(1)
         return
     # date_time = datetime.datetime.now() 
     # datetime_str = date_time.strftime("%m%d%Y-%H")
@@ -231,7 +154,10 @@ def process_data():
     async_results = []
     for ticker_chunk in ticker_chunk_list:
         ticker_chunk_df = df[df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run, args=(ticker_chunk_df,))
+        ticker_chunk_history_df = pd.DataFrame()
+        if not history_df.empty:
+            ticker_chunk_history_df = history_df[history_df['ticker'].isin(ticker_chunk)]
+        async_result = pool.apply_async(run, args=(ticker_chunk_df,ticker_chunk_history_df))
         async_results.append(async_result)
     pool.close()
     log('info',"process pool start.")
@@ -242,6 +168,7 @@ def process_data():
         if not result.empty:
             df = pd.concat([df,async_result.get()])
     
+    
     if(not df.empty):
         log('info',"result is ready.")
         df.reset_index(drop=True,inplace=True)
@@ -250,10 +177,12 @@ def process_data():
             log('info',processed_data_path + raw_data_files[-1]+" is saved.")
         except Exception as e:
             log('critical',"to_feather:"+str(e))
-        # df.to_csv(processed_data_path + raw_data_files[-1] + '.csv')
+        # global_df.to_csv(processed_data_path + raw_data_files[-1] + '.csv')
     else:
         log('error',"df empty")
+    
     log('info',"process_data stop.")
+    return df
 
 def log(type,string):
     logpath = '//jack-nas.home/Work/Python/'
@@ -282,14 +211,17 @@ if __name__ == '__main__':
     if not isPathExists:
         os.makedirs(processed_data_path)
 
-    process_data()
+    history_df = process_data(pd.DataFrame())
 
     now = datetime.datetime.now()
     today8am = now.replace(hour=8,minute=0,second=0,microsecond=0)
     today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
+    # while(True):
+    #     process_data(history_df)
+
     while((now.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)): 
-        process_data()
+        process_data(history_df)
     
     stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
     log('info','process_data process exit.')
