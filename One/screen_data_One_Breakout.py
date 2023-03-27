@@ -82,8 +82,8 @@ def screen_data():
 
     processed_data_files = os.listdir(processed_data_path)
     if len(processed_data_files) == 0:
-        log('warning',"processed data not ready, sleep 10 seconds...")
-        time.sleep(10)
+        log('warning',"processed data not ready, sleep 1 second...")
+        time.sleep(1)
         return
 
     screened_data_files = os.listdir(screened_data_path)
