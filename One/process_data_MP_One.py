@@ -134,13 +134,12 @@ def process_data(history_df):
 
     processed_data_files = os.listdir(processed_data_path)
     if raw_data_files[-1] in processed_data_files:
-        log('warning',"error: " + raw_data_files[-1] + " existed, sleep 10 seconds...")
-        time.sleep(10)
+        log('warning',"error: " + raw_data_files[-1] + " existed, sleep 1 seconds...")
+        time.sleep(1)
         return
     
     log('info',"processing "+raw_data_files[-1])
     try:
-        time.sleep(1)
         df = pd.read_feather(raw_data_path + raw_data_files[-1])
         log('info',raw_data_path + raw_data_files[-1]+" loaded.")
     except Exception as e:
