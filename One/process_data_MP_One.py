@@ -144,6 +144,7 @@ def process_data(history_df):
     
     log('info',"processing "+raw_data_files[-1])
     try:
+        time.sleep(1)
         df = pd.read_feather(raw_data_path + raw_data_files[-1])
         log('info',raw_data_path + raw_data_files[-1]+" loaded.")
     except Exception as e:
