@@ -67,7 +67,7 @@ def cal_basics(df,ticker_history_df):
         df['HHV60_DIFF120L'] = df['DIFF120L'].rolling(window=60).max()
         df['HHV120_DIFF120L'] = df['DIFF120L'].rolling(window=120).max()
 
-        if df.iloc[-1].ticker == "CING":
+        if df.iloc[-1].ticker == "TBIO":
             log("info", df.iloc[-1].ticker)
 
         return df
