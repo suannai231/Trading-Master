@@ -129,7 +129,7 @@ def process_data(history_df):
     global global_df
     raw_data_files = os.listdir(raw_data_path)
     if len(raw_data_files) == 0:
-        log('warning',"raw data not ready, sleep 1 second...")
+        # log('warning',"raw data not ready, sleep 1 second...")
         time.sleep(1)
         return
     # date_time = datetime.datetime.now() 
@@ -138,7 +138,7 @@ def process_data(history_df):
 
     processed_data_files = os.listdir(processed_data_path)
     if raw_data_files[-1] in processed_data_files:
-        log('warning',"warning: " + raw_data_files[-1] + " existed, sleep 1 seconds...")
+        # log('warning',"warning: " + raw_data_files[-1] + " existed, sleep 1 seconds...")
         time.sleep(1)
         return
     
