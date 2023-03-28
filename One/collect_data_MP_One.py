@@ -362,7 +362,7 @@ if __name__ == '__main__':
     #     tickers = nasdaq + other
     quote_data_files = os.listdir(quote_data_path)
     while len(quote_data_files) == 0:
-        log('warning',"quote data not ready, sleep 10 seconds...")
+        # log('warning',"quote data not ready, sleep 10 seconds...")
         time.sleep(10)
         quote_data_files = os.listdir(quote_data_path)
 
