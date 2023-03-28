@@ -56,13 +56,13 @@ def get_quote_data(ticker):
         elif str(e).startswith('Invalid response from server') | str(e).startswith("IndexError('list index out of range')"):
             return pd.DataFrame()
         else:
-            log("error",ticker+" "+str(e))
+            log("critical",ticker+" "+str(e))
             return pd.DataFrame()
 
     if 'regularMarketPreviousClose' in dict.keys():
         regularMarketPreviousClose = dict['regularMarketPreviousClose']
     else:
-        log("error",ticker+" regularMarketPreviousClose is not available")
+        log("warning",ticker+" regularMarketPreviousClose is not available")
         return pd.DataFrame()
     
     # dict['ticker'] = ticker
