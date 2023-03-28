@@ -201,12 +201,18 @@ def log(type,string):
     elif type=='error':
         directory_path = os.getcwd()
         file_path = directory_path+'\Sounds\PriceNotice.wav'
-        playsound(file_path)
+        try:
+            playsound(file_path)
+        except Exception as e:
+            print(str(e))
         logging.error(log_time+":"+string)
     elif type=='critical':
         directory_path = os.getcwd()
         file_path = directory_path+'\Sounds\PriceNotice.wav'
-        playsound(file_path)
+        try:
+            playsound(file_path)
+        except Exception as e:
+            print(str(e))
         logging.critical(log_time+":"+string)
 
 if __name__ == '__main__':
