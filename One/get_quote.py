@@ -153,10 +153,14 @@ def log(type,string):
     elif type=='warning':
         logging.warning(log_time+":"+string)
     elif type=='error':
-        playsound('C:\Program Files (x86)\moomoo\Sounds\PriceNotice.wav')
+        directory_path = os.getcwd()
+        file_path = directory_path+'\Sounds\PriceNotice.wav'
+        playsound(file_path)
         logging.error(log_time+":"+string)
     elif type=='critical':
-        playsound('C:\Program Files (x86)\moomoo\Sounds\PriceNotice.wav')
+        directory_path = os.getcwd()
+        file_path = directory_path+'\Sounds\PriceNotice.wav'
+        playsound(file_path)
         logging.critical(log_time+":"+string)
 
 if __name__ == '__main__':
