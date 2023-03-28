@@ -204,7 +204,7 @@ def log(type,string):
         try:
             playsound(file_path)
         except Exception as e:
-            print(str(e))
+            logging.info(log_time+":"+str(e))
         logging.error(log_time+":"+string)
     elif type=='critical':
         directory_path = os.getcwd()
@@ -212,7 +212,7 @@ def log(type,string):
         try:
             playsound(file_path)
         except Exception as e:
-            print(str(e))
+            logging.info(log_time+":"+str(e))
         logging.critical(log_time+":"+string)
 
 if __name__ == '__main__':
