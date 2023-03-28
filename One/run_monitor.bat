@@ -1,0 +1,6 @@
+call C:\ProgramData\Anaconda3\Scripts\activate.bat tf-gpu
+cd C:\Code\One
+powercfg /setactive e9a42b02-d5df-448d-aa00-03f14749eb61
+python monitor.py
+powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e
+exit

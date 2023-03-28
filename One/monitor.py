@@ -106,7 +106,7 @@ def screen_data():
         except Exception as e:
             log('critical',"df to_csv:"+str(e))
     else: 
-        log('error',"df empty")
+        log('info',"df empty")
 
     log('info',"screen_data stop.")
 
