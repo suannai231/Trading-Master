@@ -95,6 +95,7 @@ def screen_data():
 
     log('info',"processing "+processed_data_files[-1])
     try:
+        time.sleep(1)
         df = pd.read_feather(processed_data_path + processed_data_files[-1])
         log('info',processed_data_path + processed_data_files[-1] + " loaded.")
     except Exception as e:
