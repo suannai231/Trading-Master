@@ -13,6 +13,7 @@ import numpy as np
 # import yfinance as yf
 import requests
 from bs4 import BeautifulSoup
+from playsound import playsound
 
 def convert_to_num(s):
     if s[-1] == 'M':
@@ -152,8 +153,10 @@ def log(type,string):
     elif type=='warning':
         logging.warning(log_time+":"+string)
     elif type=='error':
+        playsound('C:\Program Files (x86)\moomoo\Sounds\PriceNotice.wav')
         logging.error(log_time+":"+string)
     elif type=='critical':
+        playsound('C:\Program Files (x86)\moomoo\Sounds\PriceNotice.wav')
         logging.critical(log_time+":"+string)
 
 if __name__ == '__main__':

@@ -7,7 +7,7 @@ import time
 import logging
 import math
 import numpy as np
-
+from playsound import playsound
 
 def screen(df,lines):
     if len(df)<120:
@@ -151,8 +151,10 @@ def log(type,string):
     elif type=='warning':
         logging.warning(log_time+":"+string)
     elif type=='error':
+        playsound('C:\Program Files (x86)\moomoo\Sounds\PriceNotice.wav')
         logging.error(log_time+":"+string)
     elif type=='critical':
+        playsound('C:\Program Files (x86)\moomoo\Sounds\PriceNotice.wav')
         logging.critical(log_time+":"+string)
 
 if __name__ == '__main__':

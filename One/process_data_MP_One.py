@@ -7,6 +7,7 @@ import time
 import logging
 import math
 import numpy as np
+from playsound import playsound
 
 def cal_basics(df,ticker_history_df):
     if ticker_history_df.empty:
@@ -195,8 +196,10 @@ def log(type,string):
     elif type=='warning':
         logging.warning(log_time+":"+string)
     elif type=='error':
+        playsound('C:\Program Files (x86)\moomoo\Sounds\PriceNotice.wav')
         logging.error(log_time+":"+string)
     elif type=='critical':
+        playsound('C:\Program Files (x86)\moomoo\Sounds\PriceNotice.wav')
         logging.critical(log_time+":"+string)
 
 if __name__ == '__main__':
