@@ -176,7 +176,7 @@ def speak(ticker):
 
     # set the rate and volume of the voice
     engine.setProperty('rate', 150)
-    engine.setProperty('volume', 0.7)
+    engine.setProperty('volume', 1)
 
     # ask the user for input
     # word = input(ticker)
