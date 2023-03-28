@@ -48,7 +48,10 @@ def screen(df,lines):
         if df.iloc[-1].ticker == "TBIO":
             log("info", df.iloc[-1].ticker)
         if today:
-            speak(df.iloc[-1].ticker)
+            try:
+                speak(df.iloc[-1].ticker)
+            except Exception as e:
+                log("error","speak error:"+str(e))
             return True
         else:
             return False
