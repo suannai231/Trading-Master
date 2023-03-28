@@ -42,7 +42,7 @@ def get_quote_data(ticker):
             if marketCap == "N/A":
                 return -1
         else:
-            log("error",ticker+" marketCap is None")
+            log("warning",ticker+" marketCap is None")
             return -2
         marketCap = convert_to_num(marketCap)
         return marketCap
