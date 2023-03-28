@@ -138,7 +138,7 @@ def process_data(history_df):
 
     processed_data_files = os.listdir(processed_data_path)
     if raw_data_files[-1] in processed_data_files:
-        log('warning',"error: " + raw_data_files[-1] + " existed, sleep 1 seconds...")
+        log('warning',"warning: " + raw_data_files[-1] + " existed, sleep 1 seconds...")
         time.sleep(1)
         return
     
