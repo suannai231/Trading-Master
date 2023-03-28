@@ -73,6 +73,9 @@ def cal_basics(df,ticker_history_df):
 
         return df
     else:
+        if len(ticker_history_df)<2:
+            log("warning",df.iloc[-1].ticker+"len < 2")
+            return pd.DataFrame()
         if ticker_history_df.iloc[-1].date==df.iloc[-1].date:
             index = len(ticker_history_df)-1
 
