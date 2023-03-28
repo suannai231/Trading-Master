@@ -8,6 +8,7 @@ import logging
 import math
 import numpy as np
 from playsound import playsound
+import pyttsx3
 
 def screen(df,lines):
     if len(df)<120:
@@ -47,6 +48,7 @@ def screen(df,lines):
         if df.iloc[-1].ticker == "TBIO":
             log("info", df.iloc[-1].ticker)
         if today:
+            speak(df.iloc[-1].ticker)
             return True
         else:
             return False
@@ -167,6 +169,21 @@ def log(type,string):
         except Exception as e:
             logging.info(log_time+":"+str(e))
         logging.critical(log_time+":"+string)
+
+def speak(ticker):
+    # initialize the text-to-speech engine
+    engine = pyttsx3.init()
+
+    # set the rate and volume of the voice
+    engine.setProperty('rate', 150)
+    engine.setProperty('volume', 0.7)
+
+    # ask the user for input
+    # word = input(ticker)
+
+    # speak the word
+    engine.say(ticker)
+    engine.runAndWait()
 
 if __name__ == '__main__':
 
