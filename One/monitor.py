@@ -14,7 +14,7 @@ def screen(df1,df2):
     close1 = df1.iloc[-1].close
     close2 = df2.iloc[-1].close
     rate = (close1-close2)/close2
-    if rate >= 0.01:
+    if rate >= 0.02:
         return True
     return False
 
@@ -64,10 +64,10 @@ def screen_data():
         screened_data_files_str = screened_data_files[-1] + '.txt'
         if screened_data_files_str == old_screened_data_files_str:
             log("warning",screened_data_files_str+" checked,sleep 60 seconds.")
-            speak(screened_data_files_str+" checked,sleep 60 seconds.")
-            time.sleep(60)
+            # speak(screened_data_files_str+" checked,sleep 60 seconds.")
+            time.sleep(10)
             continue
-        old_screened_data_files_str = screened_data_files_str
+        
         if screened_data_files_str in moving_data_files:
             # log('warning',"warning: " + processed_data_files_str + " existed, sleep 10 second...")
             time.sleep(10)
@@ -77,9 +77,9 @@ def screen_data():
         try:
             time.sleep(1)
             df1 = pd.read_feather(screened_data_path + screened_data_files[-1])
-            df2 = pd.read_feather(screened_data_path + screened_data_files[-2])
+            df2 = pd.read_feather(screened_data_path + screened_data_files[-5])
             log('info',screened_data_path + screened_data_files[-1] + " loaded.")
-            log('info',screened_data_path + screened_data_files[-2] + " loaded.")
+            log('info',screened_data_path + screened_data_files[-5] + " loaded.")
         except Exception as e:
             log('critical',str(e))
             continue
@@ -116,6 +116,7 @@ def screen_data():
         else: 
             log('info',"df empty")
             # time.sleep(10)
+        old_screened_data_files_str = screened_data_files_str
 
     log('info',"screen_data stop.")
 
