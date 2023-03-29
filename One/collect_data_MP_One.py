@@ -292,8 +292,8 @@ def collect_data(func,cores,thread_number):
                 # else:
                 #     thread_number = 20
                 
-                log('critical',"sleep 60 seconds")
-                time.sleep(60)
+                log('critical',"sleep 10 seconds")
+                time.sleep(10)
                 df = pd.DataFrame()
                 break
             if isinstance(stock_chunk_df,int):
@@ -305,8 +305,8 @@ def collect_data(func,cores,thread_number):
                 # else:
                 #     thread_number = 20
 
-                log('critical',"sleep 60 seconds")
-                time.sleep(60)
+                log('critical',"sleep 10 seconds")
+                time.sleep(10)
                 df = pd.DataFrame()
                 break
             if not stock_chunk_df.empty:
