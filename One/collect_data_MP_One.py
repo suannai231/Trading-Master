@@ -292,6 +292,7 @@ def collect_data(func,cores,thread_number):
                 else:
                     thread_number = 20
                 log('critical',"thread_number:"+str(thread_number))
+                df = pd.DataFrame()
                 break
             if isinstance(stock_chunk_df,int):
                 log('critical',"network connection error, terminating process pool...")
@@ -308,6 +309,8 @@ def collect_data(func,cores,thread_number):
                 df = pd.concat([df,stock_chunk_df])
             else:
                 log("error","collect_data" + str(func) + " stock_chunk_df empty.")
+                df = pd.DataFrame()
+                break
     log('info',"collect_data" + str(func) + " stop.")
     return df
 
