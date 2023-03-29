@@ -94,8 +94,8 @@ def screen_data():
     screened_data_files = os.listdir(screened_data_path)
     processed_data_files_str = processed_data_files[-1] + '.txt'
     if processed_data_files_str in screened_data_files:
-        # log('warning',"warning: " + processed_data_files_str + " existed, sleep 1 second...")
-        time.sleep(1)
+        # log('warning',"warning: " + processed_data_files_str + " existed, sleep 10 second...")
+        time.sleep(10)
         return
 
     log('info',"processing "+processed_data_files[-1])
