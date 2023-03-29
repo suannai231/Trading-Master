@@ -133,7 +133,7 @@ def process_data(history_df):
     if len(raw_data_files) == 0:
         # log('warning',"raw data not ready, sleep 1 second...")
         time.sleep(1)
-        return
+        return pd.DataFrame()
     # date_time = datetime.datetime.now() 
     # datetime_str = date_time.strftime("%m%d%Y-%H")
     # processed_data_file = datetime_str + '.feather'
@@ -142,7 +142,7 @@ def process_data(history_df):
     if raw_data_files[-1] in processed_data_files:
         # log('warning',"warning: " + raw_data_files[-1] + " existed, sleep 1 seconds...")
         time.sleep(1)
-        return
+        return pd.DataFrame()
     
     log('info',"processing "+raw_data_files[-1])
     try:
@@ -151,7 +151,7 @@ def process_data(history_df):
         log('info',raw_data_path + raw_data_files[-1]+" loaded.")
     except Exception as e:
         log('critical',str(e))
-        return
+        return pd.DataFrame()
 
     tickers = df.ticker.unique()
     cores = int(multiprocessing.cpu_count())
@@ -232,7 +232,7 @@ if __name__ == '__main__':
         os.makedirs(processed_data_path)
 
     history_df = pd.DataFrame()
-    while (history_df.empty):
+    while(history_df.empty):
         history_df = process_data(pd.DataFrame())
 
     now = datetime.datetime.now()
