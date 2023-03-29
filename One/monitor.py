@@ -81,7 +81,8 @@ def screen_data():
             log('info',screened_data_path + screened_data_files[-1] + " loaded.")
             log('info',screened_data_path + screened_data_files[-2] + " loaded.")
         except Exception as e:
-            log('critical',str(e))
+            log('critical',str(e)+" sleep 10 seconds.")
+            time.sleep(10)
             continue
         # df=df[df.date!=str(datetime.date.today())]
         tickers = df1.ticker.unique()
