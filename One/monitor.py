@@ -58,19 +58,19 @@ def screen_data():
         if len(screened_data_files) == 0:
             # log('warning',"screened data not ready, sleep 1 second...")
             time.sleep(1)
-            break
+            continue
 
         moving_data_files = os.listdir(moving_data_path)
         screened_data_files_str = screened_data_files[-1] + '.txt'
         if screened_data_files_str == old_screened_data_files_str:
             log("warning",screened_data_files_str+" checked,sleep 60 seconds.")
             time.sleep(60)
-            break
+            continue
         old_screened_data_files_str = screened_data_files_str
         if screened_data_files_str in moving_data_files:
             # log('warning',"warning: " + processed_data_files_str + " existed, sleep 10 second...")
             time.sleep(10)
-            break
+            continue
 
         log('info',"processing "+screened_data_files[-1])
         try:
@@ -81,7 +81,7 @@ def screen_data():
             log('info',screened_data_path + screened_data_files[-2] + " loaded.")
         except Exception as e:
             log('critical',str(e))
-            break
+            continue
         # df=df[df.date!=str(datetime.date.today())]
         tickers = df1.ticker.unique()
         cores = int(multiprocessing.cpu_count())
