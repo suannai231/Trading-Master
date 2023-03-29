@@ -52,63 +52,69 @@ def run(ticker_chunk_df1,ticker_chunk_df2):
 
 def screen_data():
     log('info',"screen_data start.")
+    old_screened_data_files_str = ''
+    while True:
+        screened_data_files = os.listdir(screened_data_path)
+        if len(screened_data_files) == 0:
+            # log('warning',"screened data not ready, sleep 1 second...")
+            time.sleep(1)
+            break
 
-    screened_data_files = os.listdir(screened_data_path)
-    if len(screened_data_files) == 0:
-        # log('warning',"screened data not ready, sleep 1 second...")
-        time.sleep(1)
-        return
+        moving_data_files = os.listdir(moving_data_path)
+        screened_data_files_str = screened_data_files[-1] + '.txt'
+        if screened_data_files_str == old_screened_data_files_str:
+            log("warning",screened_data_files_str+" checked,sleep 60 seconds.")
+            time.sleep(60)
+            break
+        old_screened_data_files_str = screened_data_files_str
+        if screened_data_files_str in moving_data_files:
+            # log('warning',"warning: " + processed_data_files_str + " existed, sleep 10 second...")
+            time.sleep(10)
+            break
 
-    moving_data_files = os.listdir(moving_data_path)
-    screened_data_files_str = screened_data_files[-1] + '.txt'
-    if screened_data_files_str in moving_data_files:
-        # log('warning',"warning: " + processed_data_files_str + " existed, sleep 10 second...")
-        time.sleep(10)
-        return
-
-    log('info',"processing "+screened_data_files[-1])
-    try:
-        time.sleep(1)
-        df1 = pd.read_feather(screened_data_path + screened_data_files[-1])
-        df2 = pd.read_feather(screened_data_path + screened_data_files[-2])
-        log('info',screened_data_path + screened_data_files[-1] + " loaded.")
-        log('info',screened_data_path + screened_data_files[-2] + " loaded.")
-    except Exception as e:
-        log('critical',str(e))
-        return
-    # df=df[df.date!=str(datetime.date.today())]
-    tickers = df1.ticker.unique()
-    cores = int(multiprocessing.cpu_count())
-    ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
-    pool=Pool(cores)
-
-    async_results = []
-    for ticker_chunk in ticker_chunk_list:
-        ticker_chunk_df1 = df1[df1['ticker'].isin(ticker_chunk)]
-        ticker_chunk_df2 = df2[df2['ticker'].isin(ticker_chunk)]
-        # sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
-        async_result = pool.apply_async(run, args=(ticker_chunk_df1,ticker_chunk_df2))
-        async_results.append(async_result)
-    pool.close()
-    log('info',"process pool start.")
-
-    df = pd.DataFrame()
-    for async_result in async_results:
-        result = async_result.get()
-        if not result.empty:
-            df = pd.concat([df,result])
-    
-    if(not df.empty):
-        df.reset_index(drop=False,inplace=True)
+        log('info',"processing "+screened_data_files[-1])
         try:
-            df.to_csv(moving_data_path + screened_data_files[-1] + '.csv')
-            df.ticker.to_csv(moving_data_path + screened_data_files[-1] + '.txt',header=False, index=False)
-            log('info',moving_data_path + screened_data_files[-1] +" is saved.")
+            time.sleep(1)
+            df1 = pd.read_feather(screened_data_path + screened_data_files[-1])
+            df2 = pd.read_feather(screened_data_path + screened_data_files[-2])
+            log('info',screened_data_path + screened_data_files[-1] + " loaded.")
+            log('info',screened_data_path + screened_data_files[-2] + " loaded.")
         except Exception as e:
-            log('critical',"df to_csv:"+str(e))
-    else: 
-        log('info',"df empty, sleep 10 seconds")
-        time.sleep(10)
+            log('critical',str(e))
+            break
+        # df=df[df.date!=str(datetime.date.today())]
+        tickers = df1.ticker.unique()
+        cores = int(multiprocessing.cpu_count())
+        ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/cores)))
+        pool=Pool(cores)
+
+        async_results = []
+        for ticker_chunk in ticker_chunk_list:
+            ticker_chunk_df1 = df1[df1['ticker'].isin(ticker_chunk)]
+            ticker_chunk_df2 = df2[df2['ticker'].isin(ticker_chunk)]
+            # sharesOutstanding_chunk_df = sharesOutstanding_df[sharesOutstanding_df['ticker'].isin(ticker_chunk)]
+            async_result = pool.apply_async(run, args=(ticker_chunk_df1,ticker_chunk_df2))
+            async_results.append(async_result)
+        pool.close()
+        log('info',"process pool start.")
+
+        df = pd.DataFrame()
+        for async_result in async_results:
+            result = async_result.get()
+            if not result.empty:
+                df = pd.concat([df,result])
+        
+        if(not df.empty):
+            df.reset_index(drop=False,inplace=True)
+            try:
+                df.to_csv(moving_data_path + screened_data_files[-1] + '.csv')
+                df.ticker.to_csv(moving_data_path + screened_data_files[-1] + '.txt',header=False, index=False)
+                log('info',moving_data_path + screened_data_files[-1] +" is saved.")
+            except Exception as e:
+                log('critical',"df to_csv:"+str(e))
+        else: 
+            log('info',"df empty")
+            # time.sleep(10)
 
     log('info',"screen_data stop.")
 
@@ -180,13 +186,13 @@ if __name__ == '__main__':
 
     screen_data()
 
-    now = datetime.datetime.now()
-    today8am = now.replace(hour=8,minute=0,second=0,microsecond=0)
-    today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
+    # now = datetime.datetime.now()
+    # today8am = now.replace(hour=8,minute=0,second=0,microsecond=0)
+    # today3pm = now.replace(hour=15,minute=0,second=0,microsecond=0)
 
-    while((now.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):
-        screen_data()
+    # while((now.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):
+    #     screen_data()
 
-    now = datetime.datetime.now()
-    stop_time = now.strftime("%m%d%Y-%H%M%S")
-    log('info',"screen_data process exit.")
+    # now = datetime.datetime.now()
+    # stop_time = now.strftime("%m%d%Y-%H%M%S")
+    # log('info',"screen_data process exit.")
