@@ -62,8 +62,8 @@ def screen_data():
     moving_data_files = os.listdir(moving_data_path)
     screened_data_files_str = screened_data_files[-1] + '.txt'
     if screened_data_files_str in moving_data_files:
-        # log('warning',"warning: " + processed_data_files_str + " existed, sleep 1 second...")
-        time.sleep(1)
+        # log('warning',"warning: " + processed_data_files_str + " existed, sleep 10 second...")
+        time.sleep(10)
         return
 
     log('info',"processing "+screened_data_files[-1])
