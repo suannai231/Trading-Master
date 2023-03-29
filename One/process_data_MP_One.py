@@ -150,7 +150,7 @@ def process_data(history_df):
         df = pd.read_feather(raw_data_path + raw_data_files[-1])
         log('info',raw_data_path + raw_data_files[-1]+" loaded.")
     except Exception as e:
-        log('critical',str(e))
+        log('critical',"read_feather:"+str(e))
         return pd.DataFrame()
 
     tickers = df.ticker.unique()
