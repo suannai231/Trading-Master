@@ -287,22 +287,26 @@ def collect_data(func,cores,thread_number):
                 log('critical',"timeout 2 minutes, terminating process pool...")
                 pool.terminate()
                 pool.join()
-                if(thread_number<40):
-                    thread_number += 1
-                else:
-                    thread_number = 20
-                log('critical',"thread_number:"+str(thread_number))
+                # if(thread_number<40):
+                #     thread_number += 1
+                # else:
+                #     thread_number = 20
+                
+                log('critical',"sleep 60 seconds")
+                time.sleep(60)
                 df = pd.DataFrame()
                 break
             if isinstance(stock_chunk_df,int):
                 log('critical',"network connection error, terminating process pool...")
                 pool.terminate()
                 pool.join()
-                if(thread_number>1):
-                    thread_number -= 1
-                else:
-                    thread_number = 20
-                log('critical',"thread_number:"+str(thread_number))
+                # if(thread_number>1):
+                #     thread_number -= 1
+                # else:
+                #     thread_number = 20
+
+                log('critical',"sleep 60 seconds")
+                time.sleep(60)
                 df = pd.DataFrame()
                 break
             if not stock_chunk_df.empty:
