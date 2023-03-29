@@ -117,6 +117,8 @@ def run(ticker_chunk_df,ticker_chunk_history_df):
 
         if not df.empty:
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,df],ignore_index=True)
+        else:
+            return df
     return return_ticker_chunk_df
 
 def chunks(lst, n):
@@ -171,6 +173,8 @@ def process_data(history_df):
         result = async_result.get()
         if not result.empty:
             df = pd.concat([df,async_result.get()])
+        else:
+            return pd.DataFrame()
     
     
     if(not df.empty):
@@ -227,7 +231,9 @@ if __name__ == '__main__':
     if not isPathExists:
         os.makedirs(processed_data_path)
 
-    history_df = process_data(pd.DataFrame())
+    history_df = pd.DataFrame()
+    while history_df.empty:
+        history_df = process_data(pd.DataFrame())
 
     now = datetime.datetime.now()
     today8am = now.replace(hour=8,minute=0,second=0,microsecond=0)
