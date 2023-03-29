@@ -79,7 +79,7 @@ def screen_data():
             df1 = pd.read_feather(screened_data_path + screened_data_files[-1])
             df2 = pd.read_feather(screened_data_path + screened_data_files[-2])
             log('info',screened_data_path + screened_data_files[-1] + " loaded.")
-            log('info',screened_data_path + screened_data_files[-5] + " loaded.")
+            log('info',screened_data_path + screened_data_files[-2] + " loaded.")
         except Exception as e:
             log('critical',str(e))
             continue
