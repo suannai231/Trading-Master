@@ -63,8 +63,8 @@ def screen_data():
         moving_data_files = os.listdir(moving_data_path)
         screened_data_files_str = screened_data_files[-1] + '.txt'
         if screened_data_files_str == old_screened_data_files_str:
-            log("warning",screened_data_files_str+" checked,sleep 60 seconds.")
-            # speak(screened_data_files_str+" checked,sleep 60 seconds.")
+            log("warning",screened_data_files_str+" checked,sleep 10 seconds.")
+            # speak(screened_data_files_str+" checked,sleep 10 seconds.")
             time.sleep(10)
             continue
         
