@@ -14,7 +14,7 @@ def screen(df1,df2):
     close1 = df1.iloc[-1].close
     close2 = df2.iloc[-1].close
     rate = (close1-close2)/close2
-    if rate > 0.05:
+    if rate >= 0.03:
         return True
     return False
 
@@ -39,10 +39,11 @@ def run(ticker_chunk_df1,ticker_chunk_df2):
             return pd.DataFrame()
         if(Volatile):
             i=0
-            while(i<5):
-                playsound('Bell.wav')
+            while(i<10):
+                play('Bell.wav')
+                speak(ticker)
                 i+=1
-            speak(ticker)
+            
             today_df = df1.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
             log("info",ticker)
