@@ -14,7 +14,7 @@ def screen(df1,df2):
     close1 = df1.iloc[-1].close
     close2 = df2.iloc[-1].close
     rate = (close1-close2)/close2
-    if rate >= 0.03:
+    if rate >= 0.01:
         return True
     return False
 
