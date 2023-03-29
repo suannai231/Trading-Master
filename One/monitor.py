@@ -64,6 +64,7 @@ def screen_data():
         screened_data_files_str = screened_data_files[-1] + '.txt'
         if screened_data_files_str == old_screened_data_files_str:
             log("warning",screened_data_files_str+" checked,sleep 60 seconds.")
+            speak(screened_data_files_str+" checked,sleep 60 seconds.")
             time.sleep(60)
             continue
         old_screened_data_files_str = screened_data_files_str
@@ -179,6 +180,7 @@ if __name__ == '__main__':
     screened_data_path="//jack-nas.home/Work/Python/ScreenedData/"
 
     log('info',"screen_data process start.")
+    speak("screen_data process start.")
 
     isPathExists = os.path.exists(screened_data_path)
     if not isPathExists:
