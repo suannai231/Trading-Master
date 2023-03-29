@@ -232,7 +232,7 @@ if __name__ == '__main__':
         os.makedirs(processed_data_path)
 
     history_df = pd.DataFrame()
-    while history_df.empty:
+    while (history_df.empty):
         history_df = process_data(pd.DataFrame())
 
     now = datetime.datetime.now()
