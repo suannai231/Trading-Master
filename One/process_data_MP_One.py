@@ -79,15 +79,15 @@ def cal_basics(df,ticker_history_df):
         if ticker_history_df.iloc[-1].date==df.iloc[-1].date:
             index = len(ticker_history_df)-1
 
-            ticker_history_df.loc[index,'open']==df.iloc[-1].open
-            ticker_history_df.loc[index,'high']==df.iloc[-1].high
-            ticker_history_df.loc[index,'low']==df.iloc[-1].low
-            ticker_history_df.loc[index,'close']==df.iloc[-1].close
-            ticker_history_df.loc[index,'adjclose']==df.iloc[-1].adjclose
-            ticker_history_df.loc[index,'volume']==df.iloc[-1].volume
-            ticker_history_df.loc[index,'change']==(df.iloc[-1].close - df.iloc[-2].close)/df.iloc[-2].close
-            ticker_history_df.loc[index,'EMA10']==df.tail(10).close.mean()
-            ticker_history_df.loc[index,'EMA20']==df.tail(20).close.mean()
+            ticker_history_df.loc[index,'open']=df.iloc[-1].open
+            ticker_history_df.loc[index,'high']=df.iloc[-1].high
+            ticker_history_df.loc[index,'low']=df.iloc[-1].low
+            ticker_history_df.loc[index,'close']=df.iloc[-1].close
+            ticker_history_df.loc[index,'adjclose']=df.iloc[-1].adjclose
+            ticker_history_df.loc[index,'volume']=df.iloc[-1].volume
+            ticker_history_df.loc[index,'change']=(df.iloc[-1].close - df.iloc[-2].close)/df.iloc[-2].close
+            ticker_history_df.loc[index,'EMA10']=df.tail(10).close.mean()
+            ticker_history_df.loc[index,'EMA20']=df.tail(20).close.mean()
 
             df_tail120 = df.tail(120)
             low = df_tail120.loc[df_tail120.volume==df_tail120.volume.max(),'low'].values[0]
@@ -140,7 +140,7 @@ def process_data(history_df):
 
     processed_data_files = os.listdir(processed_data_path)
     if raw_data_files[-1] in processed_data_files:
-        # log('warning',"warning: " + raw_data_files[-1] + " existed, sleep 10 seconds...")
+        log('warning',"warning: " + raw_data_files[-1] + " existed, sleep 10 seconds...")
         time.sleep(10)
         return pd.DataFrame()
     
@@ -174,7 +174,7 @@ def process_data(history_df):
         if not result.empty:
             df = pd.concat([df,async_result.get()])
         else:
-            log("error","sleep 60 seconds.")
+            log("error","result empty, sleep 60 seconds.")
             time.sleep(60)
             return pd.DataFrame()
     

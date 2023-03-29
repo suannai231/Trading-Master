@@ -151,7 +151,7 @@ def get_stock_realtime_xueqiu(ticker):
             return pd.DataFrame()
     # if ticker=="NEXA":
     #     log("info",ticker)
-    if ticker=="SOPH":
+    if ticker=="ANVS":
         log("info",ticker)
     return df
 
