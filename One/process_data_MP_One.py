@@ -174,7 +174,7 @@ def process_data(history_df):
         if not result.empty:
             df = pd.concat([df,async_result.get()])
         else:
-            log("error","result empty, sleep 60 seconds.")
+            log("error","result empty, sleep 10 seconds.")
             time.sleep(10)
             return pd.DataFrame()
     
