@@ -11,8 +11,6 @@ from playsound import playsound
 import pyttsx3
 
 def screen(df,lines):
-    if len(df)<120:
-        return False
     close = df.iloc[-1].close
     # close_Yesterday = df.iloc[-2].close
     volume_60d_avg = df.tail(60).volume.mean()
@@ -45,7 +43,7 @@ def screen(df,lines):
 
         flag = DIFF120L>0 and DIFF120L==HHV5_DIFF120L==HHV10_DIFF120L==HHV20_DIFF120L
         today = flag and turnover_flag and change and EMA_flag
-        if df.iloc[-1].ticker == "ANVS":
+        if df.iloc[-1].ticker == "BANL":
             log("info", df.iloc[-1].ticker)
         if today:
             try:
