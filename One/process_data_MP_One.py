@@ -68,7 +68,7 @@ def cal_basics(df,ticker_history_df):
 
             return ticker_history_df
         else:
-            log("error",df.iloc[-1].ticker+"date mismatch")
+            log("error",df.iloc[-1].ticker+" date mismatch")
             return pd.DataFrame()
 
 def run(ticker_chunk_df,ticker_chunk_history_df):
