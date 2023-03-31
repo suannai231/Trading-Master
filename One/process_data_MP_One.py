@@ -14,9 +14,10 @@ def cal_basics(df,ticker_history_df):
         df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
         ema10 = df['close'].ewm(span = 10, adjust = False).mean()
         ema20 = df['close'].ewm(span = 20, adjust = False).mean()
+        ema60 = df['close'].ewm(span = 60, adjust = False).mean()
         df['EMA10'] = ema10
         df['EMA20'] = ema20
- 
+        df['EMA60'] = ema60
         df_v120 = df['volume'].rolling(window=120).max()
         low = []
 
@@ -54,7 +55,7 @@ def cal_basics(df,ticker_history_df):
             ticker_history_df.loc[index,'change']=(df.iloc[-1].close - df.iloc[-2].close)/df.iloc[-2].close
             ticker_history_df.loc[index,'EMA10']=df.tail(10).close.mean()
             ticker_history_df.loc[index,'EMA20']=df.tail(20).close.mean()
-
+            ticker_history_df.loc[index,'EMA60']=df.tail(60).close.mean()
             df_tail120 = df.tail(120)
             low = df_tail120.loc[df_tail120.volume==df_tail120.volume.max(),'low'].values[0]
 
