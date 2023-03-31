@@ -331,7 +331,7 @@ def log(type,string):
         logging.warning(log_time+":"+string)
     elif type=='error':
         directory_path = os.getcwd()
-        file_path = directory_path+'\Sounds\PriceNotice.wav'
+        file_path = directory_path+'\Sounds\Program.wav'
         try:
             playsound(file_path)
         except Exception as e:
@@ -339,7 +339,7 @@ def log(type,string):
         logging.error(log_time+":"+string)
     elif type=='critical':
         directory_path = os.getcwd()
-        file_path = directory_path+'\Sounds\PriceNotice.wav'
+        file_path = directory_path+'\Sounds\Program.wav'
         try:
             playsound(file_path)
         except Exception as e:
