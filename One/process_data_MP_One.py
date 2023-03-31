@@ -12,42 +12,11 @@ from playsound import playsound
 def cal_basics(df,ticker_history_df):
     if ticker_history_df.empty:
         df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
-        # df['AMP'] = (df['high']-df['low'])/df['low']
-
-        # ema5 = df['close'].ewm(span = 5, adjust = False).mean()
         ema10 = df['close'].ewm(span = 10, adjust = False).mean()
-        # ema12 = df['close'].ewm(span = 12, adjust = False).mean()
         ema20 = df['close'].ewm(span = 20, adjust = False).mean()
-        # ema26 = df['close'].ewm(span = 26, adjust = False).mean()
-        # ema60 = df['close'].ewm(span = 60, adjust = False).mean()
-        # ema120 = df['close'].ewm(span = 120, adjust = False).mean()
-        # ema250 = df['close'].ewm(span = 250, adjust = False).mean()
-        # std20 = df['close'].rolling(window=20).std()
-        # df['EMA5'] = ema5
         df['EMA10'] = ema10
-        # df['EMA12'] = ema12
         df['EMA20'] = ema20
-        # df['EMA26'] = ema26
-        # df['EMA60'] = ema60
-        # df['EMA120'] = ema120
-        # df['EMA250'] = ema250
-        # df['DIF'] = ema12-ema26
-        # df['DEA'] = df['DIF'].ewm(span = 9, adjust = False).mean()
-        # df['STD20'] = std20
-        # df['STD20_EMA5'] = df['STD20'].ewm(span = 5, adjust = False).mean()
-
-        # LLV7 = df['low'].rolling(window=7).min()
-        # LLV14 = df['low'].rolling(window=14).min()
-        # LLV28 = df['low'].rolling(window=28).min()
-        # HHV7 = df['high'].rolling(window=7).max()
-        # HHV14 = df['high'].rolling(window=14).max()
-        # HHV28 = df['high'].rolling(window=28).max()
-        # WSTA=((df['close']-LLV7)/(HHV7-LLV7))*4
-        # WMTA=((df['close']-LLV14)/(HHV14-LLV14))*2
-        # WLTA=((df['close']-LLV28)/(HHV28-LLV28))
-        # UO=100*((WSTA+WMTA+WLTA)/(4+2+1))
-        # df['UO']=UO
-
+ 
         df_v120 = df['volume'].rolling(window=120).max()
         low = []
 
@@ -73,32 +42,6 @@ def cal_basics(df,ticker_history_df):
 
         return df
     else:
-        if len(df)<2:
-            log("warning",df.iloc[-1].ticker+" len < 2")
-            index = 0
-
-            ticker_history_df.loc[index,'open']=df.iloc[-1].open
-            ticker_history_df.loc[index,'high']=df.iloc[-1].high
-            ticker_history_df.loc[index,'low']=df.iloc[-1].low
-            ticker_history_df.loc[index,'close']=df.iloc[-1].close
-            ticker_history_df.loc[index,'adjclose']=df.iloc[-1].adjclose
-            ticker_history_df.loc[index,'volume']=df.iloc[-1].volume
-            ticker_history_df.loc[index,'change']=(df.iloc[-1].close - df.iloc[-2].close)/df.iloc[-2].close
-            ticker_history_df.loc[index,'EMA10']=df.tail(10).close.mean()
-            ticker_history_df.loc[index,'EMA20']=df.tail(20).close.mean()
-
-            df_tail120 = df.tail(120)
-            low = df_tail120.loc[df_tail120.volume==df_tail120.volume.max(),'low'].values[0]
-
-            ticker_history_df.loc[index,'DIFF120L'] = df.iloc[-1].close - low
-
-            ticker_history_df.loc[index,'HHV5_DIFF120L'] = ticker_history_df.tail(5).DIFF120L.max()
-            ticker_history_df.loc[index,'HHV10_DIFF120L'] = ticker_history_df.tail(10).DIFF120L.max()
-            ticker_history_df.loc[index,'HHV20_DIFF120L'] = ticker_history_df.tail(20).DIFF120L.max()
-            ticker_history_df.loc[index,'HHV60_DIFF120L'] = ticker_history_df.tail(60).DIFF120L.max()
-            ticker_history_df.loc[index,'HHV120_DIFF120L'] = ticker_history_df.tail(120).DIFF120L.max()
-
-            return ticker_history_df
         if ticker_history_df.iloc[-1].date==df.iloc[-1].date:
             index = len(ticker_history_df)-1
 
@@ -136,6 +79,9 @@ def run(ticker_chunk_df,ticker_chunk_history_df):
         ticker_history_df = pd.DataFrame()
         if not ticker_chunk_history_df.empty:
             ticker_history_df = ticker_chunk_history_df[ticker_chunk_history_df.ticker==ticker].reset_index(drop=True)
+        if len(df)<120:
+            log("warning",df.iloc[-1].ticker+" len < 120")
+            continue
         df = cal_basics(df,ticker_history_df)
 
         if not df.empty:
