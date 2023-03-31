@@ -74,8 +74,31 @@ def cal_basics(df,ticker_history_df):
         return df
     else:
         if len(df)<2:
-            log("warning",df.iloc[-1].ticker+"len < 2")
-            return pd.DataFrame()
+            log("warning",df.iloc[-1].ticker+" len < 2")
+            index = 0
+
+            ticker_history_df.loc[index,'open']=df.iloc[-1].open
+            ticker_history_df.loc[index,'high']=df.iloc[-1].high
+            ticker_history_df.loc[index,'low']=df.iloc[-1].low
+            ticker_history_df.loc[index,'close']=df.iloc[-1].close
+            ticker_history_df.loc[index,'adjclose']=df.iloc[-1].adjclose
+            ticker_history_df.loc[index,'volume']=df.iloc[-1].volume
+            ticker_history_df.loc[index,'change']=(df.iloc[-1].close - df.iloc[-2].close)/df.iloc[-2].close
+            ticker_history_df.loc[index,'EMA10']=df.tail(10).close.mean()
+            ticker_history_df.loc[index,'EMA20']=df.tail(20).close.mean()
+
+            df_tail120 = df.tail(120)
+            low = df_tail120.loc[df_tail120.volume==df_tail120.volume.max(),'low'].values[0]
+
+            ticker_history_df.loc[index,'DIFF120L'] = df.iloc[-1].close - low
+
+            ticker_history_df.loc[index,'HHV5_DIFF120L'] = ticker_history_df.tail(5).DIFF120L.max()
+            ticker_history_df.loc[index,'HHV10_DIFF120L'] = ticker_history_df.tail(10).DIFF120L.max()
+            ticker_history_df.loc[index,'HHV20_DIFF120L'] = ticker_history_df.tail(20).DIFF120L.max()
+            ticker_history_df.loc[index,'HHV60_DIFF120L'] = ticker_history_df.tail(60).DIFF120L.max()
+            ticker_history_df.loc[index,'HHV120_DIFF120L'] = ticker_history_df.tail(120).DIFF120L.max()
+
+            return ticker_history_df
         if ticker_history_df.iloc[-1].date==df.iloc[-1].date:
             index = len(ticker_history_df)-1
 
