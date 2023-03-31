@@ -12,28 +12,14 @@ import pyttsx3
 
 def screen(df,lines):
     close = df.iloc[-1].close
-    # close_Yesterday = df.iloc[-2].close
     volume_60d_avg = df.tail(60).volume.mean()
     turnover_10d_avg = volume_60d_avg*close
     turnover_flag = turnover_10d_avg > 100000
     EMA10 = df.iloc[-1].EMA10
-    # ema120_flag = (close >= EMA120)
     EMA20 = df.iloc[-1].EMA20
-    EMA_flag = EMA10>=EMA20
-    # ema60_flag = (close >= EMA60)
-    # EMA120_Yesterday = df.iloc[-2].EMA120
-    # ema120_Yesterday_flag = (close_Yesterday >= EMA120_Yesterday)
+    EMA60 = df.iloc[-1].EMA60
+    EMA_flag = EMA10>=EMA20>=EMA60
     change = df.iloc[-1].change >=0.07
-
-    # highest_volume_30days=df.tail(30).volume.max()
-    # low = df[df.volume==highest_volume_30days].low[0]
-    # bottom = True if low<=close<=low*1.5 else False
-
-    # volume = df.iloc[-1].volume
-    # volume_flag = True if volume>=volume_60d_avg*1.5 else False
-
-    # UO=df.iloc[-1].UO
-    # buy = True if UO<=30 else False
 
     if lines == "2060":
         DIFF120L = df.iloc[-1].DIFF120L
