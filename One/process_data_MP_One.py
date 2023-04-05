@@ -7,7 +7,7 @@ import time
 import logging
 import math
 import numpy as np
-from playsound import playsound
+# from playsound import playsound
 
 def cal_basics(df,ticker_history_df):
     if ticker_history_df.empty:
@@ -177,19 +177,19 @@ def log(type,string):
         logging.warning(log_time+":"+string)
     elif type=='error':
         directory_path = os.getcwd()
-        file_path = directory_path+'\Sounds\PriceNotice.wav'
-        try:
-            playsound(file_path)
-        except Exception as e:
-            logging.info(log_time+":"+str(e))
+        # file_path = directory_path+'\Sounds\PriceNotice.wav'
+        # try:
+        #     playsound(file_path)
+        # except Exception as e:
+        #     logging.info(log_time+":"+str(e))
         logging.error(log_time+":"+string)
     elif type=='critical':
         directory_path = os.getcwd()
-        file_path = directory_path+'\Sounds\PriceNotice.wav'
-        try:
-            playsound(file_path)
-        except Exception as e:
-            logging.info(log_time+":"+str(e))
+        # file_path = directory_path+'\Sounds\PriceNotice.wav'
+        # try:
+        #     playsound(file_path)
+        # except Exception as e:
+        #     logging.info(log_time+":"+str(e))
         logging.critical(log_time+":"+string)
 
 if __name__ == '__main__':
