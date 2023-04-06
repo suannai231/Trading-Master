@@ -144,8 +144,8 @@ def process_data(history_df):
         if not result.empty:
             df = pd.concat([df,async_result.get()])
         else:
-            log("error","result empty, sleep 10 seconds.")
-            time.sleep(10)
+            log("error","result empty")
+            # time.sleep(10)
             return pd.DataFrame()
     
     
@@ -176,7 +176,7 @@ def log(type,string):
     elif type=='warning':
         logging.warning(log_time+":"+string)
     elif type=='error':
-        directory_path = os.getcwd()
+        # directory_path = os.getcwd()
         # file_path = directory_path+'\Sounds\PriceNotice.wav'
         # try:
         #     playsound(file_path)
@@ -184,7 +184,7 @@ def log(type,string):
         #     logging.info(log_time+":"+str(e))
         logging.error(log_time+":"+string)
     elif type=='critical':
-        directory_path = os.getcwd()
+        # directory_path = os.getcwd()
         # file_path = directory_path+'\Sounds\PriceNotice.wav'
         # try:
         #     playsound(file_path)
@@ -215,7 +215,10 @@ if __name__ == '__main__':
     #     process_data(history_df)
 
     while((now.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)): 
-        process_data(history_df)
+        df = process_data(history_df)
+        if df.empty:
+            while(history_df.empty):
+                history_df = process_data(pd.DataFrame())
     
     stop_time = datetime.datetime.now().strftime("%m%d%Y-%H%M%S")
     log('info','process_data process exit.')
