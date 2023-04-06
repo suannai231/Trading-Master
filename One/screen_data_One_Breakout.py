@@ -17,8 +17,8 @@ def screen(df,lines):
     turnover_flag = turnover_10d_avg > 100000
     EMA10 = df.iloc[-1].EMA10
     EMA20 = df.iloc[-1].EMA20
-    EMA60 = df.iloc[-1].EMA60
-    EMA_flag = EMA10>=EMA20>=EMA60
+    # EMA60 = df.iloc[-1].EMA60
+    EMA_flag = EMA10>=EMA20
     change = df.iloc[-1].change >=0.07
 
     if lines == "2060":
@@ -29,13 +29,13 @@ def screen(df,lines):
 
         flag = DIFF120L>0 and DIFF120L==HHV5_DIFF120L==HHV10_DIFF120L==HHV20_DIFF120L
         today = flag and turnover_flag and change and EMA_flag
-        if df.iloc[-1].ticker == "BANL":
+        if df.iloc[-1].ticker == "ELOX":
             log("info", df.iloc[-1].ticker)
         if today:
-            try:
-                speak(df.iloc[-1].ticker)
-            except Exception as e:
-                log("error","speak error:"+str(e))
+            # try:
+            #     speak(df.iloc[-1].ticker)
+            # except Exception as e:
+            #     log("error","speak error:"+str(e))
             return True
         else:
             return False
