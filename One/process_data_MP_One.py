@@ -53,9 +53,18 @@ def cal_basics(df,ticker_history_df):
             ticker_history_df.loc[index,'adjclose']=df.iloc[-1].adjclose
             ticker_history_df.loc[index,'volume']=df.iloc[-1].volume
             ticker_history_df.loc[index,'change']=(df.iloc[-1].close - df.iloc[-2].close)/df.iloc[-2].close
-            ticker_history_df.loc[index,'EMA10']=df.tail(10).close.mean()
-            ticker_history_df.loc[index,'EMA20']=df.tail(20).close.mean()
-            ticker_history_df.loc[index,'EMA60']=df.tail(60).close.mean()
+            k10=2/(10+1)
+            ema10_y = df.iloc[-2].EMA10
+            ema10 = df.iloc[-1].close*k10+ema10_y*(1-k10)
+            k20=2/(20+1)
+            ema20_y = df.iloc[-2].EMA20
+            ema20 = df.iloc[-1].close*k20+ema20_y*(1-k20)
+            k60=2/(60+1)
+            ema60_y = df.iloc[-2].EMA60
+            ema60 = df.iloc[-1].close*k60+ema60_y*(1-k60)
+            ticker_history_df.loc[index,'EMA10']=ema10
+            ticker_history_df.loc[index,'EMA20']=ema20
+            ticker_history_df.loc[index,'EMA60']=ema60
             df_tail120 = df.tail(120)
             low = df_tail120.loc[df_tail120.volume==df_tail120.volume.max(),'low'].values[0]
 
