@@ -226,6 +226,7 @@ if __name__ == '__main__':
     while((now.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)): 
         df = process_data(history_df)
         if df.empty:
+            history_df = pd.DataFrame()
             while(history_df.empty):
                 history_df = process_data(pd.DataFrame())
     
