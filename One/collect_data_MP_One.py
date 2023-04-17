@@ -75,6 +75,8 @@ def realtime_required(df):
     return not np_dt in df.date.values
 
 def get_stock_realtime_xueqiu(ticker):
+    if ticker=="EH":
+        log("debug",ticker)
     df = pd.DataFrame()
     try:
         close = float(si.get_live_price(ticker))
@@ -231,6 +233,8 @@ def get_stock_realtime(ticker):
     return df
 
 def get_stock_history(ticker):
+    if ticker=="EH":
+        log("debug",ticker)
     df = pd.DataFrame()
     try:
         df = si.get_data(ticker,start.strftime("%m/%d/%Y"),end.strftime("%m/%d/%Y"),index_as_date=False)
@@ -382,7 +386,7 @@ if __name__ == '__main__':
         log('critical',str(e))
         sys.exit()
 
-    tickers = quote_data_df[(quote_data_df.marketCap<=500000000) & (((quote_data_df.regularMarketPreviousClose<=10) & (quote_data_df.regularMarketPreviousClose>=0.1)) | ((quote_data_df.regularMarketPreviousClose>=11) & (quote_data_df.regularMarketPreviousClose<=20)))].ticker.values
+    tickers = quote_data_df[(quote_data_df.marketCap<=1000000000) & (((quote_data_df.regularMarketPreviousClose<=10) & (quote_data_df.regularMarketPreviousClose>=0.1)) | ((quote_data_df.regularMarketPreviousClose>=11) & (quote_data_df.regularMarketPreviousClose<=20)))].ticker.values
 
     cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))

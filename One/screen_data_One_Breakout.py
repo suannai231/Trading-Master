@@ -29,7 +29,7 @@ def screen(df,lines):
 
         flag = DIFF120L>0 and DIFF120L==HHV5_DIFF120L==HHV10_DIFF120L==HHV20_DIFF120L
         today = flag and turnover_flag and change and EMA_flag
-        if df.iloc[-1].ticker == "ELOX":
+        if df.iloc[-1].ticker == "EH":
             log("info", df.iloc[-1].ticker)
         if today:
             # try:
