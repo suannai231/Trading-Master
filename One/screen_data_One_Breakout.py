@@ -24,10 +24,8 @@ def screen(df,lines):
     if lines == "2060":
         DIFF120L = df.iloc[-1].DIFF120L
         HHV5_DIFF120L = df.iloc[-1].HHV5_DIFF120L
-        HHV10_DIFF120L = df.iloc[-1].HHV10_DIFF120L
-        HHV20_DIFF120L = df.iloc[-1].HHV20_DIFF120L
 
-        flag = DIFF120L>0 and DIFF120L==HHV5_DIFF120L==HHV10_DIFF120L==HHV20_DIFF120L
+        flag = DIFF120L>0 and DIFF120L==HHV5_DIFF120L
         today = flag and turnover_flag and change and EMA_flag
         if df.iloc[-1].ticker == "EH":
             log("info", df.iloc[-1].ticker)
