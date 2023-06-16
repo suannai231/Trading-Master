@@ -7,7 +7,6 @@ import time
 import logging
 import math
 import numpy as np
-# from playsound import playsound
 
 def cal_basics(df,ticker_history_df):
     if ticker_history_df.empty:
@@ -15,16 +14,17 @@ def cal_basics(df,ticker_history_df):
         ema10 = df['close'].ewm(span = 10, adjust = False).mean()
         ema20 = df['close'].ewm(span = 20, adjust = False).mean()
         ema60 = df['close'].ewm(span = 60, adjust = False).mean()
+        ema120 = df['close'].ewm(span = 120, adjust = False).mean()
         df['EMA10'] = ema10
         df['EMA20'] = ema20
         df['EMA60'] = ema60
+        df['EMA120'] = ema120
         df_v120 = df['volume'].rolling(window=120).max()
         low = []
 
         for vol in df_v120:
             if not np.isnan(vol):
                 low.append(df.loc[df.volume==vol,'low'].values[0])
-
             else:
                 low.append(np.nan)
 
@@ -62,9 +62,13 @@ def cal_basics(df,ticker_history_df):
             k60=2/(60+1)
             ema60_y = ticker_history_df.iloc[-2].EMA60
             ema60 = df.iloc[-1].close*k60+ema60_y*(1-k60)
+            k120=2/(120+1)
+            ema120_y = ticker_history_df.iloc[-2].EMA120
+            ema120 = df.iloc[-1].close*k120+ema120_y*(1-k120)
             ticker_history_df.loc[index,'EMA10']=ema10
             ticker_history_df.loc[index,'EMA20']=ema20
             ticker_history_df.loc[index,'EMA60']=ema60
+            ticker_history_df.loc[index,'EMA120']=ema120
             df_tail120 = df.tail(120)
             low = df_tail120.loc[df_tail120.volume==df_tail120.volume.max(),'low'].values[0]
 
