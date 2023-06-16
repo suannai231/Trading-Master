@@ -15,40 +15,21 @@ import time
 import sys
 import requests
 from bs4 import BeautifulSoup
-# from playsound import playsound
-# from futu import *
 
 days=365*2
 date_time = datetime.now()
+
+marketCapMax = 5000000000
+marketCapMin = 1000000
+
+regularMarketPreviousCloseMax = 20
+regularMarketPreviousCloseMin = 0.1
 
 today8am = date_time.replace(hour=8,minute=0,second=0,microsecond=0)
 today3pm = date_time.replace(hour=15,minute=0,second=0,microsecond=0)
 
 end = datetime.today()
 start = end - timedelta(days)
-# if((date_time.weekday() <= 4) & (today8am <= datetime.datetime.now() <= today3pm)):
-#     end = datetime.date.today()
-# else:
-#     end = datetime.date.today()+ datetime.timedelta(1)
-
-# def get_quote_data(ticker):
-#     df = pd.DataFrame()
-#     try:
-#         dict = si.get_quote_data(ticker)
-#         # dict['ticker'] = ticker
-#         if 'sharesOutstanding' in dict.keys():
-#             sharesOutstanding = dict['sharesOutstanding']
-#         else:
-#             return pd.DataFrame()
-#     except Exception as e:
-#         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
-#             return -1
-#         else:
-#             return pd.DataFrame()
-#     d={'ticker':[ticker],'sharesOutstanding':[sharesOutstanding]}
-#     df = pd.DataFrame(d)
-#     df = df.set_index('ticker')
-#     return df
 
 # Define a dictionary to map units to multipliers
 multipliers = {
@@ -126,33 +107,16 @@ def get_stock_realtime_xueqiu(ticker):
         else:
             # log("error",ticker+" marketCap is None")
             low = -1
-        # quote_table = si.get_quote_table(ticker)
-        # open = float(quote_table['Open'])
-        # low = float(quote_table["Day's Range"].split(" - ")[0])
-        # high = float(quote_table["Day's Range"].split(" - ")[1])
-        # volume = int(quote_table['Volume'])
-        # open = -1
-        # low = -1
-        # high = -1
-        # volume = np.nan
+
         d = {'date':pd.to_datetime(end.strftime('%Y-%m-%d')), 'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
-        # df=pd.DataFrame(d,index=[str(end)])
         df=pd.DataFrame(d,index=[str(end)])
-        # df.date=pd.to_datetime(df.date)
-        # df.index.name = 'date'
-        # if (not df.empty) and df.index[-1]!=str(datetime.date.today()):
-        #     log("error",ticker+" date error")
-        #     return pd.DataFrame()
     except Exception as e:
         if ticker=="ADIL":
             log("info",ticker)
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
         else:
-            # log("error","get_stock_realtime " + ticker + " " + str(e))
             return pd.DataFrame()
-    # if ticker=="NEXA":
-    #     log("info",ticker)
     if ticker=="ANVS":
         log("info",ticker)
     return df
@@ -201,33 +165,15 @@ def get_stock_realtime(ticker):
             # log("error",ticker+" marketCap is None")
             low = -1
             high = -1
-        # quote_table = si.get_quote_table(ticker)
-        # open = float(quote_table['Open'])
-        # low = float(quote_table["Day's Range"].split(" - ")[0])
-        # high = float(quote_table["Day's Range"].split(" - ")[1])
-        # volume = int(quote_table['Volume'])
-        # open = -1
-        # low = -1
-        # high = -1
-        # volume = np.nan
         d = {'date':pd.to_datetime(end.strftime('%Y-%m-%d')), 'open':open,'high':high,'low':low,'close':close,'adjclose':close,'volume':volume,'ticker':ticker}
-        # df=pd.DataFrame(d,index=[str(end)])
         df=pd.DataFrame(d,index=[str(end)])
-        # df.date=pd.to_datetime(df.date)
-        # df.index.name = 'date'
-        # if (not df.empty) and df.index[-1]!=str(datetime.date.today()):
-        #     log("error",ticker+" date error")
-        #     return pd.DataFrame()
     except Exception as e:
         if ticker=="ADIL":
             log("info",ticker)
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
         else:
-            # log("error","get_stock_realtime " + ticker + " " + str(e))
             return pd.DataFrame()
-    # if ticker=="NEXA":
-    #     log("info",ticker)
     if ticker=="SOPH":
         log("info",ticker)
     return df
@@ -245,12 +191,7 @@ def get_stock_history(ticker):
         if str(e).startswith('HTTPSConnectionPool') | str(e).startswith("('Connection aborted.'"):
             return -1
         else:
-            # log("error","get_stock_history " + ticker + " " + str(e))
             return pd.DataFrame()
-    # df.index.name = 'date'
-    # if (not df.empty) and df.index[-1]!=datetime.date.today():
-    #     log("error",ticker+" date error")
-    #     return pd.DataFrame()
     return df
 
 def get_stock_data_mt(func,ticker_chunk,thread_number):
@@ -291,11 +232,6 @@ def collect_data(func,cores,thread_number):
                 log('critical',"timeout 2 minutes, terminating process pool...")
                 pool.terminate()
                 pool.join()
-                # if(thread_number<40):
-                #     thread_number += 1
-                # else:
-                #     thread_number = 20
-                
                 log('critical',"sleep 10 seconds")
                 time.sleep(10)
                 df = pd.DataFrame()
@@ -304,11 +240,6 @@ def collect_data(func,cores,thread_number):
                 log('critical',"network connection error, terminating process pool...")
                 pool.terminate()
                 pool.join()
-                # if(thread_number>1):
-                #     thread_number -= 1
-                # else:
-                #     thread_number = 20
-
                 log('critical',"sleep 10 seconds")
                 time.sleep(10)
                 df = pd.DataFrame()
@@ -334,20 +265,8 @@ def log(type,string):
     elif type=='warning':
         logging.warning(log_time+":"+string)
     elif type=='error':
-        directory_path = os.getcwd()
-        # file_path = directory_path+'\Sounds\Program.wav'
-        # try:
-        #     playsound(file_path)
-        # except Exception as e:
-        #     logging.info(log_time+":"+str(e))
         logging.error(log_time+":"+string)
     elif type=='critical':
-        directory_path = os.getcwd()
-        # file_path = directory_path+'\Sounds\Program.wav'
-        # try:
-        #     playsound(file_path)
-        # except Exception as e:
-        #     logging.info(log_time+":"+str(e))
         logging.critical(log_time+":"+string)
 
 if __name__ == '__main__':
@@ -363,20 +282,10 @@ if __name__ == '__main__':
     other = []
     tickers = []
 
-    # while((len(nasdaq)==0) or (len(other)==0)):
-    #     try:
-    #         nasdaq = si.tickers_nasdaq()
-    #         other = si.tickers_other()
-    #     except Exception as e:
-    #         log('critical','get tickers exception:'+str(e))
-    #         continue
-    #     tickers = nasdaq + other
     quote_data_files = os.listdir(quote_data_path)
     while len(quote_data_files) == 0:
-        # log('warning',"quote data not ready, sleep 10 seconds...")
         time.sleep(10)
         quote_data_files = os.listdir(quote_data_path)
-
     log('info',"processing "+quote_data_files[-1])
     try:
         time.sleep(1)
@@ -386,22 +295,10 @@ if __name__ == '__main__':
         log('critical',str(e))
         sys.exit()
 
-    tickers = quote_data_df[(quote_data_df.marketCap<=1000000000) & (quote_data_df.marketCap>=2000000) & (quote_data_df.regularMarketPreviousClose<=20) & (quote_data_df.regularMarketPreviousClose>=0.1)].ticker.values
+    tickers = quote_data_df[(quote_data_df.marketCap<=marketCapMax) & (quote_data_df.marketCap>=marketCapMin) & (quote_data_df.regularMarketPreviousClose<=regularMarketPreviousCloseMax) & (quote_data_df.regularMarketPreviousClose>=regularMarketPreviousCloseMin)].ticker.values
 
     cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
-
-    # sharesOutstanding_df=collect_data(get_quote_data,cores)
-    # log('info','sharesOutstanding_df is ready.')
-    # if not sharesOutstanding_df.empty: 
-    #     sharesOutstanding_df.reset_index(inplace=True)
-    #     stop_time = datetime.datetime.now().strftime("%m%d%Y")
-    #     try:
-    #         sharesOutstanding_path = 'C:/Python/sharesOutstanding/'
-    #         sharesOutstanding_df.to_feather(sharesOutstanding_path + stop_time + "_sharesOutstanding.feather")
-    #         log('info','sharesOutstanding_df to_feather saved.')
-    #     except Exception as e:
-    #         log('critical',"to_feather:"+str(e))
 
     stock_history_concat_df=collect_data(get_stock_history,cores,10).dropna()
     flag = realtime_required(stock_history_concat_df)
