@@ -8,17 +8,16 @@ import logging
 import math
 import numpy as np
 # from playsound import playsound
-import pyttsx3
 
 def screen(df,lines):
     close = df.iloc[-1].close
     volume_60d_avg = df.tail(60).volume.mean()
     turnover_10d_avg = volume_60d_avg*close
     turnover_flag = turnover_10d_avg > 100000
-    EMA10 = df.iloc[-1].EMA10
     EMA20 = df.iloc[-1].EMA20
-    # EMA60 = df.iloc[-1].EMA60
-    EMA_flag = EMA10>=EMA20
+    EMA60 = df.iloc[-1].EMA60
+    EMA120 = df.iloc[-1].EMA120
+    EMA_flag = EMA20>=EMA60>=EMA120
     change = df.iloc[-1].change >=0.07
 
     if lines == "2060":
@@ -30,10 +29,6 @@ def screen(df,lines):
         if df.iloc[-1].ticker == "EH":
             log("info", df.iloc[-1].ticker)
         if today:
-            # try:
-            #     speak(df.iloc[-1].ticker)
-            # except Exception as e:
-            #     log("error","speak error:"+str(e))
             return True
         else:
             return False
@@ -154,21 +149,6 @@ def log(type,string):
         # except Exception as e:
         #     logging.info(log_time+":"+str(e))
         logging.critical(log_time+":"+string)
-
-def speak(ticker):
-    # initialize the text-to-speech engine
-    engine = pyttsx3.init()
-
-    # set the rate and volume of the voice
-    engine.setProperty('rate', 150)
-    engine.setProperty('volume', 1)
-
-    # ask the user for input
-    # word = input(ticker)
-
-    # speak the word
-    engine.say(ticker)
-    engine.runAndWait()
 
 if __name__ == '__main__':
 
