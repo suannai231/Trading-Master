@@ -215,6 +215,14 @@ if __name__ == '__main__':
     isPathExists = os.path.exists(processed_data_path)
     if not isPathExists:
         os.makedirs(processed_data_path)
+    else:
+        log('info','path exists.')
+        # delete existing files but keep the last 1 file
+        files = os.listdir(processed_data_path)
+        files.sort()
+        for file in files[:-1]:
+            os.remove(processed_data_path+file)
+            log('info',file+" deleted.")
 
     history_df = pd.DataFrame()
     while(history_df.empty):

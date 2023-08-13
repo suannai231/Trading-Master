@@ -162,6 +162,26 @@ if __name__ == '__main__':
     isPathExists = os.path.exists(screened_data_path)
     if not isPathExists:
         os.makedirs(screened_data_path)
+    else:
+        log('info','path exists.')
+        # delete existing files but keep the last 1 file
+        files = os.listdir(screened_data_path)
+        files.sort()
+        for file in files[:-1]:
+            os.remove(screened_data_path+file)
+            log('info',file+" deleted.")
+
+    isPathExists = os.path.exists(screened_text_path)
+    if not isPathExists:
+        os.makedirs(screened_text_path)
+    else:
+        log('info','path exists.')
+        # delete existing files but keep the last 1 file
+        files = os.listdir(screened_text_path)
+        files.sort()
+        for file in files[:-1]:
+            os.remove(screened_text_path+file)
+            log('info',file+" deleted.")
 
     screen_data()
 

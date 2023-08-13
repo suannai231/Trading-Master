@@ -174,6 +174,14 @@ if __name__ == '__main__':
     isPathExists = os.path.exists(path)
     if not isPathExists:
         os.makedirs(path)
+    else:
+        log('info','path exists.')
+        # delete existing files but keep the last 1 file
+        files = os.listdir(path)
+        files.sort()
+        for file in files[:-1]:
+            os.remove(path+file)
+            log('info',file+" deleted.")
 
     log('info','collect process started.')
 
