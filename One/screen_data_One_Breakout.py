@@ -183,6 +183,10 @@ if __name__ == '__main__':
             os.remove(screened_text_path+file)
             log('info',file+" deleted.")
 
+    isPathExists = os.path.exists(screened_text_path)
+    if not isPathExists:
+        os.makedirs(screened_text_path)
+
     screen_data()
 
     now = datetime.datetime.now()
