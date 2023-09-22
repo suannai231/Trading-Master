@@ -14,11 +14,12 @@ def screen(df,lines):
     volume_60d_avg = df.tail(60).volume.mean()
     turnover_10d_avg = volume_60d_avg*close
     turnover_flag = turnover_10d_avg > 100000
+    EMA5 = df.iloc[-1].EMA5
+    EMA10 = df.iloc[-1].EMA10
     EMA20 = df.iloc[-1].EMA20
     EMA60 = df.iloc[-1].EMA60
-    EMA120 = df.iloc[-1].EMA120
-    EMA_flag = EMA20>=EMA60>=EMA120
-    change = df.iloc[-1].change >=0.07
+    EMA_flag = EMA5>EMA10>EMA20>EMA60
+    change = df.iloc[-1].change >=0.05
 
     if lines == "2060":
         DIFF120L = df.iloc[-1].DIFF120L
