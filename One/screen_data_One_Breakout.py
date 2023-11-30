@@ -11,13 +11,13 @@ import numpy as np
 
 def screen(df,lines):
     close = df.iloc[-1].close
-    volume_60d_avg = df.tail(60).volume.mean()
-    turnover_10d_avg = volume_60d_avg*close
-    turnover_flag = turnover_10d_avg > 100000
+    volume_10d_avg = df.tail(10).volume.mean()
+    turnover_10d_avg = volume_10d_avg*close
+    turnover_flag = turnover_10d_avg > 1000000
     EMA10 = df.iloc[-1].EMA10
     EMA20 = df.iloc[-1].EMA20
     EMA60 = df.iloc[-1].EMA60
-    EMA_flag = EMA10>EMA20>EMA60
+    # EMA_flag = EMA10>EMA20>EMA60
     change = df.iloc[-1].change >=0.05
 
     if lines == "2060":
@@ -25,8 +25,8 @@ def screen(df,lines):
         HHV5_DIFF120L = df.iloc[-1].HHV5_DIFF120L
 
         flag = DIFF120L>0 and DIFF120L==HHV5_DIFF120L
-        today = flag and turnover_flag and change and EMA_flag
-        if df.iloc[-1].ticker == "EH":
+        today = flag and turnover_flag and change
+        if df.iloc[-1].ticker == "CDAQ":
             log("info", df.iloc[-1].ticker)
         if today:
             return True
@@ -107,9 +107,10 @@ def screen_data():
         df.reset_index(drop=False,inplace=True)
         try:
             df.to_feather(screened_data_path + processed_data_files[-1])
-            df.to_csv(screened_text_path + processed_data_files[-1] + '.csv')
-            df.ticker.to_csv(screened_text_path + processed_data_files[-1] + '.txt',header=False, index=False)
+            # df.to_csv(screened_text_path + processed_data_files[-1] + '.csv')
+            df.ticker.to_csv(screened_data_path + processed_data_files[-1] + '.txt',header=False, index=False)
             log('info',screened_data_path + processed_data_files[-1] +" is saved.")
+
         except Exception as e:
             log('critical',"df to_csv:"+str(e))
     else: 

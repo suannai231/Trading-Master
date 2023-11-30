@@ -19,11 +19,11 @@ from bs4 import BeautifulSoup
 days=365*2
 date_time = datetime.now()
 
-marketCapMax = 5000000000
-marketCapMin = 1000000
+# marketCapMax = 5000000000
+marketCapMin = 10000000
 
-regularMarketPreviousCloseMax = 20
-regularMarketPreviousCloseMin = 0.1
+# regularMarketPreviousCloseMax = 20
+regularMarketPreviousCloseMin = 4
 
 today8am = date_time.replace(hour=8,minute=0,second=0,microsecond=0)
 today3pm = date_time.replace(hour=15,minute=0,second=0,microsecond=0)
@@ -56,8 +56,8 @@ def realtime_required(df):
     return not np_dt in df.date.values
 
 def get_stock_realtime_xueqiu(ticker):
-    if ticker=="EH":
-        log("debug",ticker)
+    # if ticker=="EH":
+    #     log("debug",ticker)
     df = pd.DataFrame()
     try:
         close = float(si.get_live_price(ticker))
@@ -303,7 +303,7 @@ if __name__ == '__main__':
         log('critical',str(e))
         sys.exit()
 
-    tickers = quote_data_df[(quote_data_df.marketCap<=marketCapMax) & (quote_data_df.marketCap>=marketCapMin) & (quote_data_df.regularMarketPreviousClose<=regularMarketPreviousCloseMax) & (quote_data_df.regularMarketPreviousClose>=regularMarketPreviousCloseMin)].ticker.values
+    tickers = quote_data_df[(quote_data_df.marketCap>=marketCapMin) & (quote_data_df.regularMarketPreviousClose>=regularMarketPreviousCloseMin)].ticker.values
 
     cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))

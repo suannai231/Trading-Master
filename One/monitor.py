@@ -7,8 +7,8 @@ import time
 import logging
 import math
 import numpy as np
-from playsound import playsound
-import pyttsx3
+# from playsound import playsound
+# import pyttsx3
 
 def screen(df1,df2):
     close1 = df1.iloc[-1].close
@@ -38,11 +38,11 @@ def run(ticker_chunk_df1,ticker_chunk_df2):
             log('critical',str(e))
             return pd.DataFrame()
         if(Volatile):
-            i=0
-            while(i<10):
-                play('Bell.wav')
-                speak(ticker)
-                i+=1
+            # i=0
+            # while(i<10):
+            #     # play('Bell.wav')
+            #     # speak(ticker)
+            #     i+=1
             
             today_df = df1.iloc[[-1]]
             return_ticker_chunk_df = pd.concat([return_ticker_chunk_df,today_df])
@@ -126,13 +126,13 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def play(sound):
-    directory_path = os.getcwd()
-    file_path = directory_path+'\\Sounds\\' + sound
-    try:
-        playsound(file_path)
-    except Exception as e:
-        log("critical",str(e))
+# def play(sound):
+#     directory_path = os.getcwd()
+#     file_path = directory_path+'\\Sounds\\' + sound
+#     try:
+#         playsound(file_path)
+#     except Exception as e:
+#         log("critical",str(e))
 
 def log(type,string):
     logpath = '//jack-nas.home/Work/Python/'
@@ -148,41 +148,41 @@ def log(type,string):
     elif type=='error':
         directory_path = os.getcwd()
         file_path = directory_path+'\Sounds\PriceNotice.wav'
-        try:
-            playsound(file_path)
-        except Exception as e:
-            logging.info(log_time+":"+str(e))
+        # try:
+        #     playsound(file_path)
+        # except Exception as e:
+        #     logging.info(log_time+":"+str(e))
         logging.error(log_time+":"+string)
     elif type=='critical':
         directory_path = os.getcwd()
         file_path = directory_path+'\Sounds\PriceNotice.wav'
-        try:
-            playsound(file_path)
-        except Exception as e:
-            logging.info(log_time+":"+str(e))
+        # try:
+        #     playsound(file_path)
+        # except Exception as e:
+        #     logging.info(log_time+":"+str(e))
         logging.critical(log_time+":"+string)
 
-def speak(ticker):
-    # initialize the text-to-speech engine
-    engine = pyttsx3.init()
+# def speak(ticker):
+#     # initialize the text-to-speech engine
+#     engine = pyttsx3.init()
 
-    # set the rate and volume of the voice
-    engine.setProperty('rate', 150)
-    engine.setProperty('volume', 1)
+#     # set the rate and volume of the voice
+#     engine.setProperty('rate', 150)
+#     engine.setProperty('volume', 1)
 
-    # ask the user for input
-    # word = input(ticker)
+#     # ask the user for input
+#     # word = input(ticker)
 
-    # speak the word
-    engine.say(ticker)
-    engine.runAndWait()
+#     # speak the word
+#     engine.say(ticker)
+#     engine.runAndWait()
 
 if __name__ == '__main__':
     moving_data_path = "//jack-nas.home/Work/Python/moving/"
     screened_data_path="//jack-nas.home/Work/Python/ScreenedData/"
 
     log('info',"screen_data process start.")
-    speak("screen_data process start.")
+    # speak("screen_data process start.")
 
     isPathExists = os.path.exists(screened_data_path)
     if not isPathExists:
