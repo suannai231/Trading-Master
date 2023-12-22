@@ -22,8 +22,8 @@ def screen(df,lines):
 
         flag = DIFF>0 and DIFF==HHV5_DIFF
         today = flag and turnover_flag and change
-        # if df.iloc[-1].ticker == "CDAQ":
-        #     log("info", df.iloc[-1].ticker)
+        if df.iloc[-1].ticker == "MLCO":
+            log("info", df.iloc[-1].ticker)
         if today:
             return True
         else:

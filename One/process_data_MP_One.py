@@ -19,10 +19,15 @@ def cal_basics(df,ticker_history_df):
         df['EMA20'] = ema20
         df['EMA60'] = ema60
         df['EMA120'] = ema120
-        df_v999 = df['volume'].rolling(window=999).max()
+        # get df length
+        df_len = len(df)
+        if df_len < 999:
+            df_v = df['volume'].rolling(window=df_len).max()
+        else:
+            df_v = df['volume'].rolling(window=999).max()
         low = []
 
-        for vol in df_v999:
+        for vol in df_v:
             if not np.isnan(vol):
                 low.append(df.loc[df.volume==vol,'low'].values[0])
             else:
@@ -69,8 +74,13 @@ def cal_basics(df,ticker_history_df):
             ticker_history_df.loc[index,'EMA20']=ema20
             ticker_history_df.loc[index,'EMA60']=ema60
             ticker_history_df.loc[index,'EMA120']=ema120
-            df_tail120 = df.tail(999)
-            low = df_tail120.loc[df_tail120.volume==df_tail120.volume.max(),'low'].values[0]
+            # get df length
+            df_len = len(df)
+            if df_len < 999:
+                df_tail = df.tail(df_len)
+            else:
+                df_tail = df.tail(999)
+            low = df_tail.loc[df_tail.volume==df_tail.volume.max(),'low'].values[0]
 
             ticker_history_df.loc[index,'DIFF'] = df.iloc[-1].close - low
 

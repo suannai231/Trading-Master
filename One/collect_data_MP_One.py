@@ -16,7 +16,7 @@ import sys
 import requests
 from bs4 import BeautifulSoup
 
-days=365*2
+days=365*10
 date_time = datetime.now()
 
 # marketCapMax = 5000000000
