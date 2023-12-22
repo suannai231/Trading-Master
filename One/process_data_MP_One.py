@@ -19,24 +19,24 @@ def cal_basics(df,ticker_history_df):
         df['EMA20'] = ema20
         df['EMA60'] = ema60
         df['EMA120'] = ema120
-        df_v120 = df['volume'].rolling(window=120).max()
+        df_v999 = df['volume'].rolling(window=999).max()
         low = []
 
-        for vol in df_v120:
+        for vol in df_v999:
             if not np.isnan(vol):
                 low.append(df.loc[df.volume==vol,'low'].values[0])
             else:
                 low.append(np.nan)
 
 
-        df['DIFF120L'] = df["close"] - low
+        df['DIFF'] = df["close"] - low
 
 
-        df['HHV5_DIFF120L'] = df['DIFF120L'].rolling(window=5).max()
-        df['HHV10_DIFF120L'] = df['DIFF120L'].rolling(window=10).max()
-        df['HHV20_DIFF120L'] = df['DIFF120L'].rolling(window=20).max()
-        df['HHV60_DIFF120L'] = df['DIFF120L'].rolling(window=60).max()
-        df['HHV120_DIFF120L'] = df['DIFF120L'].rolling(window=120).max()
+        df['HHV5_DIFF'] = df['DIFF'].rolling(window=5).max()
+        # df['HHV10_DIFF120L'] = df['DIFF120L'].rolling(window=10).max()
+        # df['HHV20_DIFF120L'] = df['DIFF120L'].rolling(window=20).max()
+        # df['HHV60_DIFF120L'] = df['DIFF120L'].rolling(window=60).max()
+        # df['HHV120_DIFF120L'] = df['DIFF120L'].rolling(window=120).max()
 
         # if df.iloc[-1].ticker == "TBIO":
         #     log("info", df.iloc[-1].ticker)
@@ -69,16 +69,16 @@ def cal_basics(df,ticker_history_df):
             ticker_history_df.loc[index,'EMA20']=ema20
             ticker_history_df.loc[index,'EMA60']=ema60
             ticker_history_df.loc[index,'EMA120']=ema120
-            df_tail120 = df.tail(120)
+            df_tail120 = df.tail(999)
             low = df_tail120.loc[df_tail120.volume==df_tail120.volume.max(),'low'].values[0]
 
-            ticker_history_df.loc[index,'DIFF120L'] = df.iloc[-1].close - low
+            ticker_history_df.loc[index,'DIFF'] = df.iloc[-1].close - low
 
-            ticker_history_df.loc[index,'HHV5_DIFF120L'] = ticker_history_df.tail(5).DIFF120L.max()
-            ticker_history_df.loc[index,'HHV10_DIFF120L'] = ticker_history_df.tail(10).DIFF120L.max()
-            ticker_history_df.loc[index,'HHV20_DIFF120L'] = ticker_history_df.tail(20).DIFF120L.max()
-            ticker_history_df.loc[index,'HHV60_DIFF120L'] = ticker_history_df.tail(60).DIFF120L.max()
-            ticker_history_df.loc[index,'HHV120_DIFF120L'] = ticker_history_df.tail(120).DIFF120L.max()
+            ticker_history_df.loc[index,'HHV5_DIFF'] = ticker_history_df.tail(5).DIFF.max()
+            # ticker_history_df.loc[index,'HHV10_DIFF120L'] = ticker_history_df.tail(10).DIFF120L.max()
+            # ticker_history_df.loc[index,'HHV20_DIFF120L'] = ticker_history_df.tail(20).DIFF120L.max()
+            # ticker_history_df.loc[index,'HHV60_DIFF120L'] = ticker_history_df.tail(60).DIFF120L.max()
+            # ticker_history_df.loc[index,'HHV120_DIFF120L'] = ticker_history_df.tail(120).DIFF120L.max()
 
             return ticker_history_df
         else:

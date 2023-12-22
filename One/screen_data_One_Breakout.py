@@ -14,20 +14,16 @@ def screen(df,lines):
     volume_10d_avg = df.tail(10).volume.mean()
     turnover_10d_avg = volume_10d_avg*close
     turnover_flag = turnover_10d_avg > 1000000
-    EMA10 = df.iloc[-1].EMA10
-    EMA20 = df.iloc[-1].EMA20
-    EMA60 = df.iloc[-1].EMA60
-    # EMA_flag = EMA10>EMA20>EMA60
     change = df.iloc[-1].change >=0.05
 
     if lines == "2060":
-        DIFF120L = df.iloc[-1].DIFF120L
-        HHV5_DIFF120L = df.iloc[-1].HHV5_DIFF120L
+        DIFF = df.iloc[-1].DIFF
+        HHV5_DIFF = df.iloc[-1].HHV5_DIFF
 
-        flag = DIFF120L>0 and DIFF120L==HHV5_DIFF120L
+        flag = DIFF>0 and DIFF==HHV5_DIFF
         today = flag and turnover_flag and change
-        if df.iloc[-1].ticker == "CDAQ":
-            log("info", df.iloc[-1].ticker)
+        # if df.iloc[-1].ticker == "CDAQ":
+        #     log("info", df.iloc[-1].ticker)
         if today:
             return True
         else:
