@@ -123,6 +123,10 @@ def process_data(history_df):
     log('info',"process_data start.")
     global global_df
     raw_data_files = os.listdir(raw_data_path)
+
+    # Sort the files by modification time
+    raw_data_files.sort(key=lambda x: os.path.getmtime(os.path.join(raw_data_path, x)))
+
     if len(raw_data_files) == 0:
         # log('warning',"raw data not ready, sleep 1 second...")
         time.sleep(1)

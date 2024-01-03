@@ -291,6 +291,10 @@ if __name__ == '__main__':
     tickers = []
 
     quote_data_files = os.listdir(quote_data_path)
+
+    # Sort the files by modification time
+    quote_data_files.sort(key=lambda x: os.path.getmtime(os.path.join(quote_data_path, x)))
+
     while len(quote_data_files) == 0:
         time.sleep(10)
         quote_data_files = os.listdir(quote_data_path)
@@ -316,7 +320,7 @@ if __name__ == '__main__':
         now = datetime.now()
         today15 = now.replace(hour=15,minute=0,second=0,microsecond=0)
         today235959 = now.replace(hour=23,minute=59,second=59,microsecond=0)
-        if ((now.weekday() <= 4) & (today15 <= datetime.now() <= today235959) and realtime_required):
+        if ((now.weekday() <= 4) & (today15 <= datetime.now() <= today235959) and flag):
             realtime_df=collect_data(get_stock_realtime_xueqiu,cores,10)
             if not realtime_df.empty:
                 log('info','realtime_df is ready')
@@ -345,7 +349,7 @@ if __name__ == '__main__':
         today8 = now.replace(hour=8,minute=0,second=0,microsecond=0)
         today15 = now.replace(hour=15,minute=0,second=0,microsecond=0)
         while(True):         #get real time stock price
-            if ((now.weekday() <= 4) & (today8 <= datetime.now() <= today15) and realtime_required):
+            if ((now.weekday() <= 4) & (today8 <= datetime.now() <= today15) and flag):
                 realtime_df=collect_data(get_stock_realtime_xueqiu,cores,10)
                 if not realtime_df.empty:
                     log('info','realtime_df is ready')

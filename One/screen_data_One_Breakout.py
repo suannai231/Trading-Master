@@ -65,6 +65,10 @@ def screen_data():
         return
 
     screened_data_files = os.listdir(screened_data_path)
+
+    # Sort the files by modification time
+    screened_data_files.sort(key=lambda x: os.path.getmtime(os.path.join(screened_data_path, x)))
+    
     if processed_data_files[-1] in screened_data_files:
         log('warning',"warning: " + processed_data_files[-1] + " existed, sleep 10 second...")
         time.sleep(10)
