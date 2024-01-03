@@ -22,7 +22,7 @@ def screen(df,lines):
 
         flag = DIFF>0 and DIFF==HHV5_DIFF
         today = flag and turnover_flag and change
-        if df.iloc[-1].ticker == "MLCO":
+        if df.iloc[-1].ticker == "BGC":
             log("info", df.iloc[-1].ticker)
         if today:
             return True
@@ -172,21 +172,21 @@ if __name__ == '__main__':
             os.remove(screened_data_path+file)
             log('info',file+" deleted.")
 
-    isPathExists = os.path.exists(screened_text_path)
-    if not isPathExists:
-        os.makedirs(screened_text_path)
-    else:
-        log('info','path exists.')
-        # delete existing files but keep the last 1 file
-        files = os.listdir(screened_text_path)
-        files.sort()
-        for file in files[:-1]:
-            os.remove(screened_text_path+file)
-            log('info',file+" deleted.")
+    # isPathExists = os.path.exists(screened_text_path)
+    # if not isPathExists:
+    #     os.makedirs(screened_text_path)
+    # else:
+    #     log('info','path exists.')
+    #     # delete existing files but keep the last 1 file
+    #     files = os.listdir(screened_text_path)
+    #     files.sort()
+    #     for file in files[:-1]:
+    #         os.remove(screened_text_path+file)
+    #         log('info',file+" deleted.")
 
-    isPathExists = os.path.exists(screened_text_path)
-    if not isPathExists:
-        os.makedirs(screened_text_path)
+    # isPathExists = os.path.exists(screened_text_path)
+    # if not isPathExists:
+    #     os.makedirs(screened_text_path)
 
     screen_data()
 
