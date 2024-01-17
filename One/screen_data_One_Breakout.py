@@ -9,26 +9,28 @@ import math
 import numpy as np
 # from playsound import playsound
 
-def screen(df,lines):
+def screen(df):
     close = df.iloc[-1].close
     volume_10d_avg = df.tail(10).volume.mean()
     turnover_10d_avg = volume_10d_avg*close
-    turnover_flag = turnover_10d_avg > 1000000
+    turnover_flag = turnover_10d_avg > 100000
     change = df.iloc[-1].change >=0.05
 
-    if lines == "2060":
-        DIFF = df.iloc[-1].DIFF
-        HHV5_DIFF = df.iloc[-1].HHV5_DIFF
+    DIFF = df.iloc[-1].DIFF
+    # HHV5_DIFF = df.iloc[-1].HHV5_DIFF
+    RATIO_DIFF = df.iloc[-1].RATIO_DIFF
+    EMA5_RATIO_DIFF = df.iloc[-1].EMA5_RATIO_DIFF
+    EMA10_RATIO_DIFF = df.iloc[-1].EMA10_RATIO_DIFF
 
-        flag = DIFF>0 and DIFF==HHV5_DIFF
-        today = flag and turnover_flag and change
-        if df.iloc[-1].ticker == "BGC":
-            log("info", df.iloc[-1].ticker)
-        if today:
-            return True
-        else:
-            return False
-    return False
+    flag = DIFF > 0 and RATIO_DIFF>=EMA5_RATIO_DIFF>=EMA10_RATIO_DIFF and turnover_flag and change
+
+    # if df.iloc[-1].ticker == "BGC":
+    #     log("info", df.iloc[-1].ticker)
+
+    if flag:
+        return True
+    else:
+        return False
 
 def run(ticker_chunk_df):
     if ticker_chunk_df.empty:
@@ -44,7 +46,7 @@ def run(ticker_chunk_df):
         #     log("error",ticker+" date error.")
         #     continue
         try:
-            Volatile = screen(df,"2060")
+            Volatile = screen(df)
         except Exception as e:
             log('critical',str(e))
             return pd.DataFrame()

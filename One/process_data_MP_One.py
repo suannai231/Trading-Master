@@ -8,43 +8,66 @@ import logging
 import math
 import numpy as np
 
+length = 120
+
 def cal_basics(df,ticker_history_df):
     if ticker_history_df.empty:
         df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
-        ema10 = df['close'].ewm(span = 10, adjust = False).mean()
-        ema20 = df['close'].ewm(span = 20, adjust = False).mean()
-        ema60 = df['close'].ewm(span = 60, adjust = False).mean()
-        ema120 = df['close'].ewm(span = 120, adjust = False).mean()
-        df['EMA10'] = ema10
-        df['EMA20'] = ema20
-        df['EMA60'] = ema60
-        df['EMA120'] = ema120
-        # get df length
+        # ema10 = df['close'].ewm(span = 10, adjust = False).mean()
+        # ema20 = df['close'].ewm(span = 20, adjust = False).mean()
+        # ema60 = df['close'].ewm(span = 60, adjust = False).mean()
+        # ema120 = df['close'].ewm(span = 120, adjust = False).mean()
+        # df['EMA10'] = ema10
+        # df['EMA20'] = ema20
+        # df['EMA60'] = ema60
+        # df['EMA120'] = ema120
+
+        # Assuming df is a pandas DataFrame with columns 'volume', 'low', and 'close'
+
         df_len = len(df)
-        if df_len < 999:
-            df_v = df['volume'].rolling(window=df_len).max()
-        else:
-            df_v = df['volume'].rolling(window=999).max()
-        low = []
+        window_len = df_len if df_len < length else length
 
-        for vol in df_v:
-            if not np.isnan(vol):
-                low.append(df.loc[df.volume==vol,'low'].values[0])
-            else:
-                low.append(np.nan)
+        # Calculate rolling maximum of volume
+        df['max_vol'] = df['volume'].rolling(window=window_len).max()
+
+        # Create a dictionary to map volume to low
+        vol_to_low = dict(zip(df['volume'], df['low']))
+
+        # Map the max volume to low using vectorized operations
+        df['mapped_low'] = df['max_vol'].map(vol_to_low)
+
+        # Replace NaN values where original volume was NaN
+        df['mapped_low'] = np.where(df['max_vol'].isna(), np.nan, df['mapped_low'])
+
+        # Calculate the DIFF
+        df['DIFF'] = df['close'] - df['mapped_low']
+
+        # Drop the auxiliary column 'max_vol'
+        df.drop(columns=['max_vol'], inplace=True)
+
+        # # get df length
+        # df_len = len(df)
+        # if df_len < length:
+        #     df_v = df['volume'].rolling(window=df_len).max()
+        # else:
+        #     df_v = df['volume'].rolling(window=length).max()
+        # low = []
+
+        # for vol in df_v:
+        #     if not np.isnan(vol):
+        #         low.append(df.loc[df.volume==vol,'low'].values[0])
+        #     else:
+        #         low.append(np.nan)
 
 
-        df['DIFF'] = df["close"] - low
+        # df['DIFF'] = df["close"] - low
 
 
-        df['HHV5_DIFF'] = df['DIFF'].rolling(window=5).max()
-        # df['HHV10_DIFF120L'] = df['DIFF120L'].rolling(window=10).max()
-        # df['HHV20_DIFF120L'] = df['DIFF120L'].rolling(window=20).max()
-        # df['HHV60_DIFF120L'] = df['DIFF120L'].rolling(window=60).max()
-        # df['HHV120_DIFF120L'] = df['DIFF120L'].rolling(window=120).max()
-
-        # if df.iloc[-1].ticker == "TBIO":
-        #     log("info", df.iloc[-1].ticker)
+        # df['HHV5_DIFF'] = df['DIFF'].rolling(window=5).max()
+        
+        df['RATIO_DIFF'] = df['DIFF']/df['mapped_low']*100
+        df['EMA5_RATIO_DIFF'] = df['RATIO_DIFF'].ewm(span = 5, adjust = False).mean()
+        df['EMA10_RATIO_DIFF'] = df['RATIO_DIFF'].ewm(span = 10, adjust = False).mean()
 
         return df
     else:
@@ -59,36 +82,35 @@ def cal_basics(df,ticker_history_df):
             ticker_history_df.loc[index,'volume']=df.iloc[-1].volume
             ticker_history_df.loc[index,'change']=(df.iloc[-1].close - df.iloc[-2].close)/df.iloc[-2].close
             k10=2/(10+1)
-            ema10_y = ticker_history_df.iloc[-2].EMA10
-            ema10 = df.iloc[-1].close*k10+ema10_y*(1-k10)
+            # ema10_y = ticker_history_df.iloc[-2].EMA10
+            # ema10 = df.iloc[-1].close*k10+ema10_y*(1-k10)
             k20=2/(20+1)
-            ema20_y = ticker_history_df.iloc[-2].EMA20
-            ema20 = df.iloc[-1].close*k20+ema20_y*(1-k20)
-            k60=2/(60+1)
-            ema60_y = ticker_history_df.iloc[-2].EMA60
-            ema60 = df.iloc[-1].close*k60+ema60_y*(1-k60)
-            k120=2/(120+1)
-            ema120_y = ticker_history_df.iloc[-2].EMA120
-            ema120 = df.iloc[-1].close*k120+ema120_y*(1-k120)
-            ticker_history_df.loc[index,'EMA10']=ema10
-            ticker_history_df.loc[index,'EMA20']=ema20
-            ticker_history_df.loc[index,'EMA60']=ema60
-            ticker_history_df.loc[index,'EMA120']=ema120
+            # ema20_y = ticker_history_df.iloc[-2].EMA20
+            # ema20 = df.iloc[-1].close*k20+ema20_y*(1-k20)
+            # k60=2/(60+1)
+            # ema60_y = ticker_history_df.iloc[-2].EMA60
+            # ema60 = df.iloc[-1].close*k60+ema60_y*(1-k60)
+            # k120=2/(120+1)
+            # ema120_y = ticker_history_df.iloc[-2].EMA120
+            # ema120 = df.iloc[-1].close*k120+ema120_y*(1-k120)
+            # ticker_history_df.loc[index,'EMA10']=ema10
+            # ticker_history_df.loc[index,'EMA20']=ema20
+            # ticker_history_df.loc[index,'EMA60']=ema60
+            # ticker_history_df.loc[index,'EMA120']=ema120
             # get df length
             df_len = len(df)
-            if df_len < 999:
+            if df_len < length:
                 df_tail = df.tail(df_len)
             else:
-                df_tail = df.tail(999)
+                df_tail = df.tail(length)
             low = df_tail.loc[df_tail.volume==df_tail.volume.max(),'low'].values[0]
 
             ticker_history_df.loc[index,'DIFF'] = df.iloc[-1].close - low
 
-            ticker_history_df.loc[index,'HHV5_DIFF'] = ticker_history_df.tail(5).DIFF.max()
-            # ticker_history_df.loc[index,'HHV10_DIFF120L'] = ticker_history_df.tail(10).DIFF120L.max()
-            # ticker_history_df.loc[index,'HHV20_DIFF120L'] = ticker_history_df.tail(20).DIFF120L.max()
-            # ticker_history_df.loc[index,'HHV60_DIFF120L'] = ticker_history_df.tail(60).DIFF120L.max()
-            # ticker_history_df.loc[index,'HHV120_DIFF120L'] = ticker_history_df.tail(120).DIFF120L.max()
+            # ticker_history_df.loc[index,'HHV5_DIFF'] = ticker_history_df.tail(5).DIFF.max()
+            ticker_history_df.loc[index,'RATIO_DIFF'] = ticker_history_df.iloc[-1].DIFF/low*100
+            ticker_history_df.loc[index,'EMA5_RATIO_DIFF'] = ticker_history_df.iloc[-1].RATIO_DIFF*k10+ticker_history_df.iloc[-2].EMA5_RATIO_DIFF*(1-k10)
+            ticker_history_df.loc[index,'EMA10_RATIO_DIFF'] = ticker_history_df.iloc[-1].RATIO_DIFF*k20+ticker_history_df.iloc[-2].EMA10_RATIO_DIFF*(1-k20)
 
             return ticker_history_df
         else:
@@ -103,8 +125,8 @@ def run(ticker_chunk_df,ticker_chunk_history_df):
         ticker_history_df = pd.DataFrame()
         if not ticker_chunk_history_df.empty:
             ticker_history_df = ticker_chunk_history_df[ticker_chunk_history_df.ticker==ticker].reset_index(drop=True)
-        if len(df)<120:
-            log("warning",df.iloc[-1].ticker+" len < 120")
+        if len(df)<length:
+            log("warning",df.iloc[-1].ticker+f" len < {length}")
             continue
         df = cal_basics(df,ticker_history_df)
 
@@ -173,7 +195,8 @@ def process_data(history_df):
         else:
             log("error","result empty")
             # time.sleep(10)
-            return pd.DataFrame()
+            # return pd.DataFrame()
+            continue
     
     
     if(not df.empty):
