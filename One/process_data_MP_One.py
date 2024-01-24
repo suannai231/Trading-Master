@@ -8,7 +8,7 @@ import logging
 import math
 import numpy as np
 
-length = 120
+length = 60
 
 def cal_basics(df,ticker_history_df):
     if ticker_history_df.empty:
