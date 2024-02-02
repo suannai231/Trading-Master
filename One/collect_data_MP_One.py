@@ -23,7 +23,7 @@ date_time = datetime.now()
 marketCapMin = 10000000
 
 # regularMarketPreviousCloseMax = 20
-regularMarketPreviousCloseMin = 4
+regularMarketPreviousCloseMin = 1
 
 today8am = date_time.replace(hour=8,minute=0,second=0,microsecond=0)
 today3pm = date_time.replace(hour=15,minute=0,second=0,microsecond=0)

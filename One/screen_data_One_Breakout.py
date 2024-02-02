@@ -16,16 +16,13 @@ def screen(df):
     turnover_flag = turnover_10d_avg > 100000
     change = df.iloc[-1].change >=0.05
 
-    DIFF = df.iloc[-1].DIFF
-    # HHV5_DIFF = df.iloc[-1].HHV5_DIFF
-    RATIO_DIFF = df.iloc[-1].RATIO_DIFF
-    EMA5_RATIO_DIFF = df.iloc[-1].EMA5_RATIO_DIFF
-    EMA10_RATIO_DIFF = df.iloc[-1].EMA10_RATIO_DIFF
+    UPPER = df.iloc[-1].UPPER
+    HHV_UPPER = df.iloc[-1].HHV_UPPER
 
-    flag = DIFF > 0 and RATIO_DIFF>=EMA5_RATIO_DIFF>=EMA10_RATIO_DIFF and turnover_flag and change
+    flag = close > UPPER and UPPER == HHV_UPPER and turnover_flag and change
 
-    # if df.iloc[-1].ticker == "BGC":
-    #     log("info", df.iloc[-1].ticker)
+    if df.iloc[-1].ticker == "NXT":
+        log("info", df.iloc[-1].ticker)
 
     if flag:
         return True
