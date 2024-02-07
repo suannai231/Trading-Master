@@ -18,8 +18,9 @@ def screen(df):
 
     UPPER = df.iloc[-1].UPPER
     HHV_UPPER = df.iloc[-1].HHV_UPPER
+    MID = df.iloc[-1].MID
 
-    flag = close > UPPER and UPPER == HHV_UPPER and turnover_flag and change
+    flag = (close>=UPPER*0.9 or (close<MID*1.2 and close>MID)) and UPPER == HHV_UPPER and turnover_flag and change
 
     if df.iloc[-1].ticker == "NXT":
         log("info", df.iloc[-1].ticker)
