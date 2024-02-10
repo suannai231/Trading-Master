@@ -67,6 +67,9 @@ def cal_basics(df,ticker_history_df):
         # HHV_UPPER:HHV(UPPER,60)
         df['HHV_UPPER'] = df['UPPER'].rolling(window=60).max()
 
+        # HHV_DIS5:HHV(DIS,5)
+        df['HHV_DIS5'] = df['DIS'].rolling(window=5).max()
+
 
         # DRAWICON(C>UPPER AND UPPER=HHV_UPPER,C,34)
         # DRAWNUMBER(C>UPPER AND UPPER=HHV_UPPER,C,INTPART((C-MID)/MID*100),0,C*0.1),COLORWHITE
@@ -115,7 +118,7 @@ def cal_basics(df,ticker_history_df):
             ticker_history_df.loc[index,'UPPER'] = ticker_history_df.iloc[-1].MID+2*ticker_history_df.iloc[-1].DIS
             ticker_history_df.loc[index,'LOWER'] = ticker_history_df.iloc[-1].MID-2*ticker_history_df.iloc[-1].DIS
             ticker_history_df.loc[index,'HHV_UPPER'] = ticker_history_df['UPPER'].rolling(window=60).max().iloc[-1]
-
+            ticker_history_df.loc[index,'HHV_DIS5'] = ticker_history_df['DIS'].rolling(window=5).max().iloc[-1]
             # # ema10_y = ticker_history_df.iloc[-2].EMA10
             # # ema10 = df.iloc[-1].close*k10+ema10_y*(1-k10)
             # k20=2/(20+1)
