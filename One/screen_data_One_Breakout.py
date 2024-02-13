@@ -22,7 +22,9 @@ def screen(df):
     DIS = df.iloc[-1].DIS
     HHV_DIS5 = df.iloc[-1].HHV_DIS5
 
-    flag = DIS >= HHV_DIS5*0.98 and close >MID and (UPPER==HHV_UPPER or close>UPPER) and turnover_flag and change
+    EMA120 = df.iloc[-1].EMA120
+
+    flag = close >= EMA120 and DIS >= HHV_DIS5*0.98 and close >MID and (UPPER==HHV_UPPER or close>UPPER) and turnover_flag and change
 
     if df.iloc[-1].ticker == "NXT":
         log("info", df.iloc[-1].ticker)
