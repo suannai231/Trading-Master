@@ -11,26 +11,17 @@ import numpy as np
 
 def screen(df):
     close = df.iloc[-1].close
-    low_ref = df.iloc[-2].low
     volume_10d_avg = df.tail(10).volume.mean()
     turnover_10d_avg = volume_10d_avg*close
     turnover_flag = turnover_10d_avg > 1000000
     # change = df.iloc[-1].change >=0.05
+    EMA5 = df.iloc[-1].EMA5
+    EMA10 = df.iloc[-1].EMA10
+    EMA20 = df.iloc[-1].EMA20
+    EMA60 = df.iloc[-1].EMA60
+    EMA120 = df.iloc[-1].EMA120
 
-
-    # MID = df.iloc[-1].MID
-    DE = df.iloc[-1].DE
-    DE_EMA20 = df.iloc[-1].DE_EMA20
-
-    # HM:=DE_EMA20>REF(DE_EMA20,1) AND REF(DE_EMA20,1)<REF(DE_EMA20,2) AND DE_EMA20>0
-    HM = DE_EMA20>df.iloc[-2].DE_EMA20 and df.iloc[-2].DE_EMA20<df.iloc[-3].DE_EMA20 and DE_EMA20>0
-    # HM2:=DE>REF(DE,1) AND REF(DE,1)<REF(DE,2) AND DE>0 AND DE_EMA20>0
-    HM2 = DE>df.iloc[-2].DE and df.iloc[-2].DE<df.iloc[-3].DE and DE>0 and DE_EMA20>0
-    # TP:=DE_EMA20>0 AND REF(DE_EMA20,1)<0
-    TP = DE_EMA20>0 and df.iloc[-2].DE_EMA20<0
-
-
-    flag = (HM or HM2 or TP) and turnover_flag
+    flag = EMA5 > EMA10 and EMA10 > EMA20 and EMA20 > EMA60 and EMA60 > EMA120 and close>EMA5 and turnover_flag
 
     if df.iloc[-1].ticker == "NXT":
         log("info", df.iloc[-1].ticker)
