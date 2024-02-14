@@ -11,20 +11,19 @@ import numpy as np
 
 def screen(df):
     close = df.iloc[-1].close
+    low_ref = df.iloc[-2].low
     volume_10d_avg = df.tail(10).volume.mean()
     turnover_10d_avg = volume_10d_avg*close
-    turnover_flag = turnover_10d_avg > 100000
-    change = df.iloc[-1].change >=0.05
+    turnover_flag = turnover_10d_avg > 1000000
+    # change = df.iloc[-1].change >=0.05
 
-    UPPER = df.iloc[-1].UPPER
-    HHV_UPPER = df.iloc[-1].HHV_UPPER
+
     MID = df.iloc[-1].MID
     DIS = df.iloc[-1].DIS
-    HHV_DIS5 = df.iloc[-1].HHV_DIS5
+    DIS_REF = df.iloc[-2].DIS
+    DIS_EMA120 = df.iloc[-1].DIS_EMA120
 
-    EMA120 = df.iloc[-1].EMA120
-
-    flag = close >= EMA120 and DIS >= HHV_DIS5*0.98 and close >MID and (UPPER==HHV_UPPER or close>UPPER) and turnover_flag and change
+    flag = DIS>=DIS_EMA120 and DIS>DIS_REF and close>MID and close>low_ref and turnover_flag
 
     if df.iloc[-1].ticker == "NXT":
         log("info", df.iloc[-1].ticker)

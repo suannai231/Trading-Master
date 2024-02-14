@@ -16,11 +16,11 @@ def cal_basics(df,ticker_history_df):
         # ema10 = df['close'].ewm(span = 10, adjust = False).mean()
         # ema20 = df['close'].ewm(span = 20, adjust = False).mean()
         # ema60 = df['close'].ewm(span = 60, adjust = False).mean()
-        ema120 = df['close'].ewm(span = 120, adjust = False).mean()
+        # ema120 = df['close'].ewm(span = 120, adjust = False).mean()
         # df['EMA10'] = ema10
         # df['EMA20'] = ema20
         # df['EMA60'] = ema60
-        df['EMA120'] = ema120
+        # df['EMA120'] = ema120
 
         # Assuming df is a pandas DataFrame with columns 'volume', 'low', and 'close'
 
@@ -57,18 +57,20 @@ def cal_basics(df,ticker_history_df):
 
         # DIS:=STDP(CLOSE,20);
         df['DIS'] = df['close'].rolling(window=20).std()
+        # EMA120:=EMA(DIS,120)
+        df['DIS_EMA120'] = df['DIS'].ewm(span = 120, adjust = False).mean()
         # MID:MA(CLOSE,20)
         df['MID'] = df['close'].rolling(window=20).mean()
-        # UPPER:MID+2*DIS
-        df['UPPER'] = df['MID']+2*df['DIS']
-        # LOWER:MID-2*DIS
-        df['LOWER'] = df['MID']-2*df['DIS']
+        # # UPPER:MID+2*DIS
+        # df['UPPER'] = df['MID']+2*df['DIS']
+        # # LOWER:MID-2*DIS
+        # df['LOWER'] = df['MID']-2*df['DIS']
 
-        # HHV_UPPER:HHV(UPPER,60)
-        df['HHV_UPPER'] = df['UPPER'].rolling(window=60).max()
+        # # HHV_UPPER:HHV(UPPER,60)
+        # df['HHV_UPPER'] = df['UPPER'].rolling(window=60).max()
 
-        # HHV_DIS5:HHV(DIS,5)
-        df['HHV_DIS5'] = df['DIS'].rolling(window=5).max()
+        # # HHV_DIS5:HHV(DIS,5)
+        # df['HHV_DIS5'] = df['DIS'].rolling(window=5).max()
 
 
         # DRAWICON(C>UPPER AND UPPER=HHV_UPPER,C,34)
@@ -115,10 +117,11 @@ def cal_basics(df,ticker_history_df):
 
             ticker_history_df.loc[index,'DIS'] = df['close'].rolling(window=20).std().iloc[-1]
             ticker_history_df.loc[index,'MID'] = df['close'].rolling(window=20).mean().iloc[-1]
-            ticker_history_df.loc[index,'UPPER'] = ticker_history_df.iloc[-1].MID+2*ticker_history_df.iloc[-1].DIS
-            ticker_history_df.loc[index,'LOWER'] = ticker_history_df.iloc[-1].MID-2*ticker_history_df.iloc[-1].DIS
-            ticker_history_df.loc[index,'HHV_UPPER'] = ticker_history_df['UPPER'].rolling(window=60).max().iloc[-1]
-            ticker_history_df.loc[index,'HHV_DIS5'] = ticker_history_df['DIS'].rolling(window=5).max().iloc[-1]
+            ticker_history_df.loc[index,'DIS_EMA120'] = ticker_history_df['DIS'].ewm(span = 120, adjust = False).mean().iloc[-1]
+            # ticker_history_df.loc[index,'UPPER'] = ticker_history_df.iloc[-1].MID+2*ticker_history_df.iloc[-1].DIS
+            # ticker_history_df.loc[index,'LOWER'] = ticker_history_df.iloc[-1].MID-2*ticker_history_df.iloc[-1].DIS
+            # ticker_history_df.loc[index,'HHV_UPPER'] = ticker_history_df['UPPER'].rolling(window=60).max().iloc[-1]
+            # ticker_history_df.loc[index,'HHV_DIS5'] = ticker_history_df['DIS'].rolling(window=5).max().iloc[-1]
             # # ema10_y = ticker_history_df.iloc[-2].EMA10
             # # ema10 = df.iloc[-1].close*k10+ema10_y*(1-k10)
             # k20=2/(20+1)
@@ -127,13 +130,13 @@ def cal_basics(df,ticker_history_df):
             # k60=2/(60+1)
             # ema60_y = ticker_history_df.iloc[-2].EMA60
             # ema60 = df.iloc[-1].close*k60+ema60_y*(1-k60)
-            k120=2/(120+1)
-            ema120_y = ticker_history_df.iloc[-2].EMA120
-            ema120 = df.iloc[-1].close*k120+ema120_y*(1-k120)
+            # k120=2/(120+1)
+            # ema120_y = ticker_history_df.iloc[-2].EMA120
+            # ema120 = df.iloc[-1].close*k120+ema120_y*(1-k120)
             # ticker_history_df.loc[index,'EMA10']=ema10
             # ticker_history_df.loc[index,'EMA20']=ema20
             # ticker_history_df.loc[index,'EMA60']=ema60
-            ticker_history_df.loc[index,'EMA120']=ema120
+            # ticker_history_df.loc[index,'EMA120']=ema120
             # get df length
             # df_len = len(df)
             # if df_len < length:
