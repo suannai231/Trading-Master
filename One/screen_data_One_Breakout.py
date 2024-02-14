@@ -15,27 +15,21 @@ def screen(df):
     turnover_10d_avg = volume_10d_avg*close
     turnover_flag = turnover_10d_avg > 1000000
     # change = df.iloc[-1].change >=0.05
-    EMA5 = df.iloc[-1].EMA5
-    EMA10 = df.iloc[-1].EMA10
-    EMA20 = df.iloc[-1].EMA20
+
     EMA60 = df.iloc[-1].EMA60
-    EMA120 = df.iloc[-1].EMA120
 
-    EMA5_1d = df.iloc[-2].EMA5
-    EMA10_1d = df.iloc[-2].EMA10
-    EMA20_1d = df.iloc[-2].EMA20
     EMA60_1d = df.iloc[-2].EMA60
-    EMA120_1d = df.iloc[-2].EMA120
+    EMA60_2d = df.iloc[-3].EMA60
 
-    ratio = (close-EMA120)/EMA120
 
-    flag = EMA5 > EMA10 and EMA10 > EMA20 and EMA20 > EMA60 and EMA60 > EMA120 and close>EMA5 and turnover_flag and close<10 and ratio < 1
-    flag_1d = EMA5_1d > EMA10_1d and EMA10_1d > EMA20_1d and EMA20_1d > EMA60_1d and EMA60_1d > EMA120_1d and df.iloc[-2].close>EMA5_1d   
+    ratio = (close-EMA60)/EMA60
+
+    flag = EMA60>EMA60_1d and EMA60_1d<EMA60_2d and turnover_flag and close<10 and ratio < 0.2
 
     if df.iloc[-1].ticker == "NXT":
         log("info", df.iloc[-1].ticker)
 
-    if flag_1d==False and flag:
+    if flag:
         return True
     else:
         return False
