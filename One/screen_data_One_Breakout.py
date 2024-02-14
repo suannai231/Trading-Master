@@ -19,11 +19,16 @@ def screen(df):
 
 
     MID = df.iloc[-1].MID
-    DIS = df.iloc[-1].DIS
-    DIS_REF = df.iloc[-2].DIS
-    DIS_EMA120 = df.iloc[-1].DIS_EMA120
+    DE = df.iloc[-1].DE
+    DE_EMA20 = df.iloc[-1].DE_EMA20
 
-    flag = DIS>=DIS_EMA120 and DIS>DIS_REF and close>MID and close>low_ref and turnover_flag
+    # HM:=DE_EMA20>REF(DE_EMA20,1) AND REF(DE_EMA20,1)<REF(DE_EMA20,2) AND DE_EMA20>0
+    HM = DE_EMA20>df.iloc[-2].DE_EMA20 and df.iloc[-2].DE_EMA20<df.iloc[-3].DE_EMA20 and DE_EMA20>0
+    # TP:=DE_EMA20>0 AND REF(DE_EMA20,1)<0
+    TP = DE_EMA20>0 and df.iloc[-2].DE_EMA20<0
+
+
+    flag = (HM or TP) and turnover_flag
 
     if df.iloc[-1].ticker == "NXT":
         log("info", df.iloc[-1].ticker)
