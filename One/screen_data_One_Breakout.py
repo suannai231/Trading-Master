@@ -21,12 +21,19 @@ def screen(df):
     EMA60 = df.iloc[-1].EMA60
     EMA120 = df.iloc[-1].EMA120
 
+    EMA5_1d = df.iloc[-2].EMA5
+    EMA10_1d = df.iloc[-2].EMA10
+    EMA20_1d = df.iloc[-2].EMA20
+    EMA60_1d = df.iloc[-2].EMA60
+    EMA120_1d = df.iloc[-2].EMA120
+
     flag = EMA5 > EMA10 and EMA10 > EMA20 and EMA20 > EMA60 and EMA60 > EMA120 and close>EMA5 and turnover_flag
+    flag_1d = EMA5_1d > EMA10_1d and EMA10_1d > EMA20_1d and EMA20_1d > EMA60_1d and EMA60_1d > EMA120_1d and df.iloc[-2].close>EMA5_1d   
 
     if df.iloc[-1].ticker == "NXT":
         log("info", df.iloc[-1].ticker)
 
-    if flag:
+    if flag_1d==False and flag:
         return True
     else:
         return False
