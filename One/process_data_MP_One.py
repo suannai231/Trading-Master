@@ -23,6 +23,8 @@ def cal_basics(df,ticker_history_df):
         df['EMA60'] = df['close'].ewm(span = 60, adjust = False).mean()
         # EMA120
         df['EMA120'] = df['close'].ewm(span = 120, adjust = False).mean()
+        # df['C_HHV'] is the maximum close in 60 days
+        df['EMA60_HHV'] = df['EMA60'].rolling(window=20).max()
 
 
         return df
@@ -43,6 +45,7 @@ def cal_basics(df,ticker_history_df):
             ticker_history_df.loc[index,'EMA20'] = ticker_history_df.close.ewm(span = 20, adjust = False).mean().iloc[-1]
             ticker_history_df.loc[index,'EMA60'] = ticker_history_df.close.ewm(span = 60, adjust = False).mean().iloc[-1]
             ticker_history_df.loc[index,'EMA120'] = ticker_history_df.close.ewm(span = 120, adjust = False).mean().iloc[-1]
+            ticker_history_df.loc[index,'EMA60_HHV'] = ticker_history_df.EMA60.rolling(window=60).max().iloc[-1]
 
             return ticker_history_df
         else:
