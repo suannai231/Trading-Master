@@ -17,7 +17,7 @@ def screen(df):
     # change = df.iloc[-1].change >=0.05
 
     # EMA20
-    EMA20 = df.iloc[-1].EMA20
+    # EMA20 = df.iloc[-1].EMA20
     # EMA60
     EMA60 = df.iloc[-1].EMA60
     # DIS
@@ -29,7 +29,7 @@ def screen(df):
 
     # FLAG:= DIS>=DIS_EMA5 AND DIS>REF(DIS,1) AND DIS>=0
 
-    flag = DIS>=DIS_EMA5 and DIS>DIS_REF and DIS>=0 and close<10 and turnover_flag
+    flag = DIS>=DIS_EMA5 and DIS>DIS_REF and close>EMA60 and close<10 and turnover_flag
 
     if df.iloc[-1].ticker == "NXT":
         log("info", df.iloc[-1].ticker)
