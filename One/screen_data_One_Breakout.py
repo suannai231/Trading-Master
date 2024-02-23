@@ -29,7 +29,7 @@ def screen(df):
     Ratio = (close-EMA20)/EMA20
     # FLAG:= DIS>=DIS_EMA5 AND DIS>REF(DIS,1) AND DIS>=0
 
-    flag = DIS>=DIS_EMA5 and DIS>DIS_REF and close>EMA60 and close<10 and turnover_flag and Ratio<0.2
+    flag = DIS>=DIS_EMA5 and DIS>DIS_REF and close>EMA60 and close<10 and turnover_flag and Ratio<0.3
 
     if df.iloc[-1].ticker == "NXT":
         log("info", df.iloc[-1].ticker)
