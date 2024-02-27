@@ -13,7 +13,7 @@ def screen(df):
     close = df.iloc[-1].close
     volume_10d_avg = df.tail(10).volume.mean()
     turnover_10d_avg = volume_10d_avg*close
-    turnover_flag = turnover_10d_avg > 1000000
+    turnover_flag = turnover_10d_avg > 300000
     # change = df.iloc[-1].change >=0.05
 
     # EMA20
@@ -31,7 +31,7 @@ def screen(df):
 
     flag = DIS>=DIS_EMA5 and DIS>DIS_REF and close>EMA60 and close<10 and turnover_flag and Ratio<0.3
 
-    if df.iloc[-1].ticker == "NXT":
+    if df.iloc[-1].ticker == "FWBI":
         log("info", df.iloc[-1].ticker)
 
     if flag:

@@ -20,7 +20,7 @@ days=365
 date_time = datetime.now()
 
 # marketCapMax = 5000000000
-marketCapMin = 10000000
+marketCapMin = 5000000
 
 # regularMarketPreviousCloseMax = 20
 regularMarketPreviousCloseMin = 1
