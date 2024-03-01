@@ -19,8 +19,8 @@ from bs4 import BeautifulSoup
 days=365
 date_time = datetime.now()
 
-# marketCapMax = 5000000000
-marketCapMin = 5000000
+marketCapMax = 100000000
+marketCapMin = 1000000
 
 # regularMarketPreviousCloseMax = 20
 regularMarketPreviousCloseMin = 1
@@ -307,7 +307,7 @@ if __name__ == '__main__':
         log('critical',str(e))
         sys.exit()
 
-    tickers = quote_data_df[(quote_data_df.marketCap>=marketCapMin) & (quote_data_df.regularMarketPreviousClose>=regularMarketPreviousCloseMin)].ticker.values
+    tickers = quote_data_df[(quote_data_df.marketCap>=marketCapMin) & (quote_data_df.marketCap<=marketCapMax) & (quote_data_df.regularMarketPreviousClose>=regularMarketPreviousCloseMin)].ticker.values
 
     cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
