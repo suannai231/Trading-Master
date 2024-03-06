@@ -16,22 +16,20 @@ def screen(df):
     turnover_flag = turnover_10d_avg > 300000
     # change = df.iloc[-1].change >=0.05
 
-    # EMA20
-    EMA20 = df.iloc[-1].EMA20
-    # EMA60
-    EMA60 = df.iloc[-1].EMA60
-    # DIS
-    DIS = df.iloc[-1].DIS
-    # DIS_REF
-    DIS_REF = df.iloc[-2].DIS
-    # DIS_EMA5
-    DIS_EMA5 = df.iloc[-1].DIS_EMA5
-    Ratio = (close-EMA20)/EMA20
-    # FLAG:= DIS>=DIS_EMA5 AND DIS>REF(DIS,1) AND DIS>=0
+    # EMA5
+    EMA5 = df.iloc[-1].EMA5
 
-    flag = DIS>=DIS_EMA5 and DIS>DIS_REF and close>EMA60 and close<10 and turnover_flag and Ratio<0.3
+    # Get the date of the highest volume
+    max_volume_date = df.tail(120).volume.idxmax()
+    # Get the high and low of the highest volume date
+    max_volume_high = df.loc[max_volume_date].high
+    max_volume_low = df.loc[max_volume_date].low
+    # Get the mid of the high and low
+    mid = (max_volume_high + max_volume_low) / 2
 
-    if df.iloc[-1].ticker == "FWBI":
+    flag = close>=EMA5 and turnover_flag and close >= mid
+
+    if df.iloc[-1].ticker == "APM":
         log("info", df.iloc[-1].ticker)
 
     if flag:
