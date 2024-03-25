@@ -20,7 +20,7 @@ def screen(df):
     EMA5 = df.iloc[-1].EMA5
 
     # Get the date of the highest volume
-    max_volume_date = df.tail(120).volume.idxmax()
+    max_volume_date = df.tail(250).volume.idxmax()
     # Get the high and low of the highest volume date
     max_volume_high = df.loc[max_volume_date].high
     max_volume_low = df.loc[max_volume_date].low
