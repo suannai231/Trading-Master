@@ -14,7 +14,7 @@ def screen(df):
     volume_10d_avg = df.tail(10).volume.mean()
     turnover_10d_avg = volume_10d_avg*close
     turnover_flag = turnover_10d_avg > 300000
-    # change = df.iloc[-1].change >=0.05
+    change = df.iloc[-1].change >=0.01
 
     # EMA5
     EMA5 = df.iloc[-1].EMA5
@@ -29,7 +29,7 @@ def screen(df):
 
     close_60days = df.tail(60).close.max()
 
-    flag = close>=EMA5 and turnover_flag and close >= mid and close >= close_60days
+    flag = close>=EMA5 and turnover_flag and close >= mid and close >= close_60days and change
 
     if df.iloc[-1].ticker == "APM":
         log("info", df.iloc[-1].ticker)
