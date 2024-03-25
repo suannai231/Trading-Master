@@ -31,8 +31,18 @@ def screen(df):
 
     flag = close>=EMA5 and turnover_flag and close >= mid and close >= close_60days and change
 
-    if df.iloc[-1].ticker == "APM":
+    if flag == True:
         log("info", df.iloc[-1].ticker)
+        log("info", "close: " + str(close))
+        log("info", "volume_10d_avg: " + str(volume_10d_avg))
+        log("info", "turnover_10d_avg: " + str(turnover_10d_avg))
+        log("info", "change: " + str(df.iloc[-1].change))
+        log("info", "EMA5: " + str(EMA5))
+        log("info", "max_volume_date: " + str(max_volume_date))
+        log("info", "max_volume_high: " + str(max_volume_high))
+        log("info", "max_volume_low: " + str(max_volume_low))
+        log("info", "mid: " + str(mid))
+        log("info", "close_60days: " + str(close_60days))
 
     if flag:
         return True
