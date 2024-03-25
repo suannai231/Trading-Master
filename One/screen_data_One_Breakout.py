@@ -20,14 +20,16 @@ def screen(df):
     EMA5 = df.iloc[-1].EMA5
 
     # Get the date of the highest volume
-    max_volume_date = df.tail(250).volume.idxmax()
+    max_volume_date = df.tail(120).volume.idxmax()
     # Get the high and low of the highest volume date
     max_volume_high = df.loc[max_volume_date].high
     max_volume_low = df.loc[max_volume_date].low
     # Get the mid of the high and low
     mid = (max_volume_high + max_volume_low) / 2
 
-    flag = close>=EMA5 and turnover_flag and close >= mid
+    close_60days = df.tail(60).close.max()
+
+    flag = close>=EMA5 and turnover_flag and close >= mid and close >= close_60days
 
     if df.iloc[-1].ticker == "APM":
         log("info", df.iloc[-1].ticker)
