@@ -70,7 +70,7 @@ def screen(df):
         log("info", "max_volume_high_20: " + str(max_volume_high_20))
         log("info", "max_volume_low_20: " + str(max_volume_low_20))
         log("info", "mid_20: " + str(mid_20))
-        log("info", "close_60days: " + str(close_60days))
+        log("info", "close_60days: " + str(close_20days))
 
     if flag:
         return True
