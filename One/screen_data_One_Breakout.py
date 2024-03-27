@@ -19,17 +19,24 @@ def screen(df):
     # EMA5
     EMA5 = df.iloc[-1].EMA5
 
-    # Get the date of the highest volume
-    max_volume_date = df.tail(120).volume.idxmax()
-    # Get the high and low of the highest volume date
-    max_volume_high = df.loc[max_volume_date].high
-    max_volume_low = df.loc[max_volume_date].low
-    # Get the mid of the high and low
-    mid = (max_volume_high + max_volume_low) / 2
+    max_volume_date_120 = df.tail(120).volume.idxmax()
+    max_volume_high_120 = df.loc[max_volume_date_120].high
+    max_volume_low_120 = df.loc[max_volume_date_120].low
+    mid_120 = (max_volume_high_120 + max_volume_low_120) / 2
+
+    max_volume_date_60 = df.tail(60).volume.idxmax()
+    max_volume_high_60 = df.loc[max_volume_date_60].high
+    max_volume_low_60 = df.loc[max_volume_date_60].low
+    mid_60 = (max_volume_high_60 + max_volume_low_60) / 2
+
+    max_volume_date_20 = df.tail(20).volume.idxmax()
+    max_volume_high_20 = df.loc[max_volume_date_20].high
+    max_volume_low_20 = df.loc[max_volume_date_20].low
+    mid_20 = (max_volume_high_20 + max_volume_low_20) / 2
 
     close_60days = df.tail(60).close.max()
 
-    flag = close>=EMA5 and turnover_flag and close >= mid and close >= close_60days and change
+    flag = close>=EMA5 and turnover_flag and close >= mid_120 and close >= mid_60 and close >= mid_20 and close >= close_60days and change
 
     if flag == True:
         log("info", df.iloc[-1].ticker)
@@ -38,10 +45,18 @@ def screen(df):
         log("info", "turnover_10d_avg: " + str(turnover_10d_avg))
         log("info", "change: " + str(df.iloc[-1].change))
         log("info", "EMA5: " + str(EMA5))
-        log("info", "max_volume_date: " + str(max_volume_date))
-        log("info", "max_volume_high: " + str(max_volume_high))
-        log("info", "max_volume_low: " + str(max_volume_low))
-        log("info", "mid: " + str(mid))
+        log("info", "max_volume_date_120: " + str(max_volume_date_120))
+        log("info", "max_volume_high_120: " + str(max_volume_high_120))
+        log("info", "max_volume_low_120: " + str(max_volume_low_120))
+        log("info", "mid_120: " + str(mid_120))
+        log("info", "max_volume_date_60: " + str(max_volume_date_60))
+        log("info", "max_volume_high_60: " + str(max_volume_high_60))
+        log("info", "max_volume_low_60: " + str(max_volume_low_60))
+        log("info", "mid_60: " + str(mid_60))
+        log("info", "max_volume_date_20: " + str(max_volume_date_20))
+        log("info", "max_volume_high_20: " + str(max_volume_high_20))
+        log("info", "max_volume_low_20: " + str(max_volume_low_20))
+        log("info", "mid_20: " + str(mid_20))
         log("info", "close_60days: " + str(close_60days))
 
     if flag:
