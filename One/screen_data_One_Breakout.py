@@ -44,9 +44,9 @@ def screen(df):
     max_volume_low_20 = df.loc[max_volume_date_20].low
     mid_20 = (max_volume_high_20 + max_volume_low_20) / 2
 
-    close_60days = df.tail(60).close.max()
+    close_20days = df.tail(20).close.max()
 
-    flag = close>=EMA5 and turnover_flag and close >= mid_120 and close >= mid_60 and close >= mid_20 and close >= close_60days and change and volume_estimated >= volume_yesterday
+    flag = close>=EMA5 and turnover_flag and close >= mid_120 and close >= mid_60 and close >= mid_20 and close >= close_20days and change and volume_estimated >= volume_yesterday
 
     if df.iloc[-1].ticker == 'WETG':
         log("info", "WETG")
