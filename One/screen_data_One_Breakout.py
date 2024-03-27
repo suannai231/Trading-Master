@@ -19,6 +19,13 @@ def screen(df):
     volume_today = df.iloc[-1].volume
     volume_yesterday = df.iloc[-2].volume
 
+    # get current time
+    now = datetime.datetime.now()
+    # get the time rate between now and 8:30am, divide by 6 hours 30 minutes
+    time_rate = (now - now.replace(hour=8, minute=30, second=0, microsecond=0)).total_seconds() / 23400
+    # get the estimated volume of the day
+    volume_estimated = volume_today / time_rate
+
     # EMA5
     EMA5 = df.iloc[-1].EMA5
 
@@ -39,7 +46,7 @@ def screen(df):
 
     close_60days = df.tail(60).close.max()
 
-    flag = close>=EMA5 and turnover_flag and close >= mid_120 and close >= mid_60 and close >= mid_20 and close >= close_60days and change and volume_today >= volume_yesterday
+    flag = close>=EMA5 and turnover_flag and close >= mid_120 and close >= mid_60 and close >= mid_20 and close >= close_60days and change and volume_estimated >= volume_yesterday
 
     if df.iloc[-1].ticker == 'WETG':
         log("info", "WETG")
