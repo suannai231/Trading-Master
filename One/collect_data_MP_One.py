@@ -19,7 +19,7 @@ from bs4 import BeautifulSoup
 days=365
 date_time = datetime.now()
 
-marketCapMax = 500000000
+marketCapMax = 1000000000
 marketCapMin = 1000000
 
 # regularMarketPreviousCloseMax = 20
