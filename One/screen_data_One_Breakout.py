@@ -32,17 +32,17 @@ def screen(df):
     max_volume_date_120 = df.tail(120).volume.idxmax()
     max_volume_high_120 = df.loc[max_volume_date_120].high
     max_volume_low_120 = df.loc[max_volume_date_120].low
-    mid_120 = (max_volume_high_120 + max_volume_low_120) / 2
+    mid_120 = max_volume_low_120 + (max_volume_high_120 - max_volume_low_120) / 4
 
     max_volume_date_60 = df.tail(60).volume.idxmax()
     max_volume_high_60 = df.loc[max_volume_date_60].high
     max_volume_low_60 = df.loc[max_volume_date_60].low
-    mid_60 = (max_volume_high_60 + max_volume_low_60) / 2
+    mid_60 = max_volume_low_60 + (max_volume_high_60 - max_volume_low_60) / 3
 
     max_volume_date_20 = df.tail(20).volume.idxmax()
     max_volume_high_20 = df.loc[max_volume_date_20].high
     max_volume_low_20 = df.loc[max_volume_date_20].low
-    mid_20 = (max_volume_high_20 + max_volume_low_20) / 2
+    mid_20 = max_volume_low_20 + (max_volume_high_20 - max_volume_low_20) / 2
 
     close_20days = df.tail(20).close.max()
 
