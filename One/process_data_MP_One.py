@@ -13,8 +13,12 @@ length = 120
 def cal_basics(df,ticker_history_df):
     if ticker_history_df.empty:
         df['change'] = (df.close - df.close.shift(1))/df.close.shift(1)
-        # EMA20
+        # EMA5
         df['EMA5'] = df['close'].ewm(span = 5, adjust = False).mean()
+        # EMA10
+        df['EMA10'] = df['close'].ewm(span = 10, adjust = False).mean()
+        # EMA20
+        df['EMA20'] = df['close'].ewm(span = 20, adjust = False).mean()
 
         return df
     else:
@@ -30,6 +34,8 @@ def cal_basics(df,ticker_history_df):
             ticker_history_df.loc[index,'change']=(df.iloc[-1].close - df.iloc[-2].close)/df.iloc[-2].close
 
             ticker_history_df.loc[index,'EMA5'] = ticker_history_df.close.ewm(span = 5, adjust = False).mean().iloc[-1]
+            ticker_history_df.loc[index,'EMA10'] = ticker_history_df.close.ewm(span = 10, adjust = False).mean().iloc[-1]
+            ticker_history_df.loc[index,'EMA20'] = ticker_history_df.close.ewm(span = 20, adjust = False).mean().iloc[-1]
 
             return ticker_history_df
         else:

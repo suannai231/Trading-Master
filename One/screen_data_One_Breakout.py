@@ -28,49 +28,52 @@ def screen(df):
 
     # EMA5
     EMA5 = df.iloc[-1].EMA5
+    # EMA10
+    EMA10 = df.iloc[-1].EMA10
+    # EMA20
+    EMA20 = df.iloc[-1].EMA20
 
-    max_volume_date_120 = df.tail(120).volume.idxmax()
-    max_volume_high_120 = df.loc[max_volume_date_120].high
-    max_volume_low_120 = df.loc[max_volume_date_120].low
-    mid_120 = max_volume_low_120 + (max_volume_high_120 - max_volume_low_120) / 4
-
+    # 60 days max volume
     max_volume_date_60 = df.tail(60).volume.idxmax()
     max_volume_high_60 = df.loc[max_volume_date_60].high
     max_volume_low_60 = df.loc[max_volume_date_60].low
-    mid_60 = max_volume_low_60 + (max_volume_high_60 - max_volume_low_60) / 3
+    max_volume_60 = df.loc[max_volume_date_60].volume
+    mid_60 = max_volume_low_60 + (max_volume_high_60 - max_volume_low_60) / 2
 
-    max_volume_date_20 = df.tail(20).volume.idxmax()
-    max_volume_high_20 = df.loc[max_volume_date_20].high
-    max_volume_low_20 = df.loc[max_volume_date_20].low
-    mid_20 = max_volume_low_20 + (max_volume_high_20 - max_volume_low_20) / 2
+    # 60 days second max volume
+    max_volume_date_60_2 = df.tail(60).volume.drop(max_volume_date_60).idxmax()
+    max_volume_high_60_2 = df.loc[max_volume_date_60_2].high
+    max_volume_low_60_2 = df.loc[max_volume_date_60_2].low
+    max_volume_60_2 = df.loc[max_volume_date_60_2].volume
+    mid_60_2 = max_volume_low_60_2 + (max_volume_high_60_2 - max_volume_low_60_2) / 2
 
-    close_20days = df.tail(20).close.max()
+    # 60 days third max volume
+    max_volume_date_60_3 = df.tail(60).volume.drop([max_volume_date_60, max_volume_date_60_2]).idxmax()
+    max_volume_high_60_3 = df.loc[max_volume_date_60_3].high
+    max_volume_low_60_3 = df.loc[max_volume_date_60_3].low
+    max_volume_60_3 = df.loc[max_volume_date_60_3].volume
+    mid_60_3 = max_volume_low_60_3 + (max_volume_high_60_3 - max_volume_low_60_3) / 2
 
-    flag = close>=EMA5 and turnover_flag and close >= mid_120 and close >= mid_60 and close >= mid_20 and close >= close_20days and change and volume_estimated >= volume_yesterday
+    # 60 days fourth max volume
+    max_volume_date_60_4 = df.tail(60).volume.drop([max_volume_date_60, max_volume_date_60_2, max_volume_date_60_3]).idxmax()
+    max_volume_high_60_4 = df.loc[max_volume_date_60_4].high
+    max_volume_low_60_4 = df.loc[max_volume_date_60_4].low
+    max_volume_60_4 = df.loc[max_volume_date_60_4].volume
+    mid_60_4 = max_volume_low_60_4 + (max_volume_high_60_4 - max_volume_low_60_4) / 2
+
+    try:
+        P = (mid_60*max_volume_60+mid_60_2*max_volume_60_2+mid_60_3*max_volume_60_3+mid_60_4*max_volume_60_4)/(max_volume_60+max_volume_60_2+max_volume_60_3+max_volume_60_4)
+    except ZeroDivisionError:
+        P = 0
+        log("error", "ZeroDivisionError")
+
+    flag = close>=P and close>EMA5 and EMA5>EMA10 and EMA10>EMA20 and change and volume_estimated>volume_yesterday and turnover_flag
 
     if df.iloc[-1].ticker == 'WETG':
         log("info", "WETG")
 
     if flag == True:
         log("info", df.iloc[-1].ticker)
-        log("info", "close: " + str(close))
-        log("info", "volume_10d_avg: " + str(volume_10d_avg))
-        log("info", "turnover_10d_avg: " + str(turnover_10d_avg))
-        log("info", "change: " + str(df.iloc[-1].change))
-        log("info", "EMA5: " + str(EMA5))
-        log("info", "max_volume_date_120: " + str(max_volume_date_120))
-        log("info", "max_volume_high_120: " + str(max_volume_high_120))
-        log("info", "max_volume_low_120: " + str(max_volume_low_120))
-        log("info", "mid_120: " + str(mid_120))
-        log("info", "max_volume_date_60: " + str(max_volume_date_60))
-        log("info", "max_volume_high_60: " + str(max_volume_high_60))
-        log("info", "max_volume_low_60: " + str(max_volume_low_60))
-        log("info", "mid_60: " + str(mid_60))
-        log("info", "max_volume_date_20: " + str(max_volume_date_20))
-        log("info", "max_volume_high_20: " + str(max_volume_high_20))
-        log("info", "max_volume_low_20: " + str(max_volume_low_20))
-        log("info", "mid_20: " + str(mid_20))
-        log("info", "close_60days: " + str(close_20days))
 
     if flag:
         return True
