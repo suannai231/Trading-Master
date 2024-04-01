@@ -32,6 +32,12 @@ def screen(df):
     EMA10 = df.iloc[-1].EMA10
     # EMA20
     EMA20 = df.iloc[-1].EMA20
+    # EMA60
+    EMA60 = df.iloc[-1].EMA60
+    # EMA120
+    EMA120 = df.iloc[-1].EMA120
+    # EMA250
+    EMA250 = df.iloc[-1].EMA250
 
     # 60 days max volume
     max_volume_date_60 = df.tail(60).volume.idxmax()
@@ -67,7 +73,7 @@ def screen(df):
         P = 0
         log("error", "ZeroDivisionError")
 
-    flag = close>=P and close>EMA5 and EMA5>EMA10 and EMA10>EMA20 and change and volume_estimated>volume_yesterday and turnover_flag
+    flag = close>=P and close>EMA5 and EMA5>EMA10 and EMA10>EMA20 and EMA20>EMA60 and EMA60>EMA120 and EMA120>EMA250 and change and volume_estimated>=volume_yesterday and turnover_flag
 
     if df.iloc[-1].ticker == 'WETG':
         log("info", "WETG")
