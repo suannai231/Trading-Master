@@ -13,7 +13,7 @@ def screen(df):
     close = df.iloc[-1].close
     volume_10d_avg = df.tail(10).volume.mean()
     turnover_10d_avg = volume_10d_avg*close
-    turnover_flag = turnover_10d_avg > 200000
+    turnover_flag = turnover_10d_avg > 800000
     change = df.iloc[-1].change >=0.01
 
     volume_today = df.iloc[-1].volume
