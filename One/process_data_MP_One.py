@@ -8,7 +8,7 @@ import logging
 import math
 import numpy as np
 
-length = 250
+length = 60
 
 def cal_basics(df,ticker_history_df):
     if ticker_history_df.empty:
@@ -21,10 +21,10 @@ def cal_basics(df,ticker_history_df):
         df['EMA20'] = df['close'].ewm(span = 20, adjust = False).mean()
         # EMA60
         df['EMA60'] = df['close'].ewm(span = 60, adjust = False).mean()
-        # EMA120
-        df['EMA120'] = df['close'].ewm(span = 120, adjust = False).mean()
-        # EMA250
-        df['EMA250'] = df['close'].ewm(span = 250, adjust = False).mean()
+        # # EMA120
+        # df['EMA120'] = df['close'].ewm(span = 120, adjust = False).mean()
+        # # EMA250
+        # df['EMA250'] = df['close'].ewm(span = 250, adjust = False).mean()
 
         return df
     else:
@@ -43,8 +43,8 @@ def cal_basics(df,ticker_history_df):
             ticker_history_df.loc[index,'EMA10'] = ticker_history_df.close.ewm(span = 10, adjust = False).mean().iloc[-1]
             ticker_history_df.loc[index,'EMA20'] = ticker_history_df.close.ewm(span = 20, adjust = False).mean().iloc[-1]
             ticker_history_df.loc[index,'EMA60'] = ticker_history_df.close.ewm(span = 60, adjust = False).mean().iloc[-1]
-            ticker_history_df.loc[index,'EMA120'] = ticker_history_df.close.ewm(span = 120, adjust = False).mean().iloc[-1]
-            ticker_history_df.loc[index,'EMA250'] = ticker_history_df.close.ewm(span = 250, adjust = False).mean().iloc[-1]
+            # ticker_history_df.loc[index,'EMA120'] = ticker_history_df.close.ewm(span = 120, adjust = False).mean().iloc[-1]
+            # ticker_history_df.loc[index,'EMA250'] = ticker_history_df.close.ewm(span = 250, adjust = False).mean().iloc[-1]
 
             return ticker_history_df
         else:

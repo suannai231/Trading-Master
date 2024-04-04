@@ -34,10 +34,6 @@ def screen(df):
     EMA20 = df.iloc[-1].EMA20
     # EMA60
     EMA60 = df.iloc[-1].EMA60
-    # EMA120
-    EMA120 = df.iloc[-1].EMA120
-    # EMA250
-    EMA250 = df.iloc[-1].EMA250
 
     # 60 days max volume
     max_volume_date_60 = df.tail(60).volume.idxmax()
@@ -77,8 +73,8 @@ def screen(df):
 
     flag = close>=P and EMA5>EMA10 and EMA10>EMA20 and close>EMA60 and rate<=15 and turnover_flag and close<10
 
-    if df.iloc[-1].ticker == 'WETG':
-        log("info", "WETG")
+    if df.iloc[-1].ticker == 'MNY':
+        log("info", "MNY")
 
     if flag == True:
         log("info", df.iloc[-1].ticker)
