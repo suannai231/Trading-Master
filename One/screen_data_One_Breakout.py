@@ -75,7 +75,7 @@ def screen(df):
 
     rate = (close-P)/P*100
 
-    flag = close>=P and EMA5>EMA10 and EMA10>EMA20 and close>EMA60 and rate<=15 and turnover_flag
+    flag = close>=P and EMA5>EMA10 and EMA10>EMA20 and close>EMA60 and rate<=15 and turnover_flag and close<10
 
     if df.iloc[-1].ticker == 'WETG':
         log("info", "WETG")
