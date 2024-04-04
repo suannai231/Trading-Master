@@ -73,7 +73,9 @@ def screen(df):
         P = 0
         log("error", "ZeroDivisionError")
 
-    flag = close>=P and close>EMA5 and EMA5>EMA10 and EMA10>EMA20 and close>EMA120 and change and volume_estimated>=volume_yesterday and turnover_flag
+    rate = (close-P)/P*100
+
+    flag = close>=P and EMA5>EMA10 and EMA10>EMA20 and close>EMA60 and rate<=15 and turnover_flag
 
     if df.iloc[-1].ticker == 'WETG':
         log("info", "WETG")
