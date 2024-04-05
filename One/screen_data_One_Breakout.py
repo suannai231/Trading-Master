@@ -11,67 +11,14 @@ import numpy as np
 
 def screen(df):
     close = df.iloc[-1].close
-    volume_10d_avg = df.tail(10).volume.mean()
-    turnover_10d_avg = volume_10d_avg*close
-    turnover_flag = turnover_10d_avg > 800000
-    change = df.iloc[-1].change >=0.01
+    volume = df.iloc[-1].volume
+    turnover = volume*close
+    turnover_flag = turnover > 500000
 
-    volume_today = df.iloc[-1].volume
-    volume_yesterday = df.iloc[-2].volume
+    # P = highest EMA5 in 60 days
+    P = df.EMA5.rolling(window=60).max().max()
 
-    # get current time
-    now = datetime.datetime.now()
-    # get the time rate between now and 8:30am, divide by 6 hours 30 minutes
-    time_rate = (now - now.replace(hour=8, minute=30, second=0, microsecond=0)).total_seconds() / 23400
-    # get the estimated volume of the day
-    volume_estimated = volume_today / time_rate
-
-    # EMA5
-    EMA5 = df.iloc[-1].EMA5
-    # EMA10
-    EMA10 = df.iloc[-1].EMA10
-    # EMA20
-    EMA20 = df.iloc[-1].EMA20
-    # EMA60
-    EMA60 = df.iloc[-1].EMA60
-
-    # 60 days max volume
-    max_volume_date_60 = df.tail(60).volume.idxmax()
-    max_volume_high_60 = df.loc[max_volume_date_60].high
-    max_volume_low_60 = df.loc[max_volume_date_60].low
-    max_volume_60 = df.loc[max_volume_date_60].volume
-    mid_60 = max_volume_low_60 + (max_volume_high_60 - max_volume_low_60) / 2
-
-    # 60 days second max volume
-    max_volume_date_60_2 = df.tail(60).volume.drop(max_volume_date_60).idxmax()
-    max_volume_high_60_2 = df.loc[max_volume_date_60_2].high
-    max_volume_low_60_2 = df.loc[max_volume_date_60_2].low
-    max_volume_60_2 = df.loc[max_volume_date_60_2].volume
-    mid_60_2 = max_volume_low_60_2 + (max_volume_high_60_2 - max_volume_low_60_2) / 2
-
-    # 60 days third max volume
-    max_volume_date_60_3 = df.tail(60).volume.drop([max_volume_date_60, max_volume_date_60_2]).idxmax()
-    max_volume_high_60_3 = df.loc[max_volume_date_60_3].high
-    max_volume_low_60_3 = df.loc[max_volume_date_60_3].low
-    max_volume_60_3 = df.loc[max_volume_date_60_3].volume
-    mid_60_3 = max_volume_low_60_3 + (max_volume_high_60_3 - max_volume_low_60_3) / 2
-
-    # 60 days fourth max volume
-    max_volume_date_60_4 = df.tail(60).volume.drop([max_volume_date_60, max_volume_date_60_2, max_volume_date_60_3]).idxmax()
-    max_volume_high_60_4 = df.loc[max_volume_date_60_4].high
-    max_volume_low_60_4 = df.loc[max_volume_date_60_4].low
-    max_volume_60_4 = df.loc[max_volume_date_60_4].volume
-    mid_60_4 = max_volume_low_60_4 + (max_volume_high_60_4 - max_volume_low_60_4) / 2
-
-    try:
-        P = (mid_60*max_volume_60+mid_60_2*max_volume_60_2+mid_60_3*max_volume_60_3+mid_60_4*max_volume_60_4)/(max_volume_60+max_volume_60_2+max_volume_60_3+max_volume_60_4)
-    except ZeroDivisionError:
-        P = 0
-        log("error", "ZeroDivisionError")
-
-    rate = (close-P)/P*100
-
-    flag = close>=P and EMA5>EMA10 and EMA10>EMA20 and close>EMA60 and rate<=15 and turnover_flag and close<10
+    flag = close>=P and turnover_flag and close<10
 
     if df.iloc[-1].ticker == 'MNY':
         log("info", "MNY")
