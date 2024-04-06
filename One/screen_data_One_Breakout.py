@@ -15,13 +15,14 @@ def screen(df):
     turnover = volume*close
     turnover_flag = turnover > 500000
 
+    EMA5 = df.iloc[-1].EMA5
     # P = highest EMA5 in 60 days
-    P = df.EMA5.rolling(window=60).max().max()
+    P = df.EMA5.rolling(window=60).max()
 
-    flag = close>=P and turnover_flag and close<10
+    flag = EMA5==P and turnover_flag and close<10
 
-    if df.iloc[-1].ticker == 'MNY':
-        log("info", "MNY")
+    if df.iloc[-1].ticker == 'GVH':
+        log("info", df.iloc[-1].ticker)
 
     if flag == True:
         log("info", df.iloc[-1].ticker)
