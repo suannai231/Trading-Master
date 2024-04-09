@@ -20,9 +20,9 @@ def screen(df):
     # P = highest EMA5 in 60 days
     P = df.EMA5.rolling(window=60).max()
 
-    flag = EMA5==P[-1] and turnover_flag and close<10 and change >= 0.05
+    flag = EMA5==P[-1] and turnover_flag and close<20 and change >= 0.05
 
-    if df.iloc[-1].ticker == 'GVH':
+    if df.iloc[-1].ticker == 'EGIO':
         log("info", df.iloc[-1].ticker)
 
     if flag == True:
