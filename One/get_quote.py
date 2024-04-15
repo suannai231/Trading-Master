@@ -26,6 +26,8 @@ def convert_to_num(s):
         raise ValueError("Input string must end with 'M', 'B', or 'T'")
 
 def get_quote_data(ticker):
+    if ticker=="FREY":
+        log("info",ticker)
     def get_marketCap_yahoo(ticker):
         url = f"https://finance.yahoo.com/quote/{ticker}"
         headers = {
@@ -72,8 +74,7 @@ def get_quote_data(ticker):
         marketCap = get_marketCap_yahoo(ticker)
         if marketCap==-2:
             return pd.DataFrame()
-    if ticker=="YOSH":
-        log("info",ticker)
+
     d={'ticker':[ticker],'marketCap':[marketCap],'regularMarketPreviousClose':[regularMarketPreviousClose]}
     df = pd.DataFrame(d)
     df = df.set_index('ticker')

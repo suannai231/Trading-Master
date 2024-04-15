@@ -34,7 +34,7 @@ def screen(df):
 
     flag = close >= Y and ((close <= P5 and close >= P20) or (open <= P5 and open >= P20) or (low <= P5 and low >= P20) or (high <= P5 and high >= P20)) and turnover_flag
 
-    if df.iloc[-1].ticker == 'ADIL':
+    if df.iloc[-1].ticker == 'FREY':
         log("info", df.iloc[-1].ticker)
 
     if flag == True:

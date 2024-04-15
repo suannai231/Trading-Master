@@ -174,12 +174,12 @@ def get_stock_realtime(ticker):
             return -1
         else:
             return pd.DataFrame()
-    if ticker=="SOPH":
+    if ticker=="FREY":
         log("info",ticker)
     return df
 
 def get_stock_history(ticker):
-    if ticker=="EH":
+    if ticker=="FREY":
         log("debug",ticker)
     df = pd.DataFrame()
     try:
@@ -271,7 +271,7 @@ def log(type,string):
 
 if __name__ == '__main__':
     path = '//jack-nas.home/Work/Python/RawData/'
-    quote_data_path = '//jack-nas.home/Work/Python/QuoteData/'
+    # quote_data_path = '//jack-nas.home/Work/Python/QuoteData/'
     isPathExists = os.path.exists(path)
     if not isPathExists:
         os.makedirs(path)
@@ -286,28 +286,42 @@ if __name__ == '__main__':
             
     log('info','collect process started.')
 
+    # nasdaq = []
+    # other = []
+    # tickers = []
+
+    # quote_data_files = os.listdir(quote_data_path)
+
+    # Sort the files by modification time
+    # quote_data_files.sort(key=lambda x: os.path.getmtime(os.path.join(quote_data_path, x)))
+
+    # while len(quote_data_files) == 0:
+    #     time.sleep(10)
+    #     quote_data_files = os.listdir(quote_data_path)
+    # log('info',"processing "+quote_data_files[-1])
+    # try:
+    #     time.sleep(1)
+    #     quote_data_df = pd.read_feather(quote_data_path + quote_data_files[-1])
+    #     log('info',quote_data_path + quote_data_files[-1]+" loaded.")
+    # except Exception as e:
+    #     log('critical',str(e))
+    #     sys.exit()
+
+    # tickers = quote_data_df[(quote_data_df.marketCap>=marketCapMin) & (quote_data_df.marketCap<=marketCapMax) & (quote_data_df.regularMarketPreviousClose>=regularMarketPreviousCloseMin)].ticker.values
+
     nasdaq = []
     other = []
     tickers = []
 
-    quote_data_files = os.listdir(quote_data_path)
-
-    # Sort the files by modification time
-    quote_data_files.sort(key=lambda x: os.path.getmtime(os.path.join(quote_data_path, x)))
-
-    while len(quote_data_files) == 0:
-        time.sleep(10)
-        quote_data_files = os.listdir(quote_data_path)
-    log('info',"processing "+quote_data_files[-1])
-    try:
-        time.sleep(1)
-        quote_data_df = pd.read_feather(quote_data_path + quote_data_files[-1])
-        log('info',quote_data_path + quote_data_files[-1]+" loaded.")
-    except Exception as e:
-        log('critical',str(e))
-        sys.exit()
-
-    tickers = quote_data_df[(quote_data_df.marketCap>=marketCapMin) & (quote_data_df.marketCap<=marketCapMax) & (quote_data_df.regularMarketPreviousClose>=regularMarketPreviousCloseMin)].ticker.values
+    while((len(nasdaq)==0) or (len(other)==0)):
+        try:
+            nasdaq = si.tickers_nasdaq()
+            other = si.tickers_other()
+        except Exception as e:
+            log('critical','get tickers exception:'+str(e))
+            continue
+        tickers = nasdaq + other
+        tickers = [string for string in tickers if len(string) != 5]
 
     cores = int(multiprocessing.cpu_count())
     ticker_chunk_list = list(chunks(tickers,math.ceil(len(tickers)/(cores))))
