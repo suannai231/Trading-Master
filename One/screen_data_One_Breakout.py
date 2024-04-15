@@ -11,18 +11,30 @@ import numpy as np
 
 def screen(df):
     close = df.iloc[-1].close
+    open = df.iloc[-1].open
+    high = df.iloc[-1].high
+    low = df.iloc[-1].low
     volume = df.iloc[-1].volume
     turnover = volume*close
     turnover_flag = turnover > 500000
     change = df.iloc[-1].change
 
     EMA5 = df.iloc[-1].EMA5
-    # P = highest EMA5 in 60 days
-    P = df.EMA5.rolling(window=60).max()
 
-    flag = EMA5==P[-1] and turnover_flag and close<20 and change >= 0.05
+    #
 
-    if df.iloc[-1].ticker == 'EGIO':
+    # P5 = highest EMA5 in df.tail(60)
+    P5 = df.tail(60).EMA5.max()
+    # P20 = highest EMA20 in df.tail(60)
+    P20 = df.tail(60).EMA20.max()
+    # Y = The close price of the date which has max volume from df.tail(60)
+    Y = df.tail(60).sort_values(by='volume',ascending=False).iloc[0].close
+
+    # FLAG:= C>=Y AND ((C<=P5 AND C>=P20) OR (O<=P5 AND O>=P20) OR (L<=P5 AND L>=P20) OR (H<=P5 AND H>=P20))
+
+    flag = close >= Y and ((close <= P5 and close >= P20) or (open <= P5 and open >= P20) or (low <= P5 and low >= P20) or (high <= P5 and high >= P20)) and turnover_flag
+
+    if df.iloc[-1].ticker == 'ADIL':
         log("info", df.iloc[-1].ticker)
 
     if flag == True:
